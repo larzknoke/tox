@@ -1,0 +1,366 @@
+"use client";
+
+import {
+  Calendar,
+  Coins,
+  Users,
+  MessageCircleQuestionMark,
+  Settings,
+  Ticket,
+  UserStar,
+  FileSpreadsheet,
+  CakeSlice,
+  User,
+  UserCog,
+  Car,
+  ShoppingBasket,
+  HouseIcon,
+  ShoppingBag,
+} from "lucide-react";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarHeader,
+  SidebarFooter,
+} from "@/components/ui/sidebar";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+
+import { ChevronUp, User2 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { hasRole } from "@/lib/roles";
+
+// Menu items.
+const items = [
+  {
+    title: "Abrechnung",
+    url: "/abrechnung",
+    icon: Coins,
+  },
+  {
+    title: "Trainer",
+    url: "/trainer",
+    icon: UserStar,
+  },
+  {
+    title: "Teams",
+    url: "/team",
+    icon: Users,
+  },
+  {
+    title: "Spieler",
+    url: "/player",
+    icon: User,
+  },
+  {
+    title: "Fahrkosten (in Arbeit)",
+    url: "/fahrtkosten",
+    icon: Car,
+  },
+  {
+    title: "Verkauf",
+    url: "#",
+    icon: CakeSlice,
+    disabled: true,
+  },
+  {
+    title: "Protokolle",
+    url: "#",
+    icon: FileSpreadsheet,
+    disabled: true,
+  },
+];
+
+const shopItems = [
+  {
+    title: "Home",
+    url: "/",
+    icon: HouseIcon,
+  },
+  {
+    title: "Shop",
+    url: "/shop",
+    icon: Ticket,
+  },
+];
+
+const userItems = [
+  {
+    title: "My Account",
+    url: "/account",
+    icon: User,
+  },
+  {
+    title: "My Orders",
+    url: "/account/orders",
+    icon: ShoppingBag,
+  },
+  {
+    title: "Support",
+    url: "/support",
+    icon: MessageCircleQuestionMark,
+    disabled: true,
+  },
+];
+
+export function AppSidebar() {
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+
+  const handleLogout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/signin");
+        },
+      },
+    });
+  };
+
+  const getUserInitials = (name) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const isAdmin = session && hasRole(session, "admin");
+
+  return (
+    <Sidebar collapsible="offcanvas">
+      <SidebarHeader>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="data-[slot=sidebar-menu-button]:!p-1.5"
+            >
+              <a href="/">
+                {/* <IconInnerShadowTop className="!size-5" /> */}
+                <Ticket />
+                <span className="text-base font-semibold">TOX</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {shopItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a
+                      href={item.url}
+                      className={
+                        item.disabled ? "pointer-events-none opacity-30" : ""
+                      }
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {userItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <a
+                      href={item.url}
+                      className={
+                        item.disabled ? "pointer-events-none opacity-30" : ""
+                      }
+                    >
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        {/* <SidebarGroup>
+          <SidebarGroupLabel>Formulare</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items
+                .filter((item) =>
+                  ["Abrechnung", "Fahrkosten (in Arbeit)"].includes(item.title),
+                )
+                .map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href={item.url}
+                        className={
+                          item.disabled ? "pointer-events-none opacity-30" : ""
+                        }
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Mannschaften & Co</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items
+                .filter((item) =>
+                  ["Trainer", "Teams", "Spieler"].includes(item.title),
+                )
+                .map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href={item.url}
+                        className={
+                          item.disabled ? "pointer-events-none opacity-30" : ""
+                        }
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Weitere</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {items
+                .filter(
+                  (item) =>
+                    ![
+                      "Abrechnung",
+                      "Fahrkosten (in Arbeit)",
+                      "Trainer",
+                      "Teams",
+                      "Spieler",
+                    ].includes(item.title),
+                )
+                .map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <a
+                        href={item.url}
+                        className={
+                          item.disabled ? "pointer-events-none opacity-30" : ""
+                        }
+                      >
+                        <item.icon />
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup> */}
+      </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          {isAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="/user">
+                  <UserCog />
+                  <span>User Management</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          <SidebarMenuItem>
+            {isPending ? (
+              <SidebarMenuButton variant="default" size="lg" disabled>
+                <div className="flex items-center gap-2">
+                  <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+                  <div className="flex flex-col gap-1">
+                    <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+                    <div className="h-3 w-32 bg-muted rounded animate-pulse" />
+                  </div>
+                </div>
+              </SidebarMenuButton>
+            ) : session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton variant="default" size="lg">
+                    <Avatar>
+                      <AvatarImage
+                        src={session.user.image || ""}
+                        alt={session.user.name || "User"}
+                      />
+                      <AvatarFallback>
+                        {getUserInitials(session.user.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex flex-col items-start gap-0">
+                      <span>{session.user.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {session.user.email}
+                      </span>
+                    </div>
+                    <ChevronUp className="ml-auto" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  className="w-[--radix-popper-anchor-width]"
+                >
+                  <DropdownMenuItem asChild>
+                    <a href="/account">Konto</a>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <SidebarMenuButton asChild variant="default" size="lg">
+                <a href="/signin">
+                  <User2 />
+                  <span>Anmelden</span>
+                </a>
+              </SidebarMenuButton>
+            )}
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </Sidebar>
+  );
+}

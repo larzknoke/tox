@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bill {
+  id         Int         @id @default(autoincrement())
+  trainerId  Int
+  teamId     Int
+  userId     String
+  iban       String?
+  quarter    Int
+  year       Int
+  hourlyRate Float?
+  totalCost  Float
+  status     String      @default("draft")
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  team       Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  trainer    Trainer     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  events     BillEvent[]
+
+  @@unique([trainerId, teamId, quarter, year])
+}
+
+model BillEvent {
+  id            Int      @id @default(autoincrement())
+  billId        Int
+  location      String
+  startDate     DateTime
+  endDate       DateTime
+  durationHours Float
+  hourlyRate    Float?
+  cost          Float
+  canceled      Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  bill          Bill     @relation(fields: [billId], references: [id], onDelete: Cascade)
+
+  @@index([billId, startDate])
+}
+
+model Player {
+  id          Int                  @id @default(autoincrement())
+  name        String
+  birthday    DateTime?
+  gender      String?
+  stammverein String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+  playerTeams PlayerTeamRelation[]
+}
+
+model PlayerTeamRelation {
+  id        Int      @id @default(autoincrement())
+  playerId  Int
+  teamId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  player    Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, teamId])
+}
+
+model Team {
+  id           Int                   @id @default(autoincrement())
+  name         String
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  bills        Bill[]
+  playerTeams  PlayerTeamRelation[]
+  trainerTeams TrainerTeamRelation[]
+
+  travelReports TravelReport[]
+}
+
+model Trainer {
+  id           Int                   @id @default(autoincrement())
+  name         String
+  createdAt    DateTime              @default(now())
+  updatedAt    DateTime              @updatedAt
+  stammverein  String?
+  licenseType  String?
+  Bill         Bill[]
+  trainerTeams TrainerTeamRelation[]
+
+  users User[]
+}
+
+model TrainerTeamRelation {
+  id        Int      @id @default(autoincrement())
+  trainerId Int
+  teamId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  trainer   Trainer  @relation(fields: [trainerId], references: [id], onDelete: Cascade)
+
+  @@unique([trainerId, teamId])
+}
+
+model User {
+  id            String         @id
+  name          String
+  email         String
+  emailVerified Boolean        @default(false)
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  role          String?
+  banned        Boolean?       @default(false)
+  banReason     String?
+  banExpires    DateTime?
+  sessions      Session[]
+  accounts      Account[]
+  bills         Bill[]
+  trainerId     Int?
+  trainer       Trainer?       @relation(fields: [trainerId], references: [id], onDelete: SetNull)
+  travelReports TravelReport[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id             String   @id
+  expiresAt      DateTime
+  token          String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  ipAddress      String?
+  userAgent      String?
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+model TravelReport {
+  id          Int       @id @default(autoincrement())
+  travelDate  DateTime
+  reason      String?
+  destination String
+  distance    Float
+  teamId      Int
+  userId      String
+  totalCost   Float
+  status      String    @default("unpaid")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicles    Vehicle[]
+
+  @@index([teamId, travelDate])
+}
+
+model Vehicle {
+  id             Int          @id @default(autoincrement())
+  travelReportId Int
+  driver         String?
+  distance       Float
+  cost           Float
+  noCharge       Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  travelReport   TravelReport @relation(fields: [travelReportId], references: [id], onDelete: Cascade)
+
+  @@index([travelReportId])
+}
