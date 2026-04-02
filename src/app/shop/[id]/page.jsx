@@ -4,8 +4,9 @@ import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Package, ArrowLeft, ShoppingCart } from "lucide-react";
+import { Package, ArrowLeft } from "lucide-react";
 import prisma from "@/lib/prisma";
+import AddToCartForm from "./AddToCartForm";
 
 export default async function ProductDetailPage({ params }) {
   const { id } = await params;
@@ -89,10 +90,7 @@ export default async function ProductDetailPage({ params }) {
               excl. VAT
             </p>
           </div>
-          <Button size="lg" className="gap-2" disabled>
-            <ShoppingCart className="h-4 w-4" />
-            Add to Cart
-          </Button>
+          <AddToCartForm product={product} />
         </div>
       </div>
     </div>

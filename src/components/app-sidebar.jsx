@@ -46,6 +46,7 @@ import { ChevronUp, User2 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { hasRole } from "@/lib/roles";
+import { useCart } from "@/lib/cart-context";
 
 // Menu items.
 const items = [
@@ -146,8 +147,7 @@ export function AppSidebar() {
 
   const isAdmin = session && hasRole(session, "ADMIN");
 
-  // TODO: replace with real cart state
-  const cartCount = 3;
+  const { cartCount } = useCart();
 
   return (
     <Sidebar collapsible="offcanvas">
