@@ -12,7 +12,10 @@ const schema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   pricePerPack: z.coerce.number().positive("Price must be positive"),
-  quantityPerPack: z.coerce.int().positive("Quantity must be positive"),
+  quantityPerPack: z.coerce
+    .number()
+    .int()
+    .positive("Quantity must be positive"),
   isActive: z.boolean(),
 });
 

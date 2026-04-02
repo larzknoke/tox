@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
 import {
@@ -12,37 +10,25 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
+import prisma from "@/lib/prisma";
 
-const DUMMY_PRODUCTS = [
-  {
-    id: "bofbsm",
-    reference: "BOFBSM",
-    name: "BOCA WITHOUT CUTTER PRE-PERFORATED",
-    description:
-      "Pre-perforated thermal ticket roll for BOCA printers, without cutter. Compatible with standard box-office configurations.",
-    pricePerPack: 42.5,
-    quantityPerPack: 1000,
-    isActive: true,
-  },
-  {
-    id: "iepram",
-    reference: "IEPRAM",
-    name: "IER MIXED PRE-PERFORATED",
-    description:
-      "Mixed pre-perforated thermal ticket roll for IER printers. Suitable for all mixed ticketing environments.",
-    pricePerPack: 38.0,
-    quantityPerPack: 1000,
-    isActive: true,
-  },
-];
-
-export default function ShopPage() {
+export default async function ShopPage() {
+  const raw = await prisma.product.findMany({
+    where: { isActive: true },
+    orderBy: { reference: "asc" },
+  });
+  const products = raw.map((p) => ({
+    ...p,
+    pricePerPack: Number(p.pricePerPack),
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+  }));
   return (
     <div className="flex flex-col gap-6 w-full">
       <PageHeader title="Shop" />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {DUMMY_PRODUCTS.map((product) => (
+        {products.map((product) => (
           <Link
             key={product.id}
             href={`/shop/${product.id}`}

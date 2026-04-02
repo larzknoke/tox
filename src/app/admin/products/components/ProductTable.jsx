@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { toast } from "sonner";
 import {
   Table,
@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -51,7 +52,7 @@ function ProductFormDialog({ open, onOpenChange, initial, onSave, isPending }) {
   const isEdit = !!initial?.id;
 
   // Reset form when dialog opens with new initial value
-  useState(() => {
+  useEffect(() => {
     setForm(initial ?? EMPTY_FORM);
   }, [initial]);
 
@@ -119,12 +120,13 @@ function ProductFormDialog({ open, onOpenChange, initial, onSave, isPending }) {
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="description">Description</Label>
-            <Input
+            <Textarea
               id="description"
               placeholder="Short product description"
               value={form.description}
               onChange={(e) => set("description", e.target.value)}
               disabled={isPending}
+              rows={3}
             />
           </div>
           <div className="grid grid-cols-2 gap-4 items-end">
@@ -279,7 +281,7 @@ export default function ProductTable({ products }) {
                 </TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell className="text-muted-foreground">
-                  {product.description ?? "—"}
+                  {product.description?.slice(0, 50) + "..." ?? "—"}
                 </TableCell>
                 <TableCell className="text-right">
                   €{Number(product.pricePerPack).toFixed(2)}

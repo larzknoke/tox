@@ -1,6 +1,3 @@
-"use client";
-
-import { use } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { PageHeader } from "@/components/page-header";
@@ -8,51 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Package, ArrowLeft, ShoppingCart } from "lucide-react";
+import prisma from "@/lib/prisma";
 
-const DUMMY_PRODUCTS = [
-  {
-    id: "bofbsm",
-    reference: "BOFBSM",
-    name: "BOCA WITHOUT CUTTER PRE-PERFORATED",
-    description:
-      "Pre-perforated thermal ticket roll for BOCA printers, without cutter. Compatible with standard box-office configurations.",
-    pricePerPack: 42.5,
-    quantityPerPack: 1000,
-    isActive: true,
-    details: [
-      { label: "Reference", value: "BOFBSM" },
-      { label: "Quantity per pack", value: "1,000 tickets" },
-      { label: "Price per pack (excl. VAT)", value: "€42.50" },
-      { label: "Printer compatibility", value: "BOCA" },
-      { label: "Perforation", value: "Pre-perforated" },
-      { label: "Cutter", value: "No" },
-    ],
-  },
-  {
-    id: "iepram",
-    reference: "IEPRAM",
-    name: "IER MIXED PRE-PERFORATED",
-    description:
-      "Mixed pre-perforated thermal ticket roll for IER printers. Suitable for all mixed ticketing environments.",
-    pricePerPack: 38.0,
-    quantityPerPack: 1000,
-    isActive: true,
-    details: [
-      { label: "Reference", value: "IEPRAM" },
-      { label: "Quantity per pack", value: "1,000 tickets" },
-      { label: "Price per pack (excl. VAT)", value: "€38.00" },
-      { label: "Printer compatibility", value: "IER" },
-      { label: "Perforation", value: "Pre-perforated" },
-      { label: "Type", value: "Mixed" },
-    ],
-  },
-];
+export default async function ProductDetailPage({ params }) {
+  const { id } = await params;
+  const raw = await prisma.product.findUnique({ where: { id } });
 
-export default function ProductDetailPage({ params }) {
-  const { id } = use(params);
-  const product = DUMMY_PRODUCTS.find((p) => p.id === id);
+  if (!raw) notFound();
 
-  if (!product) notFound();
+  const product = {
+    ...raw,
+    pricePerPack: Number(raw.pricePerPack),
+  };
+
+  const details = [
+    { label: "Reference", value: product.reference },
+    {
+      label: "Quantity per pack",
+      value: `${product.quantityPerPack.toLocaleString()} tickets`,
+    },
+    {
+      label: "Price per pack (excl. VAT)",
+      value: `€${product.pricePerPack.toFixed(2)}`,
+    },
+  ];
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -93,7 +69,7 @@ export default function ProductDetailPage({ params }) {
         <Separator className="mb-6" />
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-3 mb-8">
-          {product.details.map(({ label, value }) => (
+          {details.map(({ label, value }) => (
             <div key={label}>
               <p className="text-xs text-muted-foreground">{label}</p>
               <p className="text-sm font-medium">{value}</p>

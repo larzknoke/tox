@@ -15,7 +15,13 @@ async function ProductsContent() {
   const session = await requireSession();
   if (!hasRole(session, "ADMIN")) redirect("/");
 
-  const products = await getProducts();
+  const raw = await getProducts();
+  const products = raw.map((p) => ({
+    ...p,
+    pricePerPack: Number(p.pricePerPack),
+    createdAt: p.createdAt.toISOString(),
+    updatedAt: p.updatedAt.toISOString(),
+  }));
 
   return (
     <div className="flex flex-col gap-6">
