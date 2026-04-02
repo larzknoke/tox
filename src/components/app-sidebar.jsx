@@ -16,6 +16,7 @@ import {
   ShoppingBasket,
   HouseIcon,
   ShoppingBag,
+  ShoppingCart,
 } from "lucide-react";
 
 import {
@@ -144,6 +145,9 @@ export function AppSidebar() {
 
   const isAdmin = session && hasRole(session, "admin");
 
+  // TODO: replace with real cart state
+  const cartCount = 3;
+
   return (
     <Sidebar collapsible="offcanvas">
       <SidebarHeader>
@@ -154,7 +158,6 @@ export function AppSidebar() {
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
               <a href="/">
-                {/* <IconInnerShadowTop className="!size-5" /> */}
                 <Ticket />
                 <span className="text-base font-semibold">TOX</span>
               </a>
@@ -163,6 +166,28 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
+        <SidebarGroup>
+          {/* <SidebarGroupLabel>Shop</SidebarGroupLabel> */}
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <a href="/cart" aria-label={`Cart (${cartCount} Products)`}>
+                    <div className="relative">
+                      <ShoppingCart className="h-4 w-4" />
+                      {cartCount > 0 && (
+                        <span className="absolute -right-1.5 -top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground leading-none">
+                          {cartCount > 99 ? "99+" : cartCount}
+                        </span>
+                      )}
+                    </div>
+                    <span>Shopping-Cart</span>
+                  </a>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>

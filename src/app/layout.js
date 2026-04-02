@@ -24,8 +24,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "tox | HSG-Solling-Handball",
-  description: "Handball im Solling",
+  title: "tox | France Billet Ticket Order Extranet",
+  description: "France Billet Ticket Order Extranet",
   icons: {
     icon: "/favicon.ico",
   },

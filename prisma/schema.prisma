@@ -23,7 +23,6 @@ model Bill {
   updatedAt  DateTime    @updatedAt
   team       Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
   trainer    Trainer     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   events     BillEvent[]
 
   @@unique([trainerId, teamId, quarter, year])
@@ -90,8 +89,6 @@ model Trainer {
   licenseType  String?
   Bill         Bill[]
   trainerTeams TrainerTeamRelation[]
-
-  users User[]
 }
 
 model TrainerTeamRelation {
@@ -107,26 +104,47 @@ model TrainerTeamRelation {
 }
 
 model User {
-  id            String         @id
-  name          String
-  email         String
-  emailVerified Boolean        @default(false)
+  id    String   @id @default(cuid())
+  name  String?
+  email String   @unique
+  role  UserRole @default(CUSTOMER)
+
+  // Next-Auth compatible core fields
+  emailVerified Boolean   @default(false)
   image         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  role          String?
-  banned        Boolean?       @default(false)
-  banReason     String?
-  banExpires    DateTime?
   sessions      Session[]
   accounts      Account[]
-  bills         Bill[]
-  trainerId     Int?
-  trainer       Trainer?       @relation(fields: [trainerId], references: [id], onDelete: SetNull)
-  travelReports TravelReport[]
 
-  @@unique([email])
-  @@map("user")
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+
+  // GDPR consent
+  gdprConsent     Boolean   @default(false)
+  gdprConsentedAt DateTime?
+
+  // Password reset
+  resetToken          String?
+  resetTokenExpiresAt DateTime?
+
+  billingAddress   Address? @relation("BillingAddress", fields: [billingAddressId], references: [id])
+  billingAddressId String?  @unique
+
+  deliveryAddress   Address? @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
+  deliveryAddressId String?  @unique
+
+  orders         Order[]
+  supportTickets SupportTicket[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
 }
 
 model Session {
@@ -191,7 +209,6 @@ model TravelReport {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   vehicles    Vehicle[]
 
   @@index([teamId, travelDate])
@@ -209,4 +226,173 @@ model Vehicle {
   travelReport   TravelReport @relation(fields: [travelReportId], references: [id], onDelete: Cascade)
 
   @@index([travelReportId])
+}
+
+model Address {
+  id String @id @default(cuid())
+
+  firstName  String
+  lastName   String
+  company    String
+  address1   String
+  address2   String?
+  postalCode String
+  city       String
+  country    String
+  phone      String
+
+  userBilling  User? @relation("BillingAddress")
+  userDelivery User? @relation("DeliveryAddress")
+
+  orderBilling  Order[] @relation("OrderBillingSnapshot")
+  orderDelivery Order[] @relation("OrderDeliverySnapshot")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("addresses")
+}
+
+model Product {
+  id              String  @id @default(cuid())
+  reference       String  @unique
+  nameFr          String
+  nameEn          String
+  pricePerPack    Decimal @db.Decimal(10, 2)
+  quantityPerPack Int
+  isActive        Boolean @default(true)
+
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("products")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique @default(cuid())
+  name        String
+  status      OrderStatus @default(PENDING)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  billingAddressId String
+  billingAddress   Address @relation("OrderBillingSnapshot", fields: [billingAddressId], references: [id])
+
+  deliveryAddressId String
+  deliveryAddress   Address @relation("OrderDeliverySnapshot", fields: [deliveryAddressId], references: [id])
+
+  items   OrderItem[]
+  invoice Invoice?
+
+  confirmationEmailSentAt DateTime?
+  invoiceEmailSentAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("orders")
+}
+
+enum OrderStatus {
+  PENDING
+  VALIDATED
+  PROCESSING
+  SHIPPED
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  reference       String
+  designation     String
+  quantityPerPack Int
+  numberOfPacks   Int
+  pricePerPack    Decimal @db.Decimal(10, 2)
+  totalPrice      Decimal @db.Decimal(10, 2)
+
+  @@map("order_items")
+}
+
+model Invoice {
+  id            String @id @default(cuid())
+  invoiceNumber String @unique
+  orderId       String @unique
+  order         Order  @relation(fields: [orderId], references: [id])
+
+  totalAmount Decimal  @db.Decimal(10, 2)
+  currency    String   @default("EUR")
+  invoiceDate DateTime
+  pdfUrl      String?
+
+  sentAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("invoices")
+}
+
+model SupportTicket {
+  id     String  @id @default(cuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  name        String
+  email       String
+  phone       String
+  subject     String
+  type        SupportTicketType
+  description String              @db.Text
+  attachments SupportAttachment[]
+
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("support_tickets")
+}
+
+enum SupportTicketType {
+  NON_RECEIPT_OF_PARCEL
+  DELAYED_DELIVERY
+  LOST_PARCEL
+  BILLING_ERROR
+  MISSING_ITEM
+  DAMAGED_ITEM
+  PARTIAL_DELIVERY
+  RETURN_REQUEST
+  DELIVERY_TRACKING
+  SITE_ACCESS
+  ORDER_VERIFICATION
+  DOCUMENT_REQUEST
+  ACCOUNT_CREATION
+  ACCOUNT_UPDATE
+  STOCK_VERIFICATION
+  IT_INCIDENT
+  ORDER_CANCELLATION
+  REPLENISHMENT_ISSUE
+}
+
+model SupportAttachment {
+  id              String        @id @default(cuid())
+  supportTicketId String
+  supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [id], onDelete: Cascade)
+
+  filename  String
+  url       String
+  mimeType  String?
+  sizeBytes Int?
+
+  createdAt DateTime @default(now())
+
+  @@map("support_attachments")
 }

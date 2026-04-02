@@ -37,7 +37,7 @@ export default function SignUpPage() {
 
     // Check if passwords match
     if (formData.password !== formData.confirmPassword) {
-      const message = "Passwörter stimmen nicht überein";
+      const message = "Passwords do not match";
       setError(message);
       toast.error(message);
       setLoading(false);
@@ -59,13 +59,11 @@ export default function SignUpPage() {
           onSuccess: () => {
             setVerificationSent(true);
             setLoading(false);
-            toast.success(
-              "Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails.",
-            );
+            toast.success("Registration successful! Please check your inbox.");
           },
           onError: (ctx) => {
             console.log("Sign-up error context:", ctx);
-            const message = ctx?.error?.message || "Ein Fehler ist aufgetreten";
+            const message = ctx?.error?.message || "An error occurred";
             setError(message);
             toast.error(message);
             setLoading(false);
@@ -73,7 +71,7 @@ export default function SignUpPage() {
         },
       );
     } catch (err) {
-      const message = err?.message || "Ein unerwarteter Fehler ist aufgetreten";
+      const message = err?.message || "An unexpected error occurred";
       setError(message);
       toast.error(message);
       setLoading(false);
@@ -89,32 +87,30 @@ export default function SignUpPage() {
               <Ticket className="h-12 w-12 text-primary" />
             </div>
             <CardTitle className="text-2xl text-center">
-              E-Mail-Verifizierung
+              Email Verification
             </CardTitle>
             <CardDescription className="text-center">
-              Überprüfen Sie Ihr Postfach
+              Check your inbox
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
               <p className="text-sm text-blue-900 text-center">
-                Wir haben Ihnen eine E-Mail mit einem Bestätigungslink an{" "}
-                <strong>{formData.email}</strong> gesendet.
+                We sent a confirmation link to <strong>{formData.email}</strong>
+                .
               </p>
               <p className="text-sm text-blue-900 text-center mt-2">
-                Bitte klicken Sie auf den Link in der E-Mail, um Ihr Konto zu
-                aktivieren.
+                Please click the link in the email to activate your account.
               </p>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Haben Sie die E-Mail nicht erhalten? Überprüfen Sie bitte auch
-              Ihren Spam-Ordner.
+              Didn't receive the email? Please also check your spam folder.
             </p>
           </CardContent>
           <CardFooter>
             <Link href="/signin" className="w-full">
               <Button variant="outline" className="w-full">
-                Zurück zur Anmeldung
+                Back to Sign In
               </Button>
             </Link>
           </CardFooter>
@@ -130,11 +126,9 @@ export default function SignUpPage() {
           <div className="flex items-center justify-center">
             <Ticket className="h-12 w-12 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-center">
-            Konto erstellen
-          </CardTitle>
+          <CardTitle className="text-2xl text-center">Create Account</CardTitle>
           <CardDescription className="text-center">
-            Geben Sie Ihre Daten ein, um Ihr tox-Konto zu erstellen
+            Enter your details to create your tox account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -149,7 +143,7 @@ export default function SignUpPage() {
               <Input
                 id="name"
                 type="text"
-                placeholder="Max Mustermann"
+                placeholder="John Doe"
                 value={formData.name}
                 onChange={(e) =>
                   setFormData({ ...formData, name: e.target.value })
@@ -159,11 +153,11 @@ export default function SignUpPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">E-Mail</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="mustermann@domain.de"
+                placeholder="john@example.com"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -173,7 +167,7 @@ export default function SignUpPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Passwort</Label>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -187,11 +181,11 @@ export default function SignUpPage() {
                 disabled={loading}
               />
               <p className="text-xs text-muted-foreground mb-4">
-                Passwort muss mindestens 8 Zeichen lang sein
+                Password must be at least 8 characters long
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -208,12 +202,12 @@ export default function SignUpPage() {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 mt-5">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Konto wird erstellt..." : "Registrieren"}
+              {loading ? "Creating account..." : "Sign Up"}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Bereits ein Konto?{" "}
+              Already have an account?{" "}
               <Link href="/signin" className="text-primary hover:underline">
-                Anmelden
+                Sign In
               </Link>
             </p>
           </CardFooter>

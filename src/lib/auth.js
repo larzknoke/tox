@@ -50,9 +50,9 @@ export const auth = betterAuth({
   },
   plugins: [
     admin({
-      roles: ["admin", "kassenwart", "trainer"],
-      defaultRole: "trainer",
-      adminRole: "admin",
+      roles: ["ADMIN", "CUSTOMER"],
+      defaultRole: "CUSTOMER",
+      adminRole: "ADMIN",
     }),
   ],
   databaseHooks: {
@@ -67,7 +67,7 @@ export const auth = betterAuth({
           } catch (error) {
             console.error(
               "Error sending admin notification for new signup:",
-              error
+              error,
             );
             // Don't throw - we don't want to fail the signup if email fails
           }
