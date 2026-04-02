@@ -13,6 +13,7 @@ import {
   User,
   UserCog,
   Car,
+  PackageSearch,
   ShoppingBasket,
   HouseIcon,
   ShoppingBag,
@@ -143,7 +144,7 @@ export function AppSidebar() {
       .slice(0, 2);
   };
 
-  const isAdmin = session && hasRole(session, "admin");
+  const isAdmin = session && hasRole(session, "ADMIN");
 
   // TODO: replace with real cart state
   const cartCount = 3;
@@ -155,7 +156,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <a href="/">
                 <Ticket />
@@ -232,91 +233,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        {/* <SidebarGroup>
-          <SidebarGroupLabel>Formulare</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items
-                .filter((item) =>
-                  ["Abrechnung", "Fahrkosten (in Arbeit)"].includes(item.title),
-                )
-                .map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href={item.url}
-                        className={
-                          item.disabled ? "pointer-events-none opacity-30" : ""
-                        }
-                      >
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Mannschaften & Co</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items
-                .filter((item) =>
-                  ["Trainer", "Teams", "Spieler"].includes(item.title),
-                )
-                .map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href={item.url}
-                        className={
-                          item.disabled ? "pointer-events-none opacity-30" : ""
-                        }
-                      >
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Weitere</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {items
-                .filter(
-                  (item) =>
-                    ![
-                      "Abrechnung",
-                      "Fahrkosten (in Arbeit)",
-                      "Trainer",
-                      "Teams",
-                      "Spieler",
-                    ].includes(item.title),
-                )
-                .map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <a
-                        href={item.url}
-                        className={
-                          item.disabled ? "pointer-events-none opacity-30" : ""
-                        }
-                      >
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup> */}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
@@ -326,6 +242,16 @@ export function AppSidebar() {
                 <a href="/user">
                   <UserCog />
                   <span>User Management</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          {isAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="/admin/products">
+                  <PackageSearch />
+                  <span>Product Management</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>

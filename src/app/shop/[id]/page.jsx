@@ -13,13 +13,12 @@ const DUMMY_PRODUCTS = [
   {
     id: "bofbsm",
     reference: "BOFBSM",
-    nameFr: "BOCA SANS MASSICOT PRÉ PERFORÉ",
-    nameEn: "BOCA WITHOUT CUTTER PRE-PERFORATED",
+    name: "BOCA WITHOUT CUTTER PRE-PERFORATED",
+    description:
+      "Pre-perforated thermal ticket roll for BOCA printers, without cutter. Compatible with standard box-office configurations.",
     pricePerPack: 42.5,
     quantityPerPack: 1000,
     isActive: true,
-    description:
-      "Pre-perforated thermal ticket roll for BOCA printers, without cutter. Compatible with standard box-office configurations.",
     details: [
       { label: "Reference", value: "BOFBSM" },
       { label: "Quantity per pack", value: "1,000 tickets" },
@@ -32,13 +31,12 @@ const DUMMY_PRODUCTS = [
   {
     id: "iepram",
     reference: "IEPRAM",
-    nameFr: "MIXTE IER PRÉ PERFORÉ",
-    nameEn: "IER MIXED PRE-PERFORATED",
+    name: "IER MIXED PRE-PERFORATED",
+    description:
+      "Mixed pre-perforated thermal ticket roll for IER printers. Suitable for all mixed ticketing environments.",
     pricePerPack: 38.0,
     quantityPerPack: 1000,
     isActive: true,
-    description:
-      "Mixed pre-perforated thermal ticket roll for IER printers. Suitable for all mixed ticketing environments.",
     details: [
       { label: "Reference", value: "IEPRAM" },
       { label: "Quantity per pack", value: "1,000 tickets" },
@@ -83,11 +81,8 @@ export default function ProductDetailPage({ params }) {
               </Badge>
             </div>
             <h2 className="text-xl font-semibold leading-tight">
-              {product.nameEn}
+              {product.name}
             </h2>
-            <p className="text-sm text-muted-foreground mt-0.5">
-              {product.nameFr}
-            </p>
           </div>
         </div>
 

@@ -256,8 +256,8 @@ model Address {
 model Product {
   id              String  @id @default(cuid())
   reference       String  @unique
-  nameFr          String
-  nameEn          String
+  name            String
+  description     String?
   pricePerPack    Decimal @db.Decimal(10, 2)
   quantityPerPack Int
   isActive        Boolean @default(true)

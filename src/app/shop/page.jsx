@@ -17,24 +17,22 @@ const DUMMY_PRODUCTS = [
   {
     id: "bofbsm",
     reference: "BOFBSM",
-    nameFr: "BOCA SANS MASSICOT PRÉ PERFORÉ",
-    nameEn: "BOCA WITHOUT CUTTER PRE-PERFORATED",
+    name: "BOCA WITHOUT CUTTER PRE-PERFORATED",
+    description:
+      "Pre-perforated thermal ticket roll for BOCA printers, without cutter. Compatible with standard box-office configurations.",
     pricePerPack: 42.5,
     quantityPerPack: 1000,
     isActive: true,
-    description:
-      "Pre-perforated thermal ticket roll for BOCA printers, without cutter. Compatible with standard box-office configurations.",
   },
   {
     id: "iepram",
     reference: "IEPRAM",
-    nameFr: "MIXTE IER PRÉ PERFORÉ",
-    nameEn: "IER MIXED PRE-PERFORATED",
+    name: "IER MIXED PRE-PERFORATED",
+    description:
+      "Mixed pre-perforated thermal ticket roll for IER printers. Suitable for all mixed ticketing environments.",
     pricePerPack: 38.0,
     quantityPerPack: 1000,
     isActive: true,
-    description:
-      "Mixed pre-perforated thermal ticket roll for IER printers. Suitable for all mixed ticketing environments.",
   },
 ];
 
@@ -61,7 +59,7 @@ export default function ShopPage() {
                   </Badge>
                 </div>
                 <CardTitle className="mt-3 text-base leading-snug">
-                  {product.nameEn}
+                  {product.name}
                 </CardTitle>
                 <p className="text-xs text-muted-foreground font-mono">
                   {product.reference}
