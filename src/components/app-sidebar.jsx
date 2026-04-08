@@ -243,7 +243,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild>
                 <a href="/user">
                   <UserCog />
-                  <span>User Management</span>
+                  <span>Users</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -253,7 +253,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild>
                 <a href="/admin/products">
                   <PackageSearch />
-                  <span>Product Management</span>
+                  <span>Products</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -263,7 +263,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild>
                 <a href="/admin/orders">
                   <ClipboardList />
-                  <span>Order Management</span>
+                  <span>Orders</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
