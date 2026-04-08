@@ -114,12 +114,12 @@ const userItems = [
     url: "/account/orders",
     icon: ShoppingBag,
   },
-  {
-    title: "Support",
-    url: "/support",
-    icon: MessageCircleQuestionMark,
-    disabled: true,
-  },
+  // {
+  //   title: "Support",
+  //   url: "/support",
+  //   icon: MessageCircleQuestionMark,
+  //   disabled: true,
+  // },
 ];
 
 export function AppSidebar() {
@@ -236,7 +236,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <SidebarGroupLabel>Admin</SidebarGroupLabel>
+        {isAdmin && <SidebarGroupLabel>Admin</SidebarGroupLabel>}
         <SidebarMenu>
           {isAdmin && (
             <SidebarMenuItem>
