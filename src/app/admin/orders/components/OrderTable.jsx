@@ -175,7 +175,7 @@ export default function OrderTable({ orders: initialOrders }) {
                       onValueChange={(v) => handleStatusChange(order.id, v)}
                       disabled={isPending}
                     >
-                      <SelectTrigger className="w-32.5">
+                      <SelectTrigger className="w-40">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
