@@ -112,8 +112,8 @@ export default function CartPage() {
               <span>Total tickets</span>
               <span>{totalTickets.toLocaleString()}</span>
             </div>
-            <Button className="w-full" disabled>
-              Proceed to Order
+            <Button className="w-full" asChild>
+              <Link href="/checkout">Proceed to Checkout</Link>
             </Button>
             <Button
               variant="ghost"
