@@ -60,7 +60,7 @@ export default function OrderTable({ orders: initialOrders }) {
   const filtered = orders.filter(
     (o) =>
       o.name.toLowerCase().includes(search.toLowerCase()) ||
-      o.orderNumber.toLowerCase().includes(search.toLowerCase()) ||
+      String(o.id).includes(search.toLowerCase()) ||
       o.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
       o.user?.email?.toLowerCase().includes(search.toLowerCase()),
   );
@@ -147,7 +147,7 @@ export default function OrderTable({ orders: initialOrders }) {
                     <div>
                       <p className="font-medium">{order.name}</p>
                       <p className="text-xs text-muted-foreground font-mono">
-                        #{order.orderNumber}
+                        #{order.id}
                       </p>
                     </div>
                   </TableCell>
@@ -226,7 +226,7 @@ export default function OrderTable({ orders: initialOrders }) {
             <AlertDialogTitle>Delete Order</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete order{" "}
-              <strong>#{deleteOrder?.orderNumber}</strong> ({deleteOrder?.name}
+              <strong>#{deleteOrder?.id}</strong> ({deleteOrder?.name}
               )? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -260,7 +260,7 @@ export default function OrderTable({ orders: initialOrders }) {
               </Badge>
             </DialogTitle>
             <p className="text-xs text-muted-foreground font-mono">
-              #{detailOrder?.orderNumber}
+              #{detailOrder?.id}
             </p>
           </DialogHeader>
 

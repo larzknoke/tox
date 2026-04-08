@@ -61,7 +61,7 @@ function OrderCard({ order }) {
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground font-mono">
-              #{order.orderNumber}
+              #{order.id}
             </p>
           </div>
           <div className="flex items-center gap-4">

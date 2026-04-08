@@ -104,7 +104,7 @@ model TrainerTeamRelation {
 }
 
 model User {
-  id    String   @id @default(cuid())
+  id    String   @id
   name  String?
   email String   @unique
   role  UserRole @default(CUSTOMER)
@@ -128,10 +128,10 @@ model User {
   resetTokenExpiresAt DateTime?
 
   billingAddress   Address? @relation("BillingAddress", fields: [billingAddressId], references: [id])
-  billingAddressId String?  @unique
+  billingAddressId Int?     @unique
 
   deliveryAddress   Address? @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
-  deliveryAddressId String?  @unique
+  deliveryAddressId Int?     @unique
 
   orders         Order[]
   supportTickets SupportTicket[]
@@ -229,7 +229,7 @@ model Vehicle {
 }
 
 model Address {
-  id String @id @default(cuid())
+  id Int @id @default(autoincrement())
 
   firstName  String
   lastName   String
@@ -254,7 +254,7 @@ model Address {
 }
 
 model Product {
-  id              String  @id @default(cuid())
+  id              Int     @id @default(autoincrement())
   reference       String  @unique
   name            String
   description     String?
@@ -271,18 +271,17 @@ model Product {
 }
 
 model Order {
-  id          String      @id @default(cuid())
-  orderNumber String      @unique @default(cuid())
-  name        String
-  status      OrderStatus @default(PENDING)
+  id     Int         @id @default(autoincrement())
+  name   String
+  status OrderStatus @default(PENDING)
 
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  billingAddressId String
+  billingAddressId Int
   billingAddress   Address @relation("OrderBillingSnapshot", fields: [billingAddressId], references: [id])
 
-  deliveryAddressId String
+  deliveryAddressId Int
   deliveryAddress   Address @relation("OrderDeliverySnapshot", fields: [deliveryAddressId], references: [id])
 
   items   OrderItem[]
@@ -305,11 +304,11 @@ enum OrderStatus {
 }
 
 model OrderItem {
-  id      String @id @default(cuid())
-  orderId String
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  id      Int   @id @default(autoincrement())
+  orderId Int
+  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  productId String
+  productId Int
   product   Product @relation(fields: [productId], references: [id])
 
   reference       String
@@ -323,9 +322,9 @@ model OrderItem {
 }
 
 model Invoice {
-  id            String @id @default(cuid())
+  id            Int    @id @default(autoincrement())
   invoiceNumber String @unique
-  orderId       String @unique
+  orderId       Int    @unique
   order         Order  @relation(fields: [orderId], references: [id])
 
   totalAmount Decimal  @db.Decimal(10, 2)
@@ -342,7 +341,7 @@ model Invoice {
 }
 
 model SupportTicket {
-  id     String  @id @default(cuid())
+  id     Int     @id @default(autoincrement())
   userId String?
   user   User?   @relation(fields: [userId], references: [id])
 
@@ -383,8 +382,8 @@ enum SupportTicketType {
 }
 
 model SupportAttachment {
-  id              String        @id @default(cuid())
-  supportTicketId String
+  id              Int           @id @default(autoincrement())
+  supportTicketId Int
   supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [id], onDelete: Cascade)
 
   filename  String

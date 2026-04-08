@@ -3,6 +3,8 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
+import { sendEmail } from "@/lib/email";
+import { orderCreatedEmail } from "@/email/orderCreatedEmail";
 
 export async function placeOrderAction({
   name,
@@ -122,13 +124,34 @@ export async function placeOrderAction({
             create: orderItems,
           },
         },
-        include: { items: true },
+        include: {
+          items: true,
+          user: true,
+          billingAddress: true,
+          deliveryAddress: true,
+        },
       });
 
       return created;
     });
 
-    return { success: true, orderId: order.id, orderNumber: order.orderNumber };
+    // Send confirmation email to customer
+    try {
+      const emailContent = orderCreatedEmail(order);
+      await sendEmail({
+        to: session.user.email,
+        bcc: process.env.ADMIN_EMAIL,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      });
+      console.log("Order confirmation email sent successfully");
+    } catch (emailError) {
+      console.error("Error sending order confirmation email:", emailError);
+      // Don't fail the entire operation if email fails
+    }
+
+    return { success: true, orderId: order.id };
   } catch (error) {
     console.error("Error placing order:", error);
     return { success: false, error: "Failed to place order" };
