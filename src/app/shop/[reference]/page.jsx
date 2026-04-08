@@ -9,8 +9,8 @@ import prisma from "@/lib/prisma";
 import AddToCartForm from "./AddToCartForm";
 
 export default async function ProductDetailPage({ params }) {
-  const { id } = await params;
-  const raw = await prisma.product.findUnique({ where: { id } });
+  const { reference } = await params;
+  const raw = await prisma.product.findUnique({ where: { reference } });
 
   if (!raw) notFound();
 

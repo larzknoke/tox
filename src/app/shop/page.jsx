@@ -31,7 +31,7 @@ export default async function ShopPage() {
         {products.map((product) => (
           <Link
             key={product.id}
-            href={`/shop/${product.id}`}
+            href={`/shop/${product.reference}`}
             className="group focus:outline-none"
           >
             <Card className="h-full transition-shadow group-hover:shadow-md group-focus-visible:ring-2 group-focus-visible:ring-primary">
