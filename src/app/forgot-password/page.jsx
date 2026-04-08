@@ -33,15 +33,15 @@ export default function ForgotPasswordPage() {
       });
 
       if (error) {
-        toast.error(error.message || "Ein Fehler ist aufgetreten");
+        toast.error(error.message || "An error occurred");
         setLoading(false);
         return;
       }
 
       setSuccess(true);
-      toast.success("E-Mail gesendet! Überprüfen Sie Ihr Postfach.");
+      toast.success("Email sent! Check your inbox.");
     } catch (err) {
-      toast.error(err?.message || "Ein unerwarteter Fehler ist aufgetreten");
+      toast.error(err?.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -55,12 +55,12 @@ export default function ForgotPasswordPage() {
             <Ticket className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl text-center">
-            Passwort vergessen?
+            Forgot password?
           </CardTitle>
           <CardDescription className="text-center">
             {success
-              ? "Wir haben Ihnen eine E-Mail gesendet"
-              : "Geben Sie Ihre E-Mail-Adresse ein, um Ihr Passwort zurückzusetzen"}
+              ? "We've sent you an email"
+              : "Enter your email address to reset your password"}
           </CardDescription>
         </CardHeader>
 
@@ -72,17 +72,15 @@ export default function ForgotPasswordPage() {
               </div>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Wir haben einen Link zum Zurücksetzen des Passworts an
+                  We've sent a password reset link to
                 </p>
                 <p className="font-medium">{email}</p>
                 <p className="text-sm text-muted-foreground">
-                  gesendet. Überprüfen Sie Ihr Postfach und folgen Sie den
-                  Anweisungen.
+                  Check your inbox and follow the instructions.
                 </p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Haben Sie keine E-Mail erhalten? Überprüfen Sie Ihren
-                Spam-Ordner oder versuchen Sie es erneut.
+                Didn't receive an email? Check your spam folder or try again.
               </p>
             </div>
           </CardContent>
@@ -90,11 +88,11 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">E-Mail-Adresse</Label>
+                <Label htmlFor="email">Email address</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="mustermann@domain.de"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -104,7 +102,7 @@ export default function ForgotPasswordPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 mt-4">
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Wird gesendet..." : "Link zum Zurücksetzen senden"}
+                {loading ? "Sending..." : "Send reset link"}
               </Button>
             </CardFooter>
           </form>
@@ -116,7 +114,7 @@ export default function ForgotPasswordPage() {
             className="text-sm text-primary hover:underline flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Zurück zur Anmeldung
+            Back to sign in
           </Link>
         </CardFooter>
       </Card>

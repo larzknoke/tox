@@ -27,7 +27,7 @@ function VerifyEmailContent() {
 
       if (!token) {
         setStatus("error");
-        setErrorMessage("Kein Verifizierungstoken gefunden.");
+        setErrorMessage("No verification token found.");
         return;
       }
 
@@ -40,9 +40,7 @@ function VerifyEmailContent() {
 
         if (response.error) {
           setStatus("error");
-          setErrorMessage(
-            response.error.message || "Verifizierung fehlgeschlagen.",
-          );
+          setErrorMessage(response.error.message || "Verification failed.");
         } else {
           setStatus("success");
           // Redirect to sign in after 3 seconds
@@ -52,9 +50,7 @@ function VerifyEmailContent() {
         }
       } catch (error) {
         setStatus("error");
-        setErrorMessage(
-          error.message || "Ein unerwarteter Fehler ist aufgetreten.",
-        );
+        setErrorMessage(error.message || "An unexpected error occurred.");
       }
     };
 
@@ -77,23 +73,22 @@ function VerifyEmailContent() {
             )}
           </div>
           <CardTitle className="text-2xl text-center">
-            {status === "verifying" && "E-Mail wird verifiziert..."}
-            {status === "success" && "E-Mail verifiziert!"}
-            {status === "error" && "Verifizierung fehlgeschlagen"}
+            {status === "verifying" && "Verifying email..."}
+            {status === "success" && "Email verified!"}
+            {status === "error" && "Verification failed"}
           </CardTitle>
           <CardDescription className="text-center">
-            {status === "verifying" && "Bitte warten Sie einen Moment."}
-            {status === "success" && "Ihr Konto wurde erfolgreich aktiviert."}
-            {status === "error" &&
-              "Die E-Mail-Verifizierung ist fehlgeschlagen."}
+            {status === "verifying" && "Please wait a moment."}
+            {status === "success" && "Your account has been activated."}
+            {status === "error" && "Email verification failed."}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {status === "success" && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-md">
               <p className="text-sm text-green-900 text-center">
-                Ihre E-Mail-Adresse wurde erfolgreich verifiziert. Sie werden in
-                Kürze zur Anmeldeseite weitergeleitet.
+                Your email address has been verified successfully. You will be
+                redirected to the sign in page shortly.
               </p>
             </div>
           )}
@@ -101,7 +96,7 @@ function VerifyEmailContent() {
             <div className="p-4 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-900 text-center">{errorMessage}</p>
               <p className="text-sm text-red-900 text-center mt-2">
-                Bitte versuchen Sie es erneut oder kontaktieren Sie den Support.
+                Please try again or contact support.
               </p>
             </div>
           )}
@@ -109,7 +104,7 @@ function VerifyEmailContent() {
         {status !== "verifying" && (
           <CardFooter>
             <Link href="/signin" className="w-full">
-              <Button className="w-full">Zur Anmeldung</Button>
+              <Button className="w-full">Go to Sign In</Button>
             </Link>
           </CardFooter>
         )}

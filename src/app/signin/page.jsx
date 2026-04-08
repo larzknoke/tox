@@ -57,13 +57,13 @@ export default function SignInPage() {
               return;
             }
             if (code === "INVALID_EMAIL_OR_PASSWORD") {
-              const message = "Ungültige E-Mail oder Passwort";
+              const message = "Invalid email or password";
               setError(message);
               toast.error(message);
               setLoading(false);
               return;
             }
-            const message = ctx?.error?.message || "Ein Fehler ist aufgetreten";
+            const message = ctx?.error?.message || "An error occurred";
             setError(message);
             toast.error(message);
             setLoading(false);
@@ -71,7 +71,7 @@ export default function SignInPage() {
         },
       );
     } catch (err) {
-      const message = err?.message || "Ein unerwarteter Fehler ist aufgetreten";
+      const message = err?.message || "An unexpected error occurred";
       setError(message);
       toast.error(message);
       setLoading(false);
@@ -85,11 +85,9 @@ export default function SignInPage() {
           <div className="flex items-center justify-center">
             <Ticket className="h-12 w-12 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-center">
-            Willkommen zurück
-          </CardTitle>
+          <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
           <CardDescription className="text-center">
-            Melden Sie sich bei Ihrem tox-Konto an
+            Sign in to your tox account
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -100,11 +98,11 @@ export default function SignInPage() {
               </div>
             )} */}
             <div className="space-y-2">
-              <Label htmlFor="email">E-Mail</Label>
+              <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="mustermann@domain.de"
+                placeholder="name@example.com"
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -115,12 +113,12 @@ export default function SignInPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Passwort</Label>
+                <Label htmlFor="password">Password</Label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-primary hover:underline"
                 >
-                  Passwort vergessen?
+                  Forgot password?
                 </Link>
               </div>
               <Input
@@ -146,18 +144,18 @@ export default function SignInPage() {
                 className="h-4 w-4 rounded border-gray-300"
               />
               <Label htmlFor="remember" className="text-sm cursor-pointer">
-                Angemeldet bleiben
+                Remember me
               </Label>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Anmelden..." : "Anmelden"}
+              {loading ? "Login..." : "Login"}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Noch kein Konto?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup" className="text-primary hover:underline">
-                Registrieren
+                Sign up
               </Link>
             </p>
           </CardFooter>

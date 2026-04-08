@@ -34,13 +34,13 @@ function ResetPasswordForm() {
 
     if (errorFromUrl) {
       setError(
-        "Der Link zum Zurücksetzen ist ungültig oder abgelaufen. Bitte fordern Sie einen neuen an.",
+        "The reset link is invalid or expired. Please request a new one.",
       );
-      toast.error("Ungültiger oder abgelaufener Link");
+      toast.error("Invalid or expired link");
     }
 
     if (!tokenFromUrl && !errorFromUrl) {
-      setError("Kein Token gefunden. Bitte fordern Sie einen neuen Link an.");
+      setError("No token found. Please request a new link.");
     }
 
     if (tokenFromUrl) {
@@ -53,19 +53,19 @@ function ResetPasswordForm() {
     setError("");
 
     if (!token) {
-      setError("Kein Token gefunden. Bitte fordern Sie einen neuen Link an.");
+      setError("No token found. Please request a new link.");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Die Passwörter stimmen nicht überein");
-      toast.error("Die Passwörter stimmen nicht überein");
+      setError("Passwords do not match");
+      toast.error("Passwords do not match");
       return;
     }
 
     if (password.length < 8) {
-      setError("Das Passwort muss mindestens 8 Zeichen lang sein");
-      toast.error("Das Passwort muss mindestens 8 Zeichen lang sein");
+      setError("Password must be at least 8 characters");
+      toast.error("Password must be at least 8 characters");
       return;
     }
 
@@ -78,21 +78,21 @@ function ResetPasswordForm() {
       });
 
       if (error) {
-        setError(error.message || "Ein Fehler ist aufgetreten");
-        toast.error(error.message || "Ein Fehler ist aufgetreten");
+        setError(error.message || "An error occurred");
+        toast.error(error.message || "An error occurred");
         setLoading(false);
         return;
       }
 
       setSuccess(true);
-      toast.success("Passwort erfolgreich zurückgesetzt!");
+      toast.success("Password reset successfully!");
 
       // Redirect to signin after 2 seconds
       setTimeout(() => {
         router.push("/signin");
       }, 2000);
     } catch (err) {
-      const message = err?.message || "Ein unerwarteter Fehler ist aufgetreten";
+      const message = err?.message || "An unexpected error occurred";
       setError(message);
       toast.error(message);
     } finally {
@@ -108,12 +108,12 @@ function ResetPasswordForm() {
             <Ticket className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl text-center">
-            {success ? "Passwort zurückgesetzt" : "Neues Passwort festlegen"}
+            {success ? "Password Reset" : "Set New Password"}
           </CardTitle>
           <CardDescription className="text-center">
             {success
-              ? "Ihr Passwort wurde erfolgreich zurückgesetzt"
-              : "Geben Sie Ihr neues Passwort ein"}
+              ? "Your password has been reset successfully"
+              : "Enter your new password"}
           </CardDescription>
         </CardHeader>
 
@@ -125,10 +125,10 @@ function ResetPasswordForm() {
               </div>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  Ihr Passwort wurde erfolgreich zurückgesetzt.
+                  Your password has been reset successfully.
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  Sie werden in Kürze zur Anmeldeseite weitergeleitet...
+                  You will be redirected to the sign in page shortly...
                 </p>
               </div>
             </div>
@@ -140,7 +140,7 @@ function ResetPasswordForm() {
             </div>
             <Link href="/forgot-password">
               <Button className="w-full" variant="outline">
-                Neuen Link anfordern
+                Request new link
               </Button>
             </Link>
           </CardContent>
@@ -148,11 +148,11 @@ function ResetPasswordForm() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">Neues Passwort</Label>
+                <Label htmlFor="password">New Password</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Mindestens 8 Zeichen"
+                  placeholder="At least 8 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -161,11 +161,11 @@ function ResetPasswordForm() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="Passwort wiederholen"
+                  placeholder="Repeat password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -176,13 +176,13 @@ function ResetPasswordForm() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 mt-4">
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Wird gespeichert..." : "Passwort zurücksetzen"}
+                {loading ? "Saving..." : "Reset Password"}
               </Button>
               <Link
                 href="/signin"
                 className="text-sm text-center text-muted-foreground hover:text-primary"
               >
-                Zurück zur Anmeldung
+                Back to sign in
               </Link>
             </CardFooter>
           </form>
@@ -197,7 +197,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <div className="min-h-screen flex items-center justify-center">
-          Lädt...
+          Loading...
         </div>
       }
     >

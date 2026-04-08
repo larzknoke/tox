@@ -36,7 +36,8 @@ export default function UserDeleteDialog({ open, onClose, user }) {
           <DialogTitle>Confirm Deletion</DialogTitle>
         </DialogHeader>
         <p>
-          Are you sure you want to delete user <strong>{user.name}</strong> ({user.email})?
+          Are you sure you want to delete user <strong>{user.name}</strong> (
+          {user.email})?
         </p>
         <DialogFooter className="mt-4 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>

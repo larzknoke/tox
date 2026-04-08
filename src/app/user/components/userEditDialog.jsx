@@ -199,9 +199,7 @@ export default function UserEditDialog({ open, onClose, user }) {
                         className="h-4 w-4"
                       />
                     </FormControl>
-                    <FormLabel className="flex shrink-0">
-                      Ban User
-                    </FormLabel>
+                    <FormLabel className="flex shrink-0">Ban User</FormLabel>
                   </FormItem>
                 )}
               />

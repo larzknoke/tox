@@ -20,12 +20,12 @@ export const auth = betterAuth({
     sendResetPassword: async ({ user, url, token }, request) => {
       const promise = sendEmail({
         to: user.email,
-        subject: "Passwort zurücksetzen",
+        subject: "Reset Password",
         html: passwordResetTemplate(user, url),
       });
 
-      // 🔐 verhindert Timing Attacks
-      // 📨 garantiert Mail-Versand auf Vercel
+      // Prevents timing attacks
+      // Ensures email delivery on Vercel
       request?.waitUntil?.(promise);
     },
   },
@@ -34,12 +34,12 @@ export const auth = betterAuth({
     sendVerificationEmail: async ({ user, url }, request) => {
       const promise = sendEmail({
         to: user.email,
-        subject: "Verifizieren Sie Ihre E-Mail-Adresse",
+        subject: "Verify your email address",
         html: emailVerificationTemplate(user, url),
       });
 
-      // 🔐 verhindert Timing Attacks
-      // 📨 garantiert Mail-Versand auf Vercel
+      // Prevents timing attacks
+      // Ensures email delivery on Vercel
       request?.waitUntil?.(promise);
     },
   },

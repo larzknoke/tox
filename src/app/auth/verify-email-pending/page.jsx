@@ -36,35 +36,33 @@ export default function VerifyEmailPendingPage() {
             <Mail className="h-12 w-12 text-gray-800" />
           </div>
           <CardTitle className="text-2xl text-center">
-            E-Mail-Verifizierung erforderlich
+            Email Verification Required
           </CardTitle>
           <CardDescription className="text-center">
-            Bitte verifizieren Sie Ihre E-Mail-Adresse
+            Please verify your email address
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
             <p className="text-sm text-blue-900 text-center text-balance">
-              Ihr Konto wurde erstellt, aber Ihre E-Mail-Adresse wurde noch
-              nicht verifiziert.
+              Your account has been created, but your email address has not been
+              verified yet.
             </p>
             {userEmail && (
               <p className="text-sm text-blue-900 text-center mt-2">
-                Wir haben einen Bestätigungslink an <strong>{userEmail}</strong>{" "}
-                gesendet.
+                We've sent a verification link to <strong>{userEmail}</strong>.
               </p>
             )}
           </div>
           <div className="space-y-3 text-sm text-muted-foreground">
-            <p>Um Ihr Konto vollständig zu aktivieren:</p>
+            <p>To fully activate your account:</p>
             <ol className="list-decimal list-inside space-y-2 ml-2">
-              <li>Überprüfen Sie Ihr E-Mail-Postfach</li>
-              <li>Klicken Sie auf den Bestätigungslink</li>
-              <li>Kehren Sie hierher zurück oder melden Sie sich erneut an</li>
+              <li>Check your email inbox</li>
+              <li>Click the verification link</li>
+              <li>Return here or sign in again</li>
             </ol>
             <p className="text-xs mt-4">
-              Haben Sie die E-Mail nicht erhalten? Überprüfen Sie bitte auch
-              Ihren Spam-Ordner.
+              Didn't receive the email? Please also check your spam folder.
             </p>
           </div>
         </CardContent>
@@ -72,12 +70,12 @@ export default function VerifyEmailPendingPage() {
           <Link href="/signin" className="w-full">
             <Button variant="outline" className="w-full">
               <LogOut className="w-4 h-4 mr-2" />
-              Anmelden
+              Login
             </Button>
           </Link>
           <p className="text-xs text-center text-muted-foreground">
             <Link href="/" className="text-primary hover:underline">
-              Zurück zur Startseite
+              Back to home
             </Link>
           </p>
         </CardFooter>

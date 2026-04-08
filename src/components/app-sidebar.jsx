@@ -317,7 +317,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild variant="default" size="lg">
                 <a href="/signin">
                   <User2 />
-                  <span>Anmelden</span>
+                  <span>Login</span>
                 </a>
               </SidebarMenuButton>
             )}
