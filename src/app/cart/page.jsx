@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, ShoppingBag, ArrowLeft } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
+import { EmptyCart } from "@/components/empty-cart";
 
 export default function CartPage() {
   const { cartItems, cartCount, updateQuantity, removeFromCart, clearCart } =
@@ -26,16 +27,7 @@ export default function CartPage() {
     return (
       <div className="flex flex-col gap-6 w-full">
         <PageHeader title="Shopping Cart" />
-        <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-          <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
-          <p className="text-muted-foreground">Your cart is empty.</p>
-          <Button asChild variant="outline">
-            <Link href="/shop">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Shop
-            </Link>
-          </Button>
-        </div>
+        <EmptyCart />
       </div>
     );
   }

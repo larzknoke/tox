@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ArrowLeft, ShoppingBag, Pencil } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
+import { EmptyCart } from "@/components/empty-cart";
 
 const emptyAddress = {
   firstName: "",
@@ -223,16 +224,7 @@ export default function CheckoutPage() {
     return (
       <div className="flex flex-col gap-6 w-full">
         <PageHeader title="Checkout" />
-        <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
-          <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
-          <p className="text-muted-foreground">Your cart is empty.</p>
-          <Button asChild variant="outline">
-            <Link href="/shop">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Shop
-            </Link>
-          </Button>
-        </div>
+        <EmptyCart />
       </div>
     );
   }
@@ -335,12 +327,10 @@ export default function CheckoutPage() {
                   />
                   {isAddressComplete(billingAddress) && (
                     <Button
-                      variant="outline"
-                      size="sm"
                       onClick={() => setEditingBilling(false)}
                       disabled={isOrdering}
                     >
-                      Done
+                      Save
                     </Button>
                   )}
                 </div>
@@ -357,7 +347,7 @@ export default function CheckoutPage() {
               {!editingDelivery && (
                 <Button
                   variant="outline"
-                  size="sm"
+                  size={"sm"}
                   onClick={() => setEditingDelivery(true)}
                   disabled={isOrdering}
                 >
@@ -376,12 +366,10 @@ export default function CheckoutPage() {
                   />
                   {isAddressComplete(deliveryAddress) && (
                     <Button
-                      variant="outline"
-                      size="sm"
                       onClick={() => setEditingDelivery(false)}
                       disabled={isOrdering}
                     >
-                      Done
+                      Save
                     </Button>
                   )}
                 </div>

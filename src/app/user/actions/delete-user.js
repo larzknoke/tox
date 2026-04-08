@@ -8,6 +8,6 @@ export async function deleteUserAction(userId) {
     where: { id: userId },
   });
 
-  // Server-Cache für Benutzerliste invalidieren
+  // Invalidate server cache for user list
   revalidatePath("/user");
 }

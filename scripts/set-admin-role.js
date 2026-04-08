@@ -4,12 +4,12 @@ const path = require("node:path");
 const { config } = require("dotenv");
 config({ path: path.join(__dirname, "..", ".env") });
 
-const email = process.argv[2] || process.env.EMAIL || "info@larsknoke.com";
+const email = process.argv[2] || process.env.EMAIL || "l.knoke@colorplus.de";
 
 async function main() {
   if (!process.env.DATABASE_URL) {
     console.error(
-      "DATABASE_URL is not set. Populate it in .env or the environment."
+      "DATABASE_URL is not set. Populate it in .env or the environment.",
     );
     process.exit(1);
   }
@@ -36,7 +36,7 @@ async function main() {
     });
 
     console.log(
-      `✓ User ${email} (id: ${updatedUser.id}) role set to: ${updatedUser.role}`
+      `✓ User ${email} (id: ${updatedUser.id}) role set to: ${updatedUser.role}`,
     );
     await prisma.$disconnect();
   } catch (error) {

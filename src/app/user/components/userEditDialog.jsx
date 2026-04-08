@@ -33,16 +33,15 @@ import { updateUserAction } from "@/app/user/actions/update-user";
 import { setUserRoleAction } from "@/app/user/actions/set-user-role";
 import { toast } from "sonner";
 
-export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
+export default function UserEditDialog({ open, onClose, user }) {
   const [isPending, startTransition] = useTransition();
 
   const formSchema = z.object({
-    name: z.string().min(1, { message: "Bitte einen Namen eingeben" }),
-    email: z.string().email({ message: "Ungültige E-Mail-Adresse" }),
+    name: z.string().min(1, { message: "Please enter a name" }),
+    email: z.string().email({ message: "Invalid email address" }),
     role: z.string().optional(),
     banned: z.boolean().default(false),
     banReason: z.string().optional(),
-    trainerId: z.string().optional(),
   });
 
   const form = useForm({
@@ -53,7 +52,6 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
       role: "",
       banned: false,
       banReason: "",
-      trainerId: "",
     },
   });
 
@@ -66,7 +64,6 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
         role: user.role || "",
         banned: user.banned || false,
         banReason: user.banReason || "",
-        trainerId: user.trainerId ? String(user.trainerId) : "",
       });
     }
   }, [user, form]);
@@ -91,15 +88,12 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
         formData.append("email", data.email);
         formData.append("banned", data.banned.toString());
         if (data.banReason) formData.append("banReason", data.banReason);
-        if (data.trainerId && data.trainerId !== "none") {
-          formData.append("trainerId", data.trainerId);
-        }
 
         await updateUserAction(formData);
-        toast.success("Benutzer erfolgreich aktualisiert");
+        toast.success("User updated successfully");
         onClose();
       } catch (error) {
-        toast.error("Fehler beim Aktualisieren: " + error.message);
+        toast.error("Error updating user: " + error.message);
       }
     });
   }
@@ -112,7 +106,6 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
         role: user.role || "",
         banned: user.banned || false,
         banReason: user.banReason || "",
-        trainerId: user.trainerId ? String(user.trainerId) : "",
       });
     }
   }
@@ -121,7 +114,7 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Benutzer bearbeiten</DialogTitle>
+          <DialogTitle>Edit User</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
@@ -171,7 +164,7 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
                 name="role"
                 render={({ field }) => (
                   <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                    <FormLabel className="flex shrink-0">Rolle</FormLabel>
+                    <FormLabel className="flex shrink-0">Role</FormLabel>
                     <div className="w-full">
                       <FormControl>
                         <Select
@@ -179,47 +172,11 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
                           value={field.value}
                         >
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Rolle auswählen..." />
+                            <SelectValue placeholder="Select role..." />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="trainer">Trainer</SelectItem>
-                            <SelectItem value="kassenwart">
-                              Kassenwart
-                            </SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </div>
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="trainerId"
-                render={({ field }) => (
-                  <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
-                    <FormLabel className="flex shrink-0">
-                      Zugeordneter Trainer
-                    </FormLabel>
-                    <div className="w-full">
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Trainer auswählen..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {trainers.map((t) => (
-                              <SelectItem key={t.id} value={String(t.id)}>
-                                {t.name}
-                              </SelectItem>
-                            ))}
-                            <SelectItem value="none">Kein Trainer</SelectItem>
+                            <SelectItem value="CUSTOMER">Customer</SelectItem>
+                            <SelectItem value="ADMIN">Admin</SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -243,7 +200,7 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
                       />
                     </FormControl>
                     <FormLabel className="flex shrink-0">
-                      Benutzer sperren
+                      Ban User
                     </FormLabel>
                   </FormItem>
                 )}
@@ -256,7 +213,7 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
                   render={({ field }) => (
                     <FormItem className="col-span-12 col-start-auto flex self-end flex-col gap-2 space-y-0 items-start">
                       <FormLabel className="flex shrink-0">
-                        Sperrgrund
+                        Ban Reason
                       </FormLabel>
                       <div className="w-full">
                         <FormControl>
@@ -280,7 +237,7 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
         </Form>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Abbrechen
+            Cancel
           </Button>
           <Button
             variant="success"
@@ -289,7 +246,7 @@ export default function UserEditDialog({ open, onClose, user, trainers = [] }) {
             }}
             disabled={isPending}
           >
-            {isPending ? "Speichern..." : "Speichern"}
+            {isPending ? "Saving..." : "Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

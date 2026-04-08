@@ -17,7 +17,6 @@ async function getUsers() {
         take: 1,
       },
       accounts: true,
-      trainer: true,
     },
     orderBy: {
       name: "asc",
@@ -26,29 +25,21 @@ async function getUsers() {
   return users;
 }
 
-async function getTrainers() {
-  const trainers = await prisma.trainer.findMany({
-    orderBy: { name: "asc" },
-  });
-  return trainers;
-}
-
 async function UserManagement() {
   const session = await requireSession();
 
   // Only allow admin users
-  if (!hasRole(session, "admin")) {
-    redirect("/home");
+  if (!hasRole(session, "ADMIN")) {
+    redirect("/");
   }
 
   const users = await getUsers();
-  const trainers = await getTrainers();
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Benutzerverwaltung" />
+      <PageHeader title="User Management" />
       <Suspense fallback={<Skeleton />}>
-        <UserTable users={users} trainers={trainers} session={session} />
+        <UserTable users={users} session={session} />
       </Suspense>
     </div>
   );

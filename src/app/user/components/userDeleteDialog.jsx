@@ -21,10 +21,10 @@ export default function UserDeleteDialog({ open, onClose, user }) {
     startTransition(async () => {
       try {
         await deleteUserAction(user.id);
-        toast.success(`Benutzer ${user.name} gelöscht`);
+        toast.success(`User ${user.name} deleted`);
         onClose();
       } catch (err) {
-        toast.error(err.message || "Fehler beim Löschen");
+        toast.error(err.message || "Error deleting user");
       }
     });
   }
@@ -33,18 +33,17 @@ export default function UserDeleteDialog({ open, onClose, user }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Löschen bestätigen</DialogTitle>
+          <DialogTitle>Confirm Deletion</DialogTitle>
         </DialogHeader>
         <p>
-          Möchtest du den Benutzer <strong>{user.name}</strong> ({user.email})
-          wirklich löschen?
+          Are you sure you want to delete user <strong>{user.name}</strong> ({user.email})?
         </p>
         <DialogFooter className="mt-4 flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>
-            Abbrechen
+            Cancel
           </Button>
           <Button variant="destructive" onClick={onDelete} disabled={isPending}>
-            {isPending ? "Löschen..." : "Löschen"}
+            {isPending ? "Deleting..." : "Delete"}
           </Button>
         </DialogFooter>
       </DialogContent>

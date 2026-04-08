@@ -2,7 +2,7 @@ import "dotenv/config";
 import { runWithEndpointContext } from "@better-auth/core/context";
 import { auth } from "../src/lib/auth.js";
 import prisma from "../src/lib/prisma.js";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "info@larsknoke.com";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "l.knoke@colorplus.de";
 
 async function main() {
   try {
@@ -43,7 +43,7 @@ async function main() {
       });
 
       console.log(
-        `✓ Admin user created: ${adminUser.email} (id: ${adminUser.id})`
+        `✓ Admin user created: ${adminUser.email} (id: ${adminUser.id})`,
       );
       console.log(`⚠️  Default password: ChangeMe123! - Please change it!`);
     });

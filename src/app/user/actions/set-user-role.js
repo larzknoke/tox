@@ -9,7 +9,7 @@ import prisma from "@/lib/prisma";
 
 const schema = z.object({
   userId: z.string(),
-  role: z.enum(["admin", "kassenwart", "trainer"]),
+  role: z.enum(["CUSTOMER", "ADMIN"]),
 });
 
 export async function setUserRoleAction(formData) {
@@ -22,11 +22,11 @@ export async function setUserRoleAction(formData) {
   console.log("session", session);
 
   if (!session) {
-    throw new Error("Nicht authentifiziert");
+    throw new Error("Not authenticated");
   }
 
-  if (!hasRole(session, "admin")) {
-    throw new Error("Keine Berechtigung");
+  if (!hasRole(session, "ADMIN")) {
+    throw new Error("Not authorized");
   }
 
   const data = Object.fromEntries(formData);
@@ -53,6 +53,6 @@ export async function setUserRoleAction(formData) {
     revalidatePath("/user");
   } catch (error) {
     console.error("Error setting user role:", error);
-    throw new Error("Fehler beim Setzen der Benutzerrolle");
+    throw new Error("Error setting user role");
   }
 }

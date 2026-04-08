@@ -22,13 +22,13 @@ function UserListDropdown({ onDeleteClick, onEditClick }) {
         <DropdownMenuContent className="w-40" align="end">
           <DropdownMenuGroup>
             <DropdownMenuItem onClick={() => onEditClick()}>
-              Bearbeiten
+              Edit
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => onDeleteClick(true)}
               variant="destructive"
             >
-              Löschen
+              Delete
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>

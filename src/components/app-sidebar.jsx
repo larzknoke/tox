@@ -18,6 +18,7 @@ import {
   HouseIcon,
   ShoppingBag,
   ShoppingCart,
+  ClipboardList,
 } from "lucide-react";
 
 import {
@@ -235,6 +236,7 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <SidebarGroupLabel>Admin</SidebarGroupLabel>
         <SidebarMenu>
           {isAdmin && (
             <SidebarMenuItem>
@@ -252,6 +254,16 @@ export function AppSidebar() {
                 <a href="/admin/products">
                   <PackageSearch />
                   <span>Product Management</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          {isAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="/admin/orders">
+                  <ClipboardList />
+                  <span>Order Management</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -294,7 +306,7 @@ export function AppSidebar() {
                   className="w-[--radix-popper-anchor-width]"
                 >
                   <DropdownMenuItem asChild>
-                    <a href="/account">Konto</a>
+                    <a href="/account">Account Details</a>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
                     <span>Logout</span>

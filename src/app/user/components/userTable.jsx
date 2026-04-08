@@ -23,7 +23,7 @@ import UserListDropdown from "./userListDropdown";
 import UserDeleteDialog from "./userDeleteDialog";
 import UserEditDialog from "./userEditDialog";
 
-function UserTable({ users, trainers = [], session }) {
+function UserTable({ users, session }) {
   const router = useRouter();
   const [deleteDialogState, setDeleteDialogState] = useState({
     open: false,
@@ -51,17 +51,16 @@ function UserTable({ users, trainers = [], session }) {
   const getRoleBadge = (role) => {
     if (!role) return "-";
     const roleMap = {
-      admin: "Admin",
-      kassenwart: "Kassenwart",
-      trainer: "Trainer",
+      CUSTOMER: "Customer",
+      ADMIN: "Admin",
     };
     return roleMap[role] || role;
   };
 
   const getStatusBadge = (user) => {
-    if (user.banned) return "Gesperrt";
-    if (user.emailVerified) return "Aktiv";
-    return "Nicht verifiziert";
+    if (user.banned) return "Banned";
+    if (user.emailVerified) return "Active";
+    return "Unverified";
   };
 
   return (
@@ -69,7 +68,7 @@ function UserTable({ users, trainers = [], session }) {
       <div className="w-full flex flex-row gap-6 justify-between">
         <InputGroup className="max-w-sm">
           <InputGroupInput
-            placeholder="Suche nach Name oder E-Mail..."
+            placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -78,22 +77,21 @@ function UserTable({ users, trainers = [], session }) {
               variant="secondary"
               onClick={() => setSearchTerm("")}
             >
-              {searchTerm ? "Zurücksetzen" : "Suche"}
+              {searchTerm ? "Reset" : "Search"}
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>
       </div>
       <Table>
-        <TableCaption>Alle Benutzer</TableCaption>
+        <TableCaption>All Users</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Name</TableHead>
-            <TableHead>E-Mail</TableHead>
-            <TableHead>Rolle</TableHead>
-            <TableHead>Trainer</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Role</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Erstellt am</TableHead>
-            <TableHead>Letzte Anmeldung</TableHead>
+            <TableHead>Created</TableHead>
+            <TableHead>Last Login</TableHead>
             <TableHead className="text-right"></TableHead>
           </TableRow>
         </TableHeader>
@@ -103,7 +101,6 @@ function UserTable({ users, trainers = [], session }) {
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{getRoleBadge(user.role)}</TableCell>
-              <TableCell>{user.trainer?.name ?? "-"}</TableCell>
               <TableCell>{getStatusBadge(user)}</TableCell>
               <TableCell>{formatDate(user.createdAt)}</TableCell>
               <TableCell>
@@ -132,7 +129,6 @@ function UserTable({ users, trainers = [], session }) {
       <UserEditDialog
         open={editDialogState.open}
         user={editDialogState.user}
-        trainers={trainers}
         onClose={() => {
           setEditDialogState({ open: false, user: null });
           router.refresh();

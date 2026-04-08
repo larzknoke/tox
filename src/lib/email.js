@@ -18,7 +18,7 @@ export const sendEmail = async (data, pool = false) => {
   });
 
   return await transporter.sendMail({
-    from: `tox - HSG Solling <${process.env.SMTP_FROM_EMAIL}>`,
+    from: `tox - Ticket Order Extranet <${process.env.SMTP_FROM_EMAIL}>`,
     ...data,
   });
 };

@@ -6,11 +6,10 @@ import prisma from "@/lib/prisma";
 
 const schema = z.object({
   id: z.string(),
-  name: z.string().min(1, "Name ist erforderlich"),
-  email: z.string().email("Ungültige E-Mail-Adresse"),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email address"),
   banned: z.boolean(),
   banReason: z.string().optional(),
-  trainerId: z.string().optional(),
 });
 
 export async function updateUserAction(formData) {
@@ -23,7 +22,6 @@ export async function updateUserAction(formData) {
     email: data.email,
     banned: data.banned === "true",
     banReason: data.banReason || undefined,
-    trainerId: data.trainerId || undefined,
   });
 
   if (!parsed.success) {
@@ -37,7 +35,6 @@ export async function updateUserAction(formData) {
       email: parsed.data.email,
       banned: parsed.data.banned,
       banReason: parsed.data.banReason || null,
-      trainerId: parsed.data.trainerId ? Number(parsed.data.trainerId) : null,
     },
   });
 
