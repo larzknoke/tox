@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { PrismaClient } from "../../generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { admin } from "better-auth/plugins";
 import { sendEmail } from "./email.js";
 import {
@@ -8,7 +9,8 @@ import {
   passwordResetTemplate,
 } from "../email/authEmails.js";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
