@@ -18,7 +18,7 @@ export const sendEmail = async (data, pool = false) => {
   });
 
   return await transporter.sendMail({
-    from: `tox - Ticket Order Extranet <${process.env.SMTP_FROM_EMAIL}>`,
+    from: `TOX - FRANCE BILLET <${process.env.SMTP_FROM_EMAIL}>`,
     ...data,
   });
 };

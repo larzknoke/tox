@@ -37,9 +37,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
-import { Trash2, Eye } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Trash2, FileText, Euro } from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
+import { generateInvoicePDFAction } from "../actions/generate-invoice-pdf";
 
 const statuses = ["PENDING", "VALIDATED", "PROCESSING", "SHIPPED"];
 
@@ -94,6 +100,8 @@ export default function OrderTable({ orders: initialOrders }) {
     });
   }
 
+  const [generatingPDFId, setGeneratingPDFId] = useState(null);
+
   const totalPrice = (order) =>
     order.items.reduce((sum, i) => sum + i.totalPrice, 0);
 
@@ -102,6 +110,32 @@ export default function OrderTable({ orders: initialOrders }) {
       (sum, i) => sum + i.quantityPerPack * i.numberOfPacks,
       0,
     );
+
+  async function handleDownloadInvoicePDF(order) {
+    setGeneratingPDFId(order.id);
+    try {
+      const result = await generateInvoicePDFAction(order.id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+      const blob = new Blob([new Uint8Array(result.pdfBuffer)], {
+        type: "application/pdf",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success("PDF downloaded");
+    } catch (error) {
+      toast.error("Failed to generate PDF: " + error.message);
+    } finally {
+      setGeneratingPDFId(null);
+    }
+  }
 
   return (
     <>
@@ -192,21 +226,44 @@ export default function OrderTable({ orders: initialOrders }) {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setDetailOrder(order)}
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => setDeleteOrder(order)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setDetailOrder(order)}
+                          >
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>View details</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDownloadInvoicePDF(order)}
+                            disabled={generatingPDFId === order.id}
+                          >
+                            <Euro className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Download Invoice PDF</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => setDeleteOrder(order)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Delete order</TooltipContent>
+                      </Tooltip>
                     </div>
                   </TableCell>
                 </TableRow>
