@@ -28,7 +28,11 @@ export const auth = betterAuth({
 
       // Prevents timing attacks
       // Ensures email delivery on Vercel
-      request?.waitUntil?.(promise);
+      if (request?.waitUntil) {
+        request.waitUntil(promise);
+      } else {
+        await promise;
+      }
     },
   },
   emailVerification: {
@@ -42,7 +46,11 @@ export const auth = betterAuth({
 
       // Prevents timing attacks
       // Ensures email delivery on Vercel
-      request?.waitUntil?.(promise);
+      if (request?.waitUntil) {
+        request.waitUntil(promise);
+      } else {
+        await promise;
+      }
     },
   },
   secret: process.env.BETTER_AUTH_SECRET,
