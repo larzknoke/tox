@@ -23,7 +23,9 @@ export async function createProductAction(data) {
   if (!hasRole(session, "ADMIN")) throw new Error("Unauthorized");
 
   const parsed = schema.safeParse(data);
-  if (!parsed.success) throw new Error(parsed.error.errors[0].message);
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues[0]?.message ?? "Invalid product data");
+  }
 
   const {
     reference,

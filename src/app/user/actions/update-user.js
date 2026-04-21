@@ -25,7 +25,7 @@ export async function updateUserAction(formData) {
   });
 
   if (!parsed.success) {
-    throw new Error(parsed.error.errors[0].message);
+    throw new Error(parsed.error.issues[0]?.message ?? "Invalid user data");
   }
 
   await prisma.user.update({

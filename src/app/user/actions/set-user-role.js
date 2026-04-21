@@ -37,7 +37,7 @@ export async function setUserRoleAction(formData) {
   });
 
   if (!parsed.success) {
-    throw new Error(parsed.error.errors[0].message);
+    throw new Error(parsed.error.issues[0]?.message ?? "Invalid role data");
   }
 
   try {
