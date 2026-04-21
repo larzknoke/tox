@@ -234,6 +234,7 @@ model Address {
   firstName  String
   lastName   String
   company    String
+  vat        String?
   address1   String
   address2   String?
   postalCode String

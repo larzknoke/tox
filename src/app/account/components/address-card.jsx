@@ -20,6 +20,7 @@ const emptyAddress = {
   firstName: "",
   lastName: "",
   company: "",
+  vat: "",
   address1: "",
   address2: "",
   postalCode: "",
@@ -43,6 +44,7 @@ export function AddressCard({ type, address, onSave }) {
             firstName: address.firstName || "",
             lastName: address.lastName || "",
             company: address.company || "",
+            vat: address.vat || "",
             address1: address.address1 || "",
             address2: address.address2 || "",
             postalCode: address.postalCode || "",
@@ -99,6 +101,9 @@ export function AddressCard({ type, address, onSave }) {
               {address.firstName} {address.lastName}
             </p>
             {address.company && <p>{address.company}</p>}
+            {type === "billing" && address.vat && (
+              <p>Tax identification number: {address.vat}</p>
+            )}
             <p>{address.address1}</p>
             {address.address2 && <p>{address.address2}</p>}
             <p>
@@ -183,6 +188,17 @@ export function AddressCard({ type, address, onSave }) {
                   required
                 />
               </div>
+              {type === "billing" && (
+                <div className="space-y-2">
+                  <Label htmlFor="addr-vat">Tax identification number</Label>
+                  <Input
+                    id="addr-vat"
+                    value={form.vat}
+                    onChange={(e) => setForm({ ...form, vat: e.target.value })}
+                    disabled={isSaving}
+                  />
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="addr-address1">Address Line 1 *</Label>
                 <Input

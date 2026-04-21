@@ -110,6 +110,9 @@ const InvoicePDF = ({ order }) => {
           {address.firstName} {address.lastName}
         </Text>
         {address.company ? <Text>{address.company}</Text> : null}
+        {address.vat ? (
+          <Text>Tax identification number: {address.vat}</Text>
+        ) : null}
         <Text>{address.address1}</Text>
         {address.address2 ? <Text>{address.address2}</Text> : null}
         <Text>

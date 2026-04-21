@@ -146,6 +146,9 @@ function OrderCard({ order }) {
                   {order.billingAddress.company && (
                     <p>{order.billingAddress.company}</p>
                   )}
+                  {order.billingAddress.vat && (
+                    <p>Tax identification number: {order.billingAddress.vat}</p>
+                  )}
                   <p>{order.billingAddress.address1}</p>
                   {order.billingAddress.address2 && (
                     <p>{order.billingAddress.address2}</p>

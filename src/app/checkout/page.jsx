@@ -21,6 +21,7 @@ const emptyAddress = {
   firstName: "",
   lastName: "",
   company: "",
+  vat: "",
   address1: "",
   address2: "",
   postalCode: "",
@@ -29,7 +30,7 @@ const emptyAddress = {
   phone: "",
 };
 
-function AddressDisplay({ address }) {
+function AddressDisplay({ address, type }) {
   if (!address || !address.firstName) {
     return (
       <p className="text-sm text-muted-foreground">No address provided.</p>
@@ -41,6 +42,9 @@ function AddressDisplay({ address }) {
         {address.firstName} {address.lastName}
       </p>
       {address.company && <p>{address.company}</p>}
+      {type === "billing" && address.vat && (
+        <p>Tax identification number: {address.vat}</p>
+      )}
       <p>{address.address1}</p>
       {address.address2 && <p>{address.address2}</p>}
       <p>
@@ -52,7 +56,7 @@ function AddressDisplay({ address }) {
   );
 }
 
-function AddressForm({ address, onChange, disabled }) {
+function AddressForm({ address, onChange, disabled, type }) {
   const update = (field, value) => {
     onChange({ ...address, [field]: value });
   };
@@ -88,6 +92,16 @@ function AddressForm({ address, onChange, disabled }) {
           required
         />
       </div>
+      {type === "billing" && (
+        <div className="space-y-2">
+          <Label>Tax identification number</Label>
+          <Input
+            value={address.vat}
+            onChange={(e) => update("vat", e.target.value)}
+            disabled={disabled}
+          />
+        </div>
+      )}
       <div className="space-y-2">
         <Label>Address Line 1 *</Label>
         <Input
@@ -171,6 +185,7 @@ export default function CheckoutPage() {
               firstName: result.billingAddress.firstName || "",
               lastName: result.billingAddress.lastName || "",
               company: result.billingAddress.company || "",
+              vat: result.billingAddress.vat || "",
               address1: result.billingAddress.address1 || "",
               address2: result.billingAddress.address2 || "",
               postalCode: result.billingAddress.postalCode || "",
@@ -186,6 +201,7 @@ export default function CheckoutPage() {
               firstName: result.deliveryAddress.firstName || "",
               lastName: result.deliveryAddress.lastName || "",
               company: result.deliveryAddress.company || "",
+              vat: result.deliveryAddress.vat || "",
               address1: result.deliveryAddress.address1 || "",
               address2: result.deliveryAddress.address2 || "",
               postalCode: result.deliveryAddress.postalCode || "",
@@ -324,6 +340,7 @@ export default function CheckoutPage() {
                     address={billingAddress}
                     onChange={setBillingAddress}
                     disabled={isOrdering}
+                    type="billing"
                   />
                   {isAddressComplete(billingAddress) && (
                     <Button
@@ -335,7 +352,7 @@ export default function CheckoutPage() {
                   )}
                 </div>
               ) : (
-                <AddressDisplay address={billingAddress} />
+                <AddressDisplay address={billingAddress} type="billing" />
               )}
             </CardContent>
           </Card>
@@ -363,6 +380,7 @@ export default function CheckoutPage() {
                     address={deliveryAddress}
                     onChange={setDeliveryAddress}
                     disabled={isOrdering}
+                    type="delivery"
                   />
                   {isAddressComplete(deliveryAddress) && (
                     <Button
@@ -374,7 +392,7 @@ export default function CheckoutPage() {
                   )}
                 </div>
               ) : (
-                <AddressDisplay address={deliveryAddress} />
+                <AddressDisplay address={deliveryAddress} type="delivery" />
               )}
             </CardContent>
           </Card>

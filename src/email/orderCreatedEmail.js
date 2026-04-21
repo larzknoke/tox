@@ -24,6 +24,7 @@ export const orderCreatedEmail = (order) => {
   const formatAddress = (addr) =>
     [
       addr.company ? addr.company : null,
+      addr.vat ? `Tax identification number: ${addr.vat}` : null,
       `${addr.firstName} ${addr.lastName}`,
       addr.address1,
       addr.address2 || null,
@@ -37,6 +38,7 @@ export const orderCreatedEmail = (order) => {
   const formatAddressText = (addr) =>
     [
       addr.company ? addr.company : null,
+      addr.vat ? `Tax identification number: ${addr.vat}` : null,
       `${addr.firstName} ${addr.lastName}`,
       addr.address1,
       addr.address2 || null,

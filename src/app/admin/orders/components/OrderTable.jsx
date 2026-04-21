@@ -396,6 +396,12 @@ export default function OrderTable({ orders: initialOrders }) {
                       {detailOrder.billingAddress.company && (
                         <p>{detailOrder.billingAddress.company}</p>
                       )}
+                      {detailOrder.billingAddress.vat && (
+                        <p>
+                          Tax identification number:{" "}
+                          {detailOrder.billingAddress.vat}
+                        </p>
+                      )}
                       <p>{detailOrder.billingAddress.address1}</p>
                       {detailOrder.billingAddress.address2 && (
                         <p>{detailOrder.billingAddress.address2}</p>

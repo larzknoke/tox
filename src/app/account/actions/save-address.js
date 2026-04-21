@@ -31,6 +31,7 @@ export async function saveAddressAction(type, addressData) {
       firstName: addressData.firstName,
       lastName: addressData.lastName,
       company: addressData.company,
+      vat: type === "billing" ? addressData.vat || null : null,
       address1: addressData.address1,
       address2: addressData.address2 || null,
       postalCode: addressData.postalCode,
