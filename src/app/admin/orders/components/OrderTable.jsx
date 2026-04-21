@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import {
   Table,
@@ -42,7 +43,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Trash2, FileText, Euro } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Trash2, FileText, Euro, CalendarIcon } from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
 import { generateInvoicePDFAction } from "../actions/generate-invoice-pdf";
@@ -59,17 +66,28 @@ const statusVariant = {
 export default function OrderTable({ orders: initialOrders }) {
   const [orders, setOrders] = useState(initialOrders);
   const [search, setSearch] = useState("");
+  const [dateRange, setDateRange] = useState();
   const [deleteOrder, setDeleteOrder] = useState(null);
   const [detailOrder, setDetailOrder] = useState(null);
   const [isPending, startTransition] = useTransition();
 
-  const filtered = orders.filter(
-    (o) =>
-      o.name.toLowerCase().includes(search.toLowerCase()) ||
-      String(o.id).includes(search.toLowerCase()) ||
-      o.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      o.user?.email?.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = orders.filter((o) => {
+    const searchTerm = search.toLowerCase();
+    const orderDate = format(new Date(o.createdAt), "yyyy-MM-dd");
+    const fromDate = dateRange?.from
+      ? format(dateRange.from, "yyyy-MM-dd")
+      : null;
+    const toDate = dateRange?.to ? format(dateRange.to, "yyyy-MM-dd") : null;
+    const matchesSearch =
+      o.name.toLowerCase().includes(searchTerm) ||
+      String(o.id).includes(searchTerm) ||
+      o.user?.name?.toLowerCase().includes(searchTerm) ||
+      o.user?.email?.toLowerCase().includes(searchTerm);
+    const matchesFromDate = !fromDate || orderDate >= fromDate;
+    const matchesToDate = !toDate || orderDate <= toDate;
+
+    return matchesSearch && matchesFromDate && matchesToDate;
+  });
 
   function handleStatusChange(orderId, newStatus) {
     startTransition(async () => {
@@ -139,13 +157,56 @@ export default function OrderTable({ orders: initialOrders }) {
 
   return (
     <>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <Input
           placeholder="Search orders..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
         />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="justify-start px-3 font-normal"
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {dateRange?.from ? (
+                dateRange.to ? (
+                  <>
+                    {format(dateRange.from, "LLL dd, y")} -{" "}
+                    {format(dateRange.to, "LLL dd, y")}
+                  </>
+                ) : (
+                  format(dateRange.from, "LLL dd, y")
+                )
+              ) : (
+                <span>Date Filter</span>
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="range"
+              defaultMonth={dateRange?.from}
+              selected={dateRange}
+              onSelect={setDateRange}
+              numberOfMonths={2}
+            />
+          </PopoverContent>
+        </Popover>
+        {(search || dateRange?.from || dateRange?.to) && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setSearch("");
+              setDateRange(undefined);
+            }}
+          >
+            Clear
+          </Button>
+        )}
         <span className="text-sm text-muted-foreground ml-auto">
           {filtered.length} order{filtered.length !== 1 ? "s" : ""}
         </span>
