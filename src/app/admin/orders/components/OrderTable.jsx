@@ -49,7 +49,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Trash2, FileText, Euro, CalendarIcon } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Trash2, FileText, Euro, CalendarIcon, ListFilter } from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
 import { generateInvoicePDFAction } from "../actions/generate-invoice-pdf";
@@ -67,9 +75,34 @@ export default function OrderTable({ orders: initialOrders }) {
   const [orders, setOrders] = useState(initialOrders);
   const [search, setSearch] = useState("");
   const [dateRange, setDateRange] = useState();
+  const [selectedItemKeys, setSelectedItemKeys] = useState([]);
   const [deleteOrder, setDeleteOrder] = useState(null);
   const [detailOrder, setDetailOrder] = useState(null);
   const [isPending, startTransition] = useTransition();
+
+  const getItemName = (item) => item.name ?? item.designation ?? item.reference;
+  const getItemReference = (item) => item.reference ?? "";
+  const getItemKey = (item) =>
+    `${getItemName(item)}|||${getItemReference(item)}`;
+
+  const itemOptionMap = new Map();
+  orders.forEach((order) => {
+    order.items.forEach((item) => {
+      const name = getItemName(item);
+      if (!name) return;
+      const reference = getItemReference(item);
+      const key = getItemKey(item);
+
+      if (!itemOptionMap.has(key)) {
+        itemOptionMap.set(key, { key, name, reference });
+      }
+    });
+  });
+
+  const itemOptions = Array.from(itemOptionMap.values()).sort(
+    (a, b) =>
+      a.name.localeCompare(b.name) || a.reference.localeCompare(b.reference),
+  );
 
   const filtered = orders.filter((o) => {
     const searchTerm = search.toLowerCase();
@@ -85,8 +118,11 @@ export default function OrderTable({ orders: initialOrders }) {
       o.user?.email?.toLowerCase().includes(searchTerm);
     const matchesFromDate = !fromDate || orderDate >= fromDate;
     const matchesToDate = !toDate || orderDate <= toDate;
+    const matchesItems =
+      selectedItemKeys.length === 0 ||
+      o.items.some((item) => selectedItemKeys.includes(getItemKey(item)));
 
-    return matchesSearch && matchesFromDate && matchesToDate;
+    return matchesSearch && matchesFromDate && matchesToDate && matchesItems;
   });
 
   function handleStatusChange(orderId, newStatus) {
@@ -195,13 +231,64 @@ export default function OrderTable({ orders: initialOrders }) {
             />
           </PopoverContent>
         </Popover>
-        {(search || dateRange?.from || dateRange?.to) && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              className="justify-start px-3 font-normal"
+            >
+              <ListFilter className="mr-2 h-4 w-4" />
+              {selectedItemKeys.length > 0
+                ? `Items (${selectedItemKeys.length})`
+                : "Filter items"}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-72 max-h-80 overflow-y-auto"
+            align="start"
+          >
+            <DropdownMenuLabel>Order items</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {itemOptions.length === 0 ? (
+              <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                No items available
+              </div>
+            ) : (
+              itemOptions.map((option) => (
+                <DropdownMenuCheckboxItem
+                  key={option.key}
+                  checked={selectedItemKeys.includes(option.key)}
+                  onCheckedChange={(checked) => {
+                    setSelectedItemKeys((prev) =>
+                      checked
+                        ? [...prev, option.key]
+                        : prev.filter((itemKey) => itemKey !== option.key),
+                    );
+                  }}
+                  onSelect={(e) => e.preventDefault()}
+                >
+                  <span>{option.name}</span>
+                  {option.reference ? (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({option.reference})
+                    </span>
+                  ) : null}
+                </DropdownMenuCheckboxItem>
+              ))
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        {(search ||
+          dateRange?.from ||
+          dateRange?.to ||
+          selectedItemKeys.length > 0) && (
           <Button
             type="button"
             variant="outline"
             onClick={() => {
               setSearch("");
               setDateRange(undefined);
+              setSelectedItemKeys([]);
             }}
           >
             Clear
