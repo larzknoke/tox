@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { EmptyCart } from "@/components/empty-cart";
+import { getShippingByTicketCount } from "@/lib/shipping";
 
 const emptyAddress = {
   firstName: "",
@@ -249,8 +250,22 @@ export default function CheckoutPage() {
     (sum, item) => sum + item.pricePerPack * item.quantity,
     0,
   );
+  const totalTickets = cartItems.reduce(
+    (sum, item) => sum + item.quantityPerPack * item.quantity,
+    0,
+  );
+  const shipping = getShippingByTicketCount(totalTickets);
+  const shippingCost = shipping.price ?? 0;
+  const grandTotal = subtotal + shippingCost;
 
   const handlePlaceOrder = () => {
+    if (shipping.isQuoteRequired) {
+      toast.error(
+        "Shipping for this quantity is upon request. Please contact support.",
+      );
+      return;
+    }
+
     startTransition(async () => {
       const result = await placeOrderAction({
         name: orderName,
@@ -289,7 +304,8 @@ export default function CheckoutPage() {
   const canOrder =
     orderName.trim() &&
     isAddressComplete(billingAddress) &&
-    isAddressComplete(deliveryAddress);
+    isAddressComplete(deliveryAddress) &&
+    !shipping.isQuoteRequired;
 
   return (
     <div className="flex flex-col gap-6 w-full">
@@ -423,10 +439,34 @@ export default function CheckoutPage() {
 
             <Separator />
 
-            <div className="flex justify-between font-semibold">
+            <div className="flex justify-between font-medium">
               <span>Total (excl. VAT)</span>
               <span>€{subtotal.toFixed(2)}</span>
             </div>
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>
+                Shipping {shipping.parcels > 0 ? `(${shipping.parcels} parcel${shipping.parcels > 1 ? "s" : ""})` : ""}
+              </span>
+              <span>
+                {shipping.isQuoteRequired
+                  ? "Upon request"
+                  : `€${shippingCost.toFixed(2)}`}
+              </span>
+            </div>
+            <div className="flex justify-between font-semibold">
+              <span>Total incl. shipping (excl. VAT)</span>
+              <span>
+                {shipping.isQuoteRequired
+                  ? "Upon request"
+                  : `€${grandTotal.toFixed(2)}`}
+              </span>
+            </div>
+            {shipping.isQuoteRequired && (
+              <p className="text-xs text-muted-foreground">
+                For quantities above 50,000 tickets, shipping is calculated upon
+                request.
+              </p>
+            )}
             <div className="flex space-bewtween w-full items-center justify-between">
               <Button asChild variant="ghost" size="sm" className="w-40">
                 <Link href="/cart">

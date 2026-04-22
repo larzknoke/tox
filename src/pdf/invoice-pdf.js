@@ -1,6 +1,7 @@
 import React from "react";
 import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import { formatCurrency } from "@/lib/utils";
+import { getOrderPricingSummary } from "@/lib/shipping";
 
 const styles = StyleSheet.create({
   page: {
@@ -93,14 +94,7 @@ const styles = StyleSheet.create({
 });
 
 const InvoicePDF = ({ order }) => {
-  const totalPrice = order.items.reduce(
-    (sum, i) => sum + Number(i.totalPrice),
-    0,
-  );
-  const totalTickets = order.items.reduce(
-    (sum, i) => sum + i.quantityPerPack * i.numberOfPacks,
-    0,
-  );
+  const pricing = getOrderPricingSummary(order.items);
 
   const formatAddress = (address) => {
     if (!address) return null;
@@ -214,16 +208,26 @@ const InvoicePDF = ({ order }) => {
           {/* Totals */}
           <View style={styles.infoRow}>
             <Text style={styles.label}>Total Packs:</Text>
-            <Text style={styles.value}>
-              {order.items.reduce((s, i) => s + i.numberOfPacks, 0)}
-            </Text>
+            <Text style={styles.value}>{pricing.totalPacks}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Total Tickets:</Text>
-            <Text style={styles.value}>{totalTickets.toLocaleString()}</Text>
+            <Text style={styles.value}>{pricing.totalTickets.toLocaleString()}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Subtotal (excl. VAT):</Text>
+            <Text style={styles.value}>{formatCurrency(pricing.subtotal)}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Shipping:</Text>
+            <Text style={styles.value}>
+              {pricing.shipping.isQuoteRequired
+                ? "Upon request"
+                : `${formatCurrency(pricing.shippingCost)} (${pricing.shipping.parcels} parcel${pricing.shipping.parcels === 1 ? "" : "s"})`}
+            </Text>
           </View>
           <Text style={styles.total}>
-            Total (excl. VAT): {formatCurrency(totalPrice)}
+            Total incl. shipping (excl. VAT): {pricing.shipping.isQuoteRequired ? "Upon request" : formatCurrency(pricing.grandTotal)}
           </Text>
         </View>
 
@@ -248,7 +252,9 @@ const InvoicePDF = ({ order }) => {
               <View style={styles.infoRow}>
                 <Text style={styles.label}>Amount:</Text>
                 <Text style={styles.value}>
-                  {formatCurrency(Number(order.invoice.totalAmount))}{" "}
+                  {pricing.shipping.isQuoteRequired
+                    ? "Upon request"
+                    : formatCurrency(pricing.grandTotal)}{" "}
                   {order.invoice.currency}
                 </Text>
               </View>

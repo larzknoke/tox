@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { getOrderPricingSummary } from "@/lib/shipping";
 
 const statusVariant = {
   PENDING: "secondary",
@@ -39,12 +40,7 @@ function AddressSummary({ address }) {
 function OrderCard({ order }) {
   const [expanded, setExpanded] = useState(false);
 
-  const totalItems = order.items.reduce((sum, i) => sum + i.numberOfPacks, 0);
-  const totalPrice = order.items.reduce((sum, i) => sum + i.totalPrice, 0);
-  const totalTickets = order.items.reduce(
-    (sum, i) => sum + i.quantityPerPack * i.numberOfPacks,
-    0,
-  );
+  const pricing = getOrderPricingSummary(order.items);
 
   return (
     <Card>
@@ -66,10 +62,14 @@ function OrderCard({ order }) {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right text-sm">
-              <p className="font-semibold">€{totalPrice.toFixed(2)}</p>
+              <p className="font-semibold">
+                {pricing.shipping.isQuoteRequired
+                  ? "Upon request"
+                  : `€${pricing.grandTotal.toFixed(2)}`}
+              </p>
               <p className="text-xs text-muted-foreground">
-                {totalItems} {totalItems === 1 ? "pack" : "packs"} &middot;{" "}
-                {totalTickets.toLocaleString()} tickets &middot;{" "}
+                {pricing.totalPacks} {pricing.totalPacks === 1 ? "pack" : "packs"} &middot;{" "}
+                {pricing.totalTickets.toLocaleString()} tickets &middot;{" "}
                 {new Date(order.createdAt).toLocaleDateString("de-DE")}
               </p>
             </div>
@@ -122,11 +122,32 @@ function OrderCard({ order }) {
               </div>
             ))}
             <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm font-semibold bg-muted/40">
-              <span>Total (excl. VAT)</span>
+              <span>Subtotal (excl. VAT)</span>
               <span />
               <span />
               <span className="text-right tabular-nums">
-                €{totalPrice.toFixed(2)}
+                €{pricing.subtotal.toFixed(2)}
+              </span>
+            </div>
+          </div>
+
+          <div className="rounded-md border p-3 text-sm space-y-1">
+            <div className="flex items-center justify-between text-muted-foreground">
+              <span>
+                Shipping ({pricing.shipping.parcels} parcel{pricing.shipping.parcels === 1 ? "" : "s"})
+              </span>
+              <span>
+                {pricing.shipping.isQuoteRequired
+                  ? "Upon request"
+                  : `€${pricing.shippingCost.toFixed(2)}`}
+              </span>
+            </div>
+            <div className="flex items-center justify-between font-semibold">
+              <span>Total incl. shipping (excl. VAT)</span>
+              <span>
+                {pricing.shipping.isQuoteRequired
+                  ? "Upon request"
+                  : `€${pricing.grandTotal.toFixed(2)}`}
               </span>
             </div>
           </div>
@@ -205,7 +226,7 @@ function OrderCard({ order }) {
                 {new Date(order.invoice.invoiceDate).toLocaleDateString(
                   "de-DE",
                 )}{" "}
-                &middot; €{order.invoice.totalAmount.toFixed(2)}{" "}
+                &middot; €{pricing.grandTotal.toFixed(2)}{" "}
                 {order.invoice.currency}
               </p>
             </div>

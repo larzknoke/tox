@@ -57,6 +57,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getOrderPricingSummary } from "@/lib/shipping";
 import { Trash2, FileText, Euro, CalendarIcon, ListFilter } from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
@@ -156,14 +157,7 @@ export default function OrderTable({ orders: initialOrders }) {
 
   const [generatingPDFId, setGeneratingPDFId] = useState(null);
 
-  const totalPrice = (order) =>
-    order.items.reduce((sum, i) => sum + i.totalPrice, 0);
-
-  const totalTickets = (order) =>
-    order.items.reduce(
-      (sum, i) => sum + i.quantityPerPack * i.numberOfPacks,
-      0,
-    );
+  const getPricing = (order) => getOrderPricingSummary(order.items);
 
   async function handleDownloadInvoicePDF(order) {
     setGeneratingPDFId(order.id);
@@ -325,6 +319,10 @@ export default function OrderTable({ orders: initialOrders }) {
             ) : (
               filtered.map((order) => (
                 <TableRow key={order.id}>
+                  {(() => {
+                    const pricing = getPricing(order);
+                    return (
+                      <>
                   <TableCell>
                     <div>
                       <p className="font-medium">{order.name}</p>
@@ -342,14 +340,16 @@ export default function OrderTable({ orders: initialOrders }) {
                     </div>
                   </TableCell>
                   <TableCell className="text-right tabular-nums">
-                    {order.items.reduce((s, i) => s + i.numberOfPacks, 0)} packs
+                    {pricing.totalPacks} packs
                     <br />
                     <span className="text-xs text-muted-foreground">
-                      {totalTickets(order).toLocaleString()} tickets
+                      {pricing.totalTickets.toLocaleString()} tickets
                     </span>
                   </TableCell>
                   <TableCell className="text-right font-semibold tabular-nums">
-                    €{totalPrice(order).toFixed(2)}
+                    {pricing.shipping.isQuoteRequired
+                      ? "Upon request"
+                      : `€${pricing.grandTotal.toFixed(2)}`}
                   </TableCell>
                   <TableCell>
                     <Select
@@ -414,6 +414,9 @@ export default function OrderTable({ orders: initialOrders }) {
                       </Tooltip>
                     </div>
                   </TableCell>
+                      </>
+                    );
+                  })()}
                 </TableRow>
               ))
             )}
@@ -471,6 +474,10 @@ export default function OrderTable({ orders: initialOrders }) {
 
           {detailOrder && (
             <div className="flex flex-col gap-4">
+              {(() => {
+                const pricing = getPricing(detailOrder);
+                return (
+                  <>
               {/* Customer */}
               <div>
                 <p className="text-xs font-medium text-muted-foreground mb-1">
@@ -520,11 +527,32 @@ export default function OrderTable({ orders: initialOrders }) {
                   </div>
                 ))}
                 <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm font-semibold bg-muted/40">
-                  <span>Total (excl. VAT)</span>
+                  <span>Subtotal (excl. VAT)</span>
                   <span />
                   <span />
                   <span className="text-right tabular-nums">
-                    €{totalPrice(detailOrder).toFixed(2)}
+                    €{pricing.subtotal.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+
+              <div className="rounded-md border p-3 text-sm space-y-1">
+                <div className="flex items-center justify-between text-muted-foreground">
+                  <span>
+                    Shipping ({pricing.shipping.parcels} parcel{pricing.shipping.parcels === 1 ? "" : "s"})
+                  </span>
+                  <span>
+                    {pricing.shipping.isQuoteRequired
+                      ? "Upon request"
+                      : `€${pricing.shippingCost.toFixed(2)}`}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between font-semibold">
+                  <span>Total incl. shipping (excl. VAT)</span>
+                  <span>
+                    {pricing.shipping.isQuoteRequired
+                      ? "Upon request"
+                      : `€${pricing.grandTotal.toFixed(2)}`}
                   </span>
                 </div>
               </div>
@@ -608,12 +636,15 @@ export default function OrderTable({ orders: initialOrders }) {
                       {new Date(
                         detailOrder.invoice.invoiceDate,
                       ).toLocaleDateString("de-DE")}{" "}
-                      &middot; €{detailOrder.invoice.totalAmount.toFixed(2)}{" "}
+                      &middot; €{pricing.grandTotal.toFixed(2)}{" "}
                       {detailOrder.invoice.currency}
                     </p>
                   </div>
                 </>
               )}
+                  </>
+                );
+              })()}
             </div>
           )}
         </DialogContent>

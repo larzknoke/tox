@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { orderCreatedEmail } from "@/email/orderCreatedEmail";
+import { getShippingByTicketCount } from "@/lib/shipping";
 
 export async function placeOrderAction({
   name,
@@ -66,6 +67,20 @@ export async function placeOrderAction({
     }
 
     const productMap = Object.fromEntries(products.map((p) => [p.id, p]));
+
+    const totalTickets = items.reduce((sum, item) => {
+      const product = productMap[item.id];
+      return sum + product.quantityPerPack * item.quantity;
+    }, 0);
+
+    const shipping = getShippingByTicketCount(totalTickets);
+    if (shipping.isQuoteRequired) {
+      return {
+        success: false,
+        error:
+          "Shipping for this quantity is upon request. Please contact support.",
+      };
+    }
 
     const order = await prisma.$transaction(async (tx) => {
       // Create snapshot addresses for the order
