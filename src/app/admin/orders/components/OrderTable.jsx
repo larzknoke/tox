@@ -323,97 +323,105 @@ export default function OrderTable({ orders: initialOrders }) {
                     const pricing = getPricing(order);
                     return (
                       <>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium">{order.name}</p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        #{order.id}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="text-sm">{order.user?.name ?? "—"}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {order.user?.email ?? "—"}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {pricing.totalPacks} packs
-                    <br />
-                    <span className="text-xs text-muted-foreground">
-                      {pricing.totalTickets.toLocaleString()} tickets
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-semibold tabular-nums">
-                    {pricing.shipping.isQuoteRequired
-                      ? "Upon request"
-                      : `€${pricing.grandTotal.toFixed(2)}`}
-                  </TableCell>
-                  <TableCell>
-                    <Select
-                      value={order.status}
-                      onValueChange={(v) => handleStatusChange(order.id, v)}
-                      disabled={isPending}
-                    >
-                      <SelectTrigger className="w-40">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {statuses.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums">
-                    {new Date(order.createdAt).toLocaleDateString("de-DE")}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-1">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setDetailOrder(order)}
+                        <TableCell>
+                          <div>
+                            <p className="font-medium">{order.name}</p>
+                            <p className="text-xs text-muted-foreground font-mono">
+                              #{order.id}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="text-sm">{order.user?.name ?? "—"}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {order.user?.email ?? "—"}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right tabular-nums">
+                          {pricing.totalPacks} packs
+                          <br />
+                          <span className="text-xs text-muted-foreground">
+                            {pricing.totalTickets.toLocaleString()} tickets
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right font-semibold tabular-nums">
+                          {pricing.shipping.isQuoteRequired
+                            ? "Upon request"
+                            : `€${pricing.grandTotal.toFixed(2)}`}
+                        </TableCell>
+                        <TableCell>
+                          <Select
+                            value={order.status}
+                            onValueChange={(v) =>
+                              handleStatusChange(order.id, v)
+                            }
+                            disabled={isPending}
                           >
-                            <FileText className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>View details</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDownloadInvoicePDF(order)}
-                            disabled={generatingPDFId === order.id}
-                          >
-                            <Euro className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Download Invoice PDF</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-destructive hover:text-destructive"
-                            onClick={() => setDeleteOrder(order)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Delete order</TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </TableCell>
+                            <SelectTrigger className="w-40">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {statuses.map((s) => (
+                                <SelectItem key={s} value={s}>
+                                  {s}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-right text-sm tabular-nums">
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "de-DE",
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-1">
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setDetailOrder(order)}
+                                >
+                                  <FileText className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>View details</TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    handleDownloadInvoicePDF(order)
+                                  }
+                                  disabled={generatingPDFId === order.id}
+                                >
+                                  <Euro className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                Download Invoice PDF
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="text-destructive hover:text-destructive"
+                                  onClick={() => setDeleteOrder(order)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>Delete order</TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </TableCell>
                       </>
                     );
                   })()}
@@ -478,170 +486,173 @@ export default function OrderTable({ orders: initialOrders }) {
                 const pricing = getPricing(detailOrder);
                 return (
                   <>
-              {/* Customer */}
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">
-                  Customer
-                </p>
-                <p className="text-sm">
-                  {detailOrder.user?.name ?? "—"} (
-                  {detailOrder.user?.email ?? "—"})
-                </p>
-              </div>
-
-              <Separator />
-
-              {/* Items */}
-              <div className="rounded-md border">
-                <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2 text-xs font-medium text-muted-foreground border-b bg-muted/40">
-                  <span>Product</span>
-                  <span className="text-right">Qty</span>
-                  <span className="text-right">Unit Price</span>
-                  <span className="text-right">Total</span>
-                </div>
-                {detailOrder.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm border-b last:border-b-0"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-medium truncate">{item.designation}</p>
-                      <p className="text-xs text-muted-foreground font-mono">
-                        {item.reference} &middot; {item.quantityPerPack}{" "}
-                        tickets/pack &middot;{" "}
-                        {(
-                          item.quantityPerPack * item.numberOfPacks
-                        ).toLocaleString()}{" "}
-                        tickets total
+                    {/* Customer */}
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground mb-1">
+                        Customer
+                      </p>
+                      <p className="text-sm">
+                        {detailOrder.user?.name ?? "—"} (
+                        {detailOrder.user?.email ?? "—"})
                       </p>
                     </div>
-                    <span className="text-right tabular-nums">
-                      {item.numberOfPacks}
-                    </span>
-                    <span className="text-right tabular-nums">
-                      €{item.pricePerPack.toFixed(2)}
-                    </span>
-                    <span className="text-right font-semibold tabular-nums">
-                      €{item.totalPrice.toFixed(2)}
-                    </span>
-                  </div>
-                ))}
-                <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm font-semibold bg-muted/40">
-                  <span>Subtotal (excl. VAT)</span>
-                  <span />
-                  <span />
-                  <span className="text-right tabular-nums">
-                    €{pricing.subtotal.toFixed(2)}
-                  </span>
-                </div>
-              </div>
 
-              <div className="rounded-md border p-3 text-sm space-y-1">
-                <div className="flex items-center justify-between text-muted-foreground">
-                  <span>
-                    Shipping ({pricing.shipping.parcels} parcel{pricing.shipping.parcels === 1 ? "" : "s"})
-                  </span>
-                  <span>
-                    {pricing.shipping.isQuoteRequired
-                      ? "Upon request"
-                      : `€${pricing.shippingCost.toFixed(2)}`}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between font-semibold">
-                  <span>Total incl. shipping (excl. VAT)</span>
-                  <span>
-                    {pricing.shipping.isQuoteRequired
-                      ? "Upon request"
-                      : `€${pricing.grandTotal.toFixed(2)}`}
-                  </span>
-                </div>
-              </div>
+                    <Separator />
 
-              {/* Addresses */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1">
-                    Billing Address
-                  </p>
-                  {detailOrder.billingAddress ? (
-                    <div className="text-sm space-y-0.5 text-muted-foreground">
-                      <p className="text-foreground font-medium">
-                        {detailOrder.billingAddress.firstName}{" "}
-                        {detailOrder.billingAddress.lastName}
-                      </p>
-                      {detailOrder.billingAddress.company && (
-                        <p>{detailOrder.billingAddress.company}</p>
-                      )}
-                      {detailOrder.billingAddress.vat && (
-                        <p>
-                          Tax identification number:{" "}
-                          {detailOrder.billingAddress.vat}
+                    {/* Items */}
+                    <div className="rounded-md border">
+                      <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2 text-xs font-medium text-muted-foreground border-b bg-muted/40">
+                        <span>Product</span>
+                        <span className="text-right">Qty</span>
+                        <span className="text-right">Unit Price</span>
+                        <span className="text-right">Total</span>
+                      </div>
+                      {detailOrder.items.map((item) => (
+                        <div
+                          key={item.id}
+                          className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm border-b last:border-b-0"
+                        >
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">
+                              {item.designation}
+                            </p>
+                            <p className="text-xs text-muted-foreground font-mono">
+                              {item.reference} &middot; {item.quantityPerPack}{" "}
+                              tickets/pack &middot;{" "}
+                              {(
+                                item.quantityPerPack * item.numberOfPacks
+                              ).toLocaleString()}{" "}
+                              tickets total
+                            </p>
+                          </div>
+                          <span className="text-right tabular-nums">
+                            {item.numberOfPacks}
+                          </span>
+                          <span className="text-right tabular-nums">
+                            €{item.pricePerPack.toFixed(2)}
+                          </span>
+                          <span className="text-right font-semibold tabular-nums">
+                            €{item.totalPrice.toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                      <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm font-semibold bg-muted/40">
+                        <span>Subtotal (excl. VAT)</span>
+                        <span />
+                        <span />
+                        <span className="text-right tabular-nums">
+                          €{pricing.subtotal.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="rounded-md border p-3 text-sm space-y-1">
+                      <div className="flex items-center justify-between text-muted-foreground">
+                        <span>
+                          Shipping ({pricing.shipping.parcels} parcel
+                          {pricing.shipping.parcels === 1 ? "" : "s"})
+                        </span>
+                        <span>
+                          {pricing.shipping.isQuoteRequired
+                            ? "Upon request"
+                            : `€${pricing.shippingCost.toFixed(2)}`}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between font-semibold">
+                        <span>Total incl. shipping (excl. VAT)</span>
+                        <span>
+                          {pricing.shipping.isQuoteRequired
+                            ? "Upon request"
+                            : `€${pricing.grandTotal.toFixed(2)}`}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Addresses */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          Billing Address
                         </p>
-                      )}
-                      <p>{detailOrder.billingAddress.address1}</p>
-                      {detailOrder.billingAddress.address2 && (
-                        <p>{detailOrder.billingAddress.address2}</p>
-                      )}
-                      <p>
-                        {detailOrder.billingAddress.postalCode}{" "}
-                        {detailOrder.billingAddress.city}
-                      </p>
-                      <p>{detailOrder.billingAddress.country}</p>
-                      <p>{detailOrder.billingAddress.phone}</p>
+                        {detailOrder.billingAddress ? (
+                          <div className="text-sm space-y-0.5 text-muted-foreground">
+                            <p className="text-foreground font-medium">
+                              {detailOrder.billingAddress.firstName}{" "}
+                              {detailOrder.billingAddress.lastName}
+                            </p>
+                            {detailOrder.billingAddress.company && (
+                              <p>{detailOrder.billingAddress.company}</p>
+                            )}
+                            {detailOrder.billingAddress.vat && (
+                              <p>
+                                Tax identification number:{" "}
+                                {detailOrder.billingAddress.vat}
+                              </p>
+                            )}
+                            <p>{detailOrder.billingAddress.address1}</p>
+                            {detailOrder.billingAddress.address2 && (
+                              <p>{detailOrder.billingAddress.address2}</p>
+                            )}
+                            <p>
+                              {detailOrder.billingAddress.postalCode}{" "}
+                              {detailOrder.billingAddress.city}
+                            </p>
+                            <p>{detailOrder.billingAddress.country}</p>
+                            <p>{detailOrder.billingAddress.phone}</p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">—</p>
+                        )}
+                      </div>
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          Delivery Address
+                        </p>
+                        {detailOrder.deliveryAddress ? (
+                          <div className="text-sm space-y-0.5 text-muted-foreground">
+                            <p className="text-foreground font-medium">
+                              {detailOrder.deliveryAddress.firstName}{" "}
+                              {detailOrder.deliveryAddress.lastName}
+                            </p>
+                            {detailOrder.deliveryAddress.company && (
+                              <p>{detailOrder.deliveryAddress.company}</p>
+                            )}
+                            <p>{detailOrder.deliveryAddress.address1}</p>
+                            {detailOrder.deliveryAddress.address2 && (
+                              <p>{detailOrder.deliveryAddress.address2}</p>
+                            )}
+                            <p>
+                              {detailOrder.deliveryAddress.postalCode}{" "}
+                              {detailOrder.deliveryAddress.city}
+                            </p>
+                            <p>{detailOrder.deliveryAddress.country}</p>
+                            <p>{detailOrder.deliveryAddress.phone}</p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">—</p>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">—</p>
-                  )}
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1">
-                    Delivery Address
-                  </p>
-                  {detailOrder.deliveryAddress ? (
-                    <div className="text-sm space-y-0.5 text-muted-foreground">
-                      <p className="text-foreground font-medium">
-                        {detailOrder.deliveryAddress.firstName}{" "}
-                        {detailOrder.deliveryAddress.lastName}
-                      </p>
-                      {detailOrder.deliveryAddress.company && (
-                        <p>{detailOrder.deliveryAddress.company}</p>
-                      )}
-                      <p>{detailOrder.deliveryAddress.address1}</p>
-                      {detailOrder.deliveryAddress.address2 && (
-                        <p>{detailOrder.deliveryAddress.address2}</p>
-                      )}
-                      <p>
-                        {detailOrder.deliveryAddress.postalCode}{" "}
-                        {detailOrder.deliveryAddress.city}
-                      </p>
-                      <p>{detailOrder.deliveryAddress.country}</p>
-                      <p>{detailOrder.deliveryAddress.phone}</p>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">—</p>
-                  )}
-                </div>
-              </div>
 
-              {/* Invoice */}
-              {detailOrder.invoice && (
-                <>
-                  <Separator />
-                  <div>
-                    <p className="text-xs font-medium text-muted-foreground mb-1">
-                      Invoice
-                    </p>
-                    <p className="text-sm">
-                      #{detailOrder.invoice.invoiceNumber} &middot;{" "}
-                      {new Date(
-                        detailOrder.invoice.invoiceDate,
-                      ).toLocaleDateString("de-DE")}{" "}
-                      &middot; €{pricing.grandTotal.toFixed(2)}{" "}
-                      {detailOrder.invoice.currency}
-                    </p>
-                  </div>
-                </>
-              )}
+                    {/* Invoice */}
+                    {detailOrder.invoice && (
+                      <>
+                        <Separator />
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">
+                            Invoice
+                          </p>
+                          <p className="text-sm">
+                            #{detailOrder.invoice.invoiceNumber} &middot;{" "}
+                            {new Date(
+                              detailOrder.invoice.invoiceDate,
+                            ).toLocaleDateString("de-DE")}{" "}
+                            &middot; €{pricing.grandTotal.toFixed(2)}{" "}
+                            {detailOrder.invoice.currency}
+                          </p>
+                        </div>
+                      </>
+                    )}
                   </>
                 );
               })()}

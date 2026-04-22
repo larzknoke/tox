@@ -68,7 +68,8 @@ function OrderCard({ order }) {
                   : `€${pricing.grandTotal.toFixed(2)}`}
               </p>
               <p className="text-xs text-muted-foreground">
-                {pricing.totalPacks} {pricing.totalPacks === 1 ? "pack" : "packs"} &middot;{" "}
+                {pricing.totalPacks}{" "}
+                {pricing.totalPacks === 1 ? "pack" : "packs"} &middot;{" "}
                 {pricing.totalTickets.toLocaleString()} tickets &middot;{" "}
                 {new Date(order.createdAt).toLocaleDateString("de-DE")}
               </p>
@@ -134,7 +135,8 @@ function OrderCard({ order }) {
           <div className="rounded-md border p-3 text-sm space-y-1">
             <div className="flex items-center justify-between text-muted-foreground">
               <span>
-                Shipping ({pricing.shipping.parcels} parcel{pricing.shipping.parcels === 1 ? "" : "s"})
+                Shipping ({pricing.shipping.parcels} parcel
+                {pricing.shipping.parcels === 1 ? "" : "s"})
               </span>
               <span>
                 {pricing.shipping.isQuoteRequired

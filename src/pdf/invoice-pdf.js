@@ -212,7 +212,9 @@ const InvoicePDF = ({ order }) => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Total Tickets:</Text>
-            <Text style={styles.value}>{pricing.totalTickets.toLocaleString()}</Text>
+            <Text style={styles.value}>
+              {pricing.totalTickets.toLocaleString()}
+            </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>Subtotal (excl. VAT):</Text>
@@ -227,7 +229,10 @@ const InvoicePDF = ({ order }) => {
             </Text>
           </View>
           <Text style={styles.total}>
-            Total incl. shipping (excl. VAT): {pricing.shipping.isQuoteRequired ? "Upon request" : formatCurrency(pricing.grandTotal)}
+            Total incl. shipping (excl. VAT):{" "}
+            {pricing.shipping.isQuoteRequired
+              ? "Upon request"
+              : formatCurrency(pricing.grandTotal)}
           </Text>
         </View>
 

@@ -53,12 +53,19 @@ export function getShippingByTicketCount(totalTickets) {
 }
 
 export function getOrderPricingSummary(items = []) {
-  const subtotal = items.reduce((sum, item) => sum + Number(item.totalPrice || 0), 0);
-  const totalTickets = items.reduce(
-    (sum, item) => sum + Number(item.quantityPerPack || 0) * Number(item.numberOfPacks || 0),
+  const subtotal = items.reduce(
+    (sum, item) => sum + Number(item.totalPrice || 0),
     0,
   );
-  const totalPacks = items.reduce((sum, item) => sum + Number(item.numberOfPacks || 0), 0);
+  const totalTickets = items.reduce(
+    (sum, item) =>
+      sum + Number(item.quantityPerPack || 0) * Number(item.numberOfPacks || 0),
+    0,
+  );
+  const totalPacks = items.reduce(
+    (sum, item) => sum + Number(item.numberOfPacks || 0),
+    0,
+  );
   const shipping = getShippingByTicketCount(totalTickets);
   const shippingCost = shipping.price ?? 0;
   const grandTotal = subtotal + shippingCost;

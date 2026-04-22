@@ -445,7 +445,10 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>
-                Shipping {shipping.parcels > 0 ? `(${shipping.parcels} parcel${shipping.parcels > 1 ? "s" : ""})` : ""}
+                Shipping{" "}
+                {shipping.parcels > 0
+                  ? `(${shipping.parcels} parcel${shipping.parcels > 1 ? "s" : ""})`
+                  : ""}
               </span>
               <span>
                 {shipping.isQuoteRequired
