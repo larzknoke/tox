@@ -190,12 +190,13 @@ export function AddressCard({ type, address, onSave }) {
               </div>
               {type === "billing" && (
                 <div className="space-y-2">
-                  <Label htmlFor="addr-vat">Tax identification number</Label>
+                  <Label htmlFor="addr-vat">Tax identification number *</Label>
                   <Input
                     id="addr-vat"
                     value={form.vat}
                     onChange={(e) => setForm({ ...form, vat: e.target.value })}
                     disabled={isSaving}
+                    required
                   />
                 </div>
               )}
