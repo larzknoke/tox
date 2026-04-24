@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { useLocale } from "@/lib/locale-context";
 import {
   Table,
   TableBody,
@@ -80,6 +81,7 @@ export default function OrderTable({ orders: initialOrders }) {
   const [deleteOrder, setDeleteOrder] = useState(null);
   const [detailOrder, setDetailOrder] = useState(null);
   const [isPending, startTransition] = useTransition();
+  const { locale, t } = useLocale();
 
   const getItemName = (item) => item.name ?? item.designation ?? item.reference;
   const getItemReference = (item) => item.reference ?? "";
@@ -133,9 +135,9 @@ export default function OrderTable({ orders: initialOrders }) {
         setOrders((prev) =>
           prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)),
         );
-        toast.success("Status updated");
+        toast.success(t("orders.statusUpdated"));
       } catch {
-        toast.error("Failed to update status");
+        toast.error(t("orders.statusUpdateFailed"));
       }
     });
   }
@@ -146,9 +148,9 @@ export default function OrderTable({ orders: initialOrders }) {
       try {
         await deleteOrderAction(deleteOrder.id);
         setOrders((prev) => prev.filter((o) => o.id !== deleteOrder.id));
-        toast.success("Order deleted");
+        toast.success(t("orders.orderDeleted"));
       } catch {
-        toast.error("Failed to delete order");
+        toast.error(t("orders.orderDeleteFailed"));
       } finally {
         setDeleteOrder(null);
       }
@@ -177,9 +179,9 @@ export default function OrderTable({ orders: initialOrders }) {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      toast.success("PDF downloaded");
+      toast.success(t("orders.pdfDownloaded"));
     } catch (error) {
-      toast.error("Failed to generate PDF: " + error.message);
+      toast.error(t("orders.pdfFailed") + ": " + error.message);
     } finally {
       setGeneratingPDFId(null);
     }
@@ -189,7 +191,7 @@ export default function OrderTable({ orders: initialOrders }) {
     <>
       <div className="flex flex-wrap items-center gap-4">
         <Input
-          placeholder="Search orders..."
+          placeholder={t("orders.searchPlaceholder")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-sm"
@@ -211,7 +213,7 @@ export default function OrderTable({ orders: initialOrders }) {
                   format(dateRange.from, "LLL dd, y")
                 )
               ) : (
-                <span>Date Filter</span>
+                <span>{t("orders.dateFilter")}</span>
               )}
             </Button>
           </PopoverTrigger>
@@ -233,19 +235,19 @@ export default function OrderTable({ orders: initialOrders }) {
             >
               <ListFilter className="mr-2 h-4 w-4" />
               {selectedItemKeys.length > 0
-                ? `Items (${selectedItemKeys.length})`
-                : "Filter items"}
+                ? t("orders.itemsSelected", { count: selectedItemKeys.length })
+                : t("orders.filterItems")}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-72 max-h-80 overflow-y-auto"
             align="start"
           >
-            <DropdownMenuLabel>Order items</DropdownMenuLabel>
+            <DropdownMenuLabel>{t("orders.orderItems")}</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {itemOptions.length === 0 ? (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                No items available
+                {t("orders.noItemsAvailable")}
               </div>
             ) : (
               itemOptions.map((option) => (
@@ -285,11 +287,13 @@ export default function OrderTable({ orders: initialOrders }) {
               setSelectedItemKeys([]);
             }}
           >
-            Clear
+            {t("orders.clear")}
           </Button>
         )}
         <span className="text-sm text-muted-foreground ml-auto">
-          {filtered.length} order{filtered.length !== 1 ? "s" : ""}
+          {filtered.length !== 1
+            ? t("orders.orderCount_other", { count: filtered.length })
+            : t("orders.orderCount_one", { count: filtered.length })}
         </span>
       </div>
 
@@ -297,13 +301,21 @@ export default function OrderTable({ orders: initialOrders }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead className="text-right">Items</TableHead>
-              <TableHead className="text-right">Total</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Date</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t("orders.tableOrder")}</TableHead>
+              <TableHead>{t("orders.tableCustomer")}</TableHead>
+              <TableHead className="text-right">
+                {t("orders.tableItems")}
+              </TableHead>
+              <TableHead className="text-right">
+                {t("orders.tableTotal")}
+              </TableHead>
+              <TableHead>{t("orders.tableStatus")}</TableHead>
+              <TableHead className="text-right">
+                {t("orders.tableDate")}
+              </TableHead>
+              <TableHead className="text-right">
+                {t("orders.tableActions")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -313,7 +325,7 @@ export default function OrderTable({ orders: initialOrders }) {
                   colSpan={7}
                   className="text-center text-muted-foreground py-8"
                 >
-                  No orders found.
+                  {t("orders.noOrdersFound")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -340,15 +352,16 @@ export default function OrderTable({ orders: initialOrders }) {
                           </div>
                         </TableCell>
                         <TableCell className="text-right tabular-nums">
-                          {pricing.totalPacks} packs
+                          {pricing.totalPacks} {t("orders.packs")}
                           <br />
                           <span className="text-xs text-muted-foreground">
-                            {pricing.totalTickets.toLocaleString()} tickets
+                            {pricing.totalTickets.toLocaleString(locale)}{" "}
+                            {t("orders.tickets")}
                           </span>
                         </TableCell>
                         <TableCell className="text-right font-semibold tabular-nums">
                           {pricing.shipping.isQuoteRequired
-                            ? "Upon request"
+                            ? t("orders.uponRequest")
                             : `€${pricing.grandTotal.toFixed(2)}`}
                         </TableCell>
                         <TableCell>
@@ -372,9 +385,7 @@ export default function OrderTable({ orders: initialOrders }) {
                           </Select>
                         </TableCell>
                         <TableCell className="text-right text-sm tabular-nums">
-                          {new Date(order.createdAt).toLocaleDateString(
-                            "de-DE",
-                          )}
+                          {new Date(order.createdAt).toLocaleDateString(locale)}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
@@ -388,7 +399,9 @@ export default function OrderTable({ orders: initialOrders }) {
                                   <FileText className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>View details</TooltipContent>
+                              <TooltipContent>
+                                {t("orders.viewDetails")}
+                              </TooltipContent>
                             </Tooltip>
                             <Tooltip>
                               <TooltipTrigger asChild>
@@ -404,7 +417,7 @@ export default function OrderTable({ orders: initialOrders }) {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                Download Invoice PDF
+                                {t("orders.downloadInvoice")}
                               </TooltipContent>
                             </Tooltip>
                             <Tooltip>
@@ -418,7 +431,9 @@ export default function OrderTable({ orders: initialOrders }) {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Delete order</TooltipContent>
+                              <TooltipContent>
+                                {t("orders.deleteOrder")}
+                              </TooltipContent>
                             </Tooltip>
                           </div>
                         </TableCell>
@@ -439,21 +454,26 @@ export default function OrderTable({ orders: initialOrders }) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Order</AlertDialogTitle>
+            <AlertDialogTitle>{t("orders.deleteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete order{" "}
-              <strong>#{deleteOrder?.id}</strong> ({deleteOrder?.name}
-              )? This action cannot be undone.
+              {t("orders.deleteDescription", {
+                id: deleteOrder?.id ?? "",
+                name: deleteOrder?.name ?? "",
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>
+              {t("orders.cancelButton")}
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={isPending}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {isPending ? "Deleting..." : "Delete"}
+              {isPending
+                ? t("orders.deletingButton")
+                : t("orders.deleteButton")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -489,7 +509,7 @@ export default function OrderTable({ orders: initialOrders }) {
                     {/* Customer */}
                     <div>
                       <p className="text-xs font-medium text-muted-foreground mb-1">
-                        Customer
+                        {t("orders.detailCustomer")}
                       </p>
                       <p className="text-sm">
                         {detailOrder.user?.name ?? "—"} (
@@ -502,10 +522,16 @@ export default function OrderTable({ orders: initialOrders }) {
                     {/* Items */}
                     <div className="rounded-md border">
                       <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2 text-xs font-medium text-muted-foreground border-b bg-muted/40">
-                        <span>Product</span>
-                        <span className="text-right">Qty</span>
-                        <span className="text-right">Unit Price</span>
-                        <span className="text-right">Total</span>
+                        <span>{t("orders.detailProduct")}</span>
+                        <span className="text-right">
+                          {t("orders.detailQty")}
+                        </span>
+                        <span className="text-right">
+                          {t("orders.detailUnitPrice")}
+                        </span>
+                        <span className="text-right">
+                          {t("orders.detailTotal")}
+                        </span>
                       </div>
                       {detailOrder.items.map((item) => (
                         <div
@@ -518,11 +544,11 @@ export default function OrderTable({ orders: initialOrders }) {
                             </p>
                             <p className="text-xs text-muted-foreground font-mono">
                               {item.reference} &middot; {item.quantityPerPack}{" "}
-                              tickets/pack &middot;{" "}
+                              {t("orders.ticketsPerPack")} &middot;{" "}
                               {(
                                 item.quantityPerPack * item.numberOfPacks
-                              ).toLocaleString()}{" "}
-                              tickets total
+                              ).toLocaleString(locale)}{" "}
+                              {t("orders.ticketsTotal")}
                             </p>
                           </div>
                           <span className="text-right tabular-nums">
@@ -537,7 +563,7 @@ export default function OrderTable({ orders: initialOrders }) {
                         </div>
                       ))}
                       <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm font-semibold bg-muted/40">
-                        <span>Subtotal (excl. VAT)</span>
+                        <span>{t("orders.detailSubtotal")}</span>
                         <span />
                         <span />
                         <span className="text-right tabular-nums">
@@ -549,20 +575,25 @@ export default function OrderTable({ orders: initialOrders }) {
                     <div className="rounded-md border p-3 text-sm space-y-1">
                       <div className="flex items-center justify-between text-muted-foreground">
                         <span>
-                          Shipping ({pricing.shipping.parcels} parcel
-                          {pricing.shipping.parcels === 1 ? "" : "s"})
+                          {pricing.shipping.parcels === 1
+                            ? t("orders.detailShipping", {
+                                parcels: pricing.shipping.parcels,
+                              })
+                            : t("orders.detailShippingPlural", {
+                                parcels: pricing.shipping.parcels,
+                              })}
                         </span>
                         <span>
                           {pricing.shipping.isQuoteRequired
-                            ? "Upon request"
+                            ? t("orders.uponRequest")
                             : `€${pricing.shippingCost.toFixed(2)}`}
                         </span>
                       </div>
                       <div className="flex items-center justify-between font-semibold">
-                        <span>Total incl. shipping (excl. VAT)</span>
+                        <span>{t("orders.detailGrandTotal")}</span>
                         <span>
                           {pricing.shipping.isQuoteRequired
-                            ? "Upon request"
+                            ? t("orders.uponRequest")
                             : `€${pricing.grandTotal.toFixed(2)}`}
                         </span>
                       </div>
@@ -572,7 +603,7 @@ export default function OrderTable({ orders: initialOrders }) {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-xs font-medium text-muted-foreground mb-1">
-                          Billing Address
+                          {t("orders.detailBillingAddress")}
                         </p>
                         {detailOrder.billingAddress ? (
                           <div className="text-sm space-y-0.5 text-muted-foreground">
@@ -606,7 +637,7 @@ export default function OrderTable({ orders: initialOrders }) {
                       </div>
                       <div>
                         <p className="text-xs font-medium text-muted-foreground mb-1">
-                          Delivery Address
+                          {t("orders.detailShippingAddress")}
                         </p>
                         {detailOrder.deliveryAddress ? (
                           <div className="text-sm space-y-0.5 text-muted-foreground">

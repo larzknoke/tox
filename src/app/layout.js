@@ -6,6 +6,9 @@ import { redirect } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { LayoutWrapper } from "@/components/layout-wrapper";
+import { LocaleProvider } from "@/lib/locale-context";
+import { getLocale } from "@/lib/i18n-server";
+import { getMessages } from "@/lib/i18n";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Sigma } from "lucide-react";
@@ -38,15 +41,20 @@ export default async function RootLayout({ children }) {
   const cookieStore = await cookies();
   const defaultOpen = cookieStore.get("sidebar_state")?.value === "true";
 
+  const locale = await getLocale();
+  const messages = getMessages(locale);
+
   // if (!session) redirect("/signin");
 
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Toaster position="top-center" />
-        <LayoutWrapper>{children}</LayoutWrapper>
+        <LocaleProvider locale={locale} messages={messages}>
+          <LayoutWrapper>{children}</LayoutWrapper>
+        </LocaleProvider>
       </body>
     </html>
   );

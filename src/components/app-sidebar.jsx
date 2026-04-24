@@ -20,6 +20,8 @@ import {
   ShoppingCart,
   ClipboardList,
 } from "lucide-react";
+import { useLocale } from "@/lib/locale-context";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 import {
   Sidebar,
@@ -90,41 +92,20 @@ const items = [
   },
 ];
 
-const shopItems = [
-  {
-    title: "Home",
-    url: "/",
-    icon: HouseIcon,
-  },
-  {
-    title: "Shop",
-    url: "/shop",
-    icon: Ticket,
-  },
-];
-
-const userItems = [
-  {
-    title: "My Account",
-    url: "/account",
-    icon: User,
-  },
-  {
-    title: "My Orders",
-    url: "/account/orders",
-    icon: ShoppingBag,
-  },
-  // {
-  //   title: "Support",
-  //   url: "/support",
-  //   icon: MessageCircleQuestionMark,
-  //   disabled: true,
-  // },
-];
-
 export function AppSidebar() {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
+  const { t } = useLocale();
+
+  const shopItems = [
+    { title: t("nav.home"), url: "/", icon: HouseIcon },
+    { title: t("nav.shop"), url: "/shop", icon: Ticket },
+  ];
+
+  const userItems = [
+    { title: t("nav.myAccount"), url: "/account", icon: User },
+    { title: t("nav.myOrders"), url: "/account/orders", icon: ShoppingBag },
+  ];
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -154,16 +135,17 @@ export function AppSidebar() {
     <Sidebar collapsible="offcanvas">
       <SidebarHeader>
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="flex items-center justify-between gap-2">
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:p-1.5! flex-1"
             >
               <a href="/">
                 <Ticket />
                 <span className="text-base font-semibold">TOX</span>
               </a>
             </SidebarMenuButton>
+            <LanguageSwitcher compact />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -183,7 +165,7 @@ export function AppSidebar() {
                         </span>
                       )}
                     </div>
-                    <span>Shopping-Cart</span>
+                    <span>{t("nav.shoppingCart")}</span>
                   </a>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -191,7 +173,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav.navigation")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {shopItems.map((item) => (
@@ -213,7 +195,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
         <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
+          <SidebarGroupLabel>{t("nav.account")}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {userItems.map((item) => (
@@ -236,14 +218,14 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        {isAdmin && <SidebarGroupLabel>Admin</SidebarGroupLabel>}
+        {isAdmin && <SidebarGroupLabel>{t("nav.admin")}</SidebarGroupLabel>}
         <SidebarMenu>
           {isAdmin && (
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <a href="/user">
                   <UserCog />
-                  <span>Users</span>
+                  <span>{t("nav.users")}</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -253,7 +235,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild>
                 <a href="/admin/products">
                   <PackageSearch />
-                  <span>Products</span>
+                  <span>{t("nav.products")}</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -263,7 +245,17 @@ export function AppSidebar() {
               <SidebarMenuButton asChild>
                 <a href="/admin/orders">
                   <ClipboardList />
-                  <span>Orders</span>
+                  <span>{t("nav.orders")}</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
+          {isAdmin && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="/admin/support">
+                  <MessageCircleQuestionMark />
+                  <span>{t("nav.supportTickets")}</span>
                 </a>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -306,10 +298,10 @@ export function AppSidebar() {
                   className="w-[--radix-popper-anchor-width]"
                 >
                   <DropdownMenuItem asChild>
-                    <a href="/account">Account Details</a>
+                    <a href="/account">{t("nav.accountDetails")}</a>
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={handleLogout}>
-                    <span>Logout</span>
+                    <span>{t("nav.logout")}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -317,7 +309,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild variant="default" size="lg">
                 <a href="/signin">
                   <User2 />
-                  <span>Login</span>
+                  <span>{t("nav.login")}</span>
                 </a>
               </SidebarMenuButton>
             )}
