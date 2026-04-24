@@ -351,8 +351,7 @@ model SupportTicket {
   phone       String
   subject     String
   type        SupportTicketType
-  description String              @db.Text
-  attachments SupportAttachment[]
+  description String            @db.Text
 
   status    String   @default("open")
   createdAt DateTime @default(now())
@@ -380,19 +379,4 @@ enum SupportTicketType {
   IT_INCIDENT
   ORDER_CANCELLATION
   REPLENISHMENT_ISSUE
-}
-
-model SupportAttachment {
-  id              Int           @id @default(autoincrement())
-  supportTicketId Int
-  supportTicket   SupportTicket @relation(fields: [supportTicketId], references: [id], onDelete: Cascade)
-
-  filename  String
-  url       String
-  mimeType  String?
-  sizeBytes Int?
-
-  createdAt DateTime @default(now())
-
-  @@map("support_attachments")
 }
