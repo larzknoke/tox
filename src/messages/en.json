@@ -129,5 +129,175 @@
       "statusUpdated": "Ticket status updated",
       "statusUpdateFailed": "Failed to update ticket status"
     }
+  },
+  "shop": {
+    "pageTitle": "Shop",
+    "badges": {
+      "inStock": "In Stock",
+      "unavailable": "Unavailable"
+    },
+    "card": {
+      "view": "View",
+      "perPack": "/ pack ({count} tickets)"
+    },
+    "detail": {
+      "pageTitle": "Product Details",
+      "backToShop": "Back to Shop",
+      "reference": "Reference",
+      "quantityPerPack": "Quantity per pack",
+      "pricePerPack": "Price per pack (excl. VAT)",
+      "ticketsCount": "{count} tickets",
+      "perPackInfo": "per pack of {count} tickets, excl. VAT",
+      "addToCart": "Add to Cart",
+      "packOne": "pack",
+      "packOther": "packs",
+      "addedToCart": "{quantity} {packsLabel} of {reference} added to cart."
+    }
+  },
+  "cart": {
+    "pageTitle": "Shopping Cart",
+    "emptyMessage": "Your cart is empty.",
+    "backToShop": "Back to Shop",
+    "ticketsPerPack": "{count} tickets/pack",
+    "ticketsTotal": "tickets total",
+    "ticketsTotalCount": "{count} tickets total",
+    "removeItem": "Remove item",
+    "orderSummary": "Order Summary",
+    "subtotal": "Subtotal (excl. VAT)",
+    "totalTickets": "Total tickets",
+    "proceedToCheckout": "Proceed to Checkout",
+    "clearCart": "Clear Cart"
+  },
+  "checkout": {
+    "pageTitle": "Checkout",
+    "loading": "Loading...",
+    "noAddressProvided": "No address provided.",
+    "taxId": "Tax identification number",
+    "fields": {
+      "firstName": "First Name *",
+      "lastName": "Last Name *",
+      "company": "Company *",
+      "vat": "Tax identification number",
+      "address1": "Address Line 1 *",
+      "address2": "Address Line 2",
+      "postalCode": "Postal Code *",
+      "city": "City *",
+      "country": "Country *",
+      "phone": "Phone *"
+    },
+    "orderNameTitle": "Order Name",
+    "orderNameLabel": "Name *",
+    "orderNamePlaceholder": "e.g. March 2026 Restock",
+    "billingAddressTitle": "Billing Address",
+    "deliveryAddressTitle": "Delivery Address",
+    "edit": "Edit",
+    "save": "Save",
+    "orderSummary": "Order Summary",
+    "packOne": "pack",
+    "packOther": "packs",
+    "parcelOne": "parcel",
+    "parcelOther": "parcels",
+    "shipping": "Shipping",
+    "shippingWithParcels": "Shipping ({count} {parcelLabel})",
+    "uponRequest": "Upon request",
+    "totalExclVat": "Total (excl. VAT)",
+    "totalInclShipping": "Total incl. shipping (excl. VAT)",
+    "quoteRequiredInfo": "For quantities above 50,000 tickets, shipping is calculated upon request.",
+    "quoteRequiredError": "Shipping for this quantity is upon request. Please contact support.",
+    "backToCart": "Back to Cart",
+    "placeOrder": "Place Order",
+    "placingOrder": "Placing Order...",
+    "orderPlaced": "Order placed successfully!",
+    "orderFailed": "Failed to place order"
+  },
+  "account": {
+    "pageTitle": "Account Settings",
+    "info": {
+      "title": "Account Info",
+      "userFallback": "User",
+      "emailVerified": "Email verified",
+      "session": "Session",
+      "userId": "User ID:",
+      "sessionId": "Session ID:",
+      "role": "Role:",
+      "noRole": "No role",
+      "created": "Created:",
+      "signOut": "Sign Out"
+    },
+    "address": {
+      "billingTitle": "Billing Address",
+      "deliveryTitle": "Delivery Address",
+      "noBilling": "No billing address saved.",
+      "noDelivery": "No delivery address saved.",
+      "edit": "Edit",
+      "add": "Add",
+      "saved": "{label} saved",
+      "editBillingDescription": "Edit your billing address",
+      "editDeliveryDescription": "Edit your delivery address",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "saveAddress": "Save Address",
+      "errors": {
+        "requiredFields": "Please fill in all required fields",
+        "saveFailed": "Failed to save address"
+      },
+      "fields": {
+        "firstName": "First Name *",
+        "lastName": "Last Name *",
+        "company": "Company *",
+        "vat": "Tax identification number *",
+        "address1": "Address Line 1 *",
+        "address2": "Address Line 2",
+        "postalCode": "Postal Code *",
+        "city": "City *",
+        "country": "Country *",
+        "phone": "Phone *"
+      }
+    },
+    "password": {
+      "change": "Change Password",
+      "description": "Enter your current and new password",
+      "current": "Current Password",
+      "new": "New Password",
+      "confirm": "Confirm Password",
+      "minimum": "Minimum 8 characters required",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "success": "Password changed successfully",
+      "errors": {
+        "currentRequired": "Current password is required",
+        "newRequired": "New password is required",
+        "minLength": "New password must be at least 8 characters",
+        "noMatch": "Passwords do not match",
+        "generic": "An error occurred"
+      }
+    },
+    "orders": {
+      "pageTitle": "My Orders",
+      "loading": "Loading...",
+      "empty": "You have no orders yet.",
+      "goToShop": "Go to Shop",
+      "packOne": "pack",
+      "packOther": "packs",
+      "invoice": "Invoice",
+      "status": {
+        "pending": "Pending",
+        "validated": "Validated",
+        "processing": "Processing",
+        "shipped": "Shipped"
+      }
+    }
+  },
+  "home": {
+    "heroAlt": "Hero",
+    "welcomeBack": "Welcome back, {name}",
+    "tagline": "Ticket Order Extranet - France Billet",
+    "browseShop": "Browse Shop",
+    "globeAlt": "Globe icon",
+    "franceBillet": "France Billet",
+    "franceBilletCopyright": "France Billet ©2026",
+    "guestHeadline": "Ticket Order Extranet | France Billet ©2026",
+    "login": "Login",
+    "signUp": "Sign Up"
   }
 }

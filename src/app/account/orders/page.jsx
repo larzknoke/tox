@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
 import { getOrderPricingSummary } from "@/lib/shipping";
+import { useLocale } from "@/lib/locale-context";
 
 const statusVariant = {
   PENDING: "secondary",
@@ -20,12 +21,15 @@ const statusVariant = {
   SHIPPED: "outline",
 };
 
-const statusLabel = {
-  PENDING: "Pending",
-  VALIDATED: "Validated",
-  PROCESSING: "Processing",
-  SHIPPED: "Shipped",
-};
+function getStatusLabel(status, t) {
+  const map = {
+    PENDING: "account.orders.status.pending",
+    VALIDATED: "account.orders.status.validated",
+    PROCESSING: "account.orders.status.processing",
+    SHIPPED: "account.orders.status.shipped",
+  };
+  return t(map[status] ?? "") || status;
+}
 
 function AddressSummary({ address }) {
   if (!address) return <span className="text-muted-foreground">—</span>;
@@ -37,7 +41,7 @@ function AddressSummary({ address }) {
   );
 }
 
-function OrderCard({ order }) {
+function OrderCard({ order, locale, t }) {
   const [expanded, setExpanded] = useState(false);
 
   const pricing = getOrderPricingSummary(order.items);
@@ -53,7 +57,7 @@ function OrderCard({ order }) {
             <div className="flex items-center gap-2">
               <CardTitle className="text-base">{order.name}</CardTitle>
               <Badge variant={statusVariant[order.status] ?? "secondary"}>
-                {statusLabel[order.status] ?? order.status}
+                {getStatusLabel(order.status, t)}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground font-mono">
@@ -64,14 +68,17 @@ function OrderCard({ order }) {
             <div className="text-right text-sm">
               <p className="font-semibold">
                 {pricing.shipping.isQuoteRequired
-                  ? "Upon request"
+                  ? t("orders.uponRequest")
                   : `€${pricing.grandTotal.toFixed(2)}`}
               </p>
               <p className="text-xs text-muted-foreground">
                 {pricing.totalPacks}{" "}
-                {pricing.totalPacks === 1 ? "pack" : "packs"} &middot;{" "}
-                {pricing.totalTickets.toLocaleString()} tickets &middot;{" "}
-                {new Date(order.createdAt).toLocaleDateString("de-DE")}
+                {pricing.totalPacks === 1
+                  ? t("account.orders.packOne")
+                  : t("account.orders.packOther")}{" "}
+                &middot; {pricing.totalTickets.toLocaleString(locale)}{" "}
+                {t("orders.tickets")} &middot;{" "}
+                {new Date(order.createdAt).toLocaleDateString(locale)}
               </p>
             </div>
             {expanded ? (
@@ -90,10 +97,10 @@ function OrderCard({ order }) {
           {/* Items table */}
           <div className="rounded-md border mb-6">
             <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2 text-xs font-medium text-muted-foreground border-b bg-muted/40">
-              <span>Product</span>
-              <span className="text-right">Qty</span>
-              <span className="text-right">Unit Price</span>
-              <span className="text-right">Total</span>
+              <span>{t("orders.detailProduct")}</span>
+              <span className="text-right">{t("orders.detailQty")}</span>
+              <span className="text-right">{t("orders.detailUnitPrice")}</span>
+              <span className="text-right">{t("orders.detailTotal")}</span>
             </div>
             {order.items.map((item) => (
               <div
@@ -104,11 +111,11 @@ function OrderCard({ order }) {
                   <p className="font-medium truncate">{item.designation}</p>
                   <p className="text-xs text-muted-foreground font-mono">
                     {item.reference} &middot; {item.quantityPerPack}{" "}
-                    tickets/pack &middot;{" "}
-                    {(
-                      item.quantityPerPack * item.numberOfPacks
-                    ).toLocaleString()}{" "}
-                    tickets total
+                    {t("orders.ticketsPerPack")} &middot;{" "}
+                    {(item.quantityPerPack * item.numberOfPacks).toLocaleString(
+                      locale,
+                    )}{" "}
+                    {t("orders.ticketsTotal")}
                   </p>
                 </div>
                 <span className="text-right tabular-nums">
@@ -123,7 +130,7 @@ function OrderCard({ order }) {
               </div>
             ))}
             <div className="grid grid-cols-[1fr_3rem_6rem_6rem] gap-x-4 px-4 py-2.5 text-sm font-semibold bg-muted/40">
-              <span>Subtotal (excl. VAT)</span>
+              <span>{t("orders.detailSubtotal")}</span>
               <span />
               <span />
               <span className="text-right tabular-nums">
@@ -135,20 +142,25 @@ function OrderCard({ order }) {
           <div className="rounded-md border p-3 text-sm space-y-1">
             <div className="flex items-center justify-between text-muted-foreground">
               <span>
-                Shipping ({pricing.shipping.parcels} parcel
-                {pricing.shipping.parcels === 1 ? "" : "s"})
+                {pricing.shipping.parcels === 1
+                  ? t("orders.detailShipping", {
+                      parcels: pricing.shipping.parcels,
+                    })
+                  : t("orders.detailShippingPlural", {
+                      parcels: pricing.shipping.parcels,
+                    })}
               </span>
               <span>
                 {pricing.shipping.isQuoteRequired
-                  ? "Upon request"
+                  ? t("orders.uponRequest")
                   : `€${pricing.shippingCost.toFixed(2)}`}
               </span>
             </div>
             <div className="flex items-center justify-between font-semibold">
-              <span>Total incl. shipping (excl. VAT)</span>
+              <span>{t("orders.detailGrandTotal")}</span>
               <span>
                 {pricing.shipping.isQuoteRequired
-                  ? "Upon request"
+                  ? t("orders.uponRequest")
                   : `€${pricing.grandTotal.toFixed(2)}`}
               </span>
             </div>
@@ -158,7 +170,7 @@ function OrderCard({ order }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">
-                Billing Address
+                {t("orders.detailBillingAddress")}
               </p>
               {order.billingAddress ? (
                 <div className="text-sm space-y-0.5 text-muted-foreground">
@@ -170,7 +182,9 @@ function OrderCard({ order }) {
                     <p>{order.billingAddress.company}</p>
                   )}
                   {order.billingAddress.vat && (
-                    <p>Tax identification number: {order.billingAddress.vat}</p>
+                    <p>
+                      {t("checkout.taxId")}: {order.billingAddress.vat}
+                    </p>
                   )}
                   <p>{order.billingAddress.address1}</p>
                   {order.billingAddress.address2 && (
@@ -189,7 +203,7 @@ function OrderCard({ order }) {
             </div>
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">
-                Delivery Address
+                {t("orders.detailShippingAddress")}
               </p>
               {order.deliveryAddress ? (
                 <div className="text-sm space-y-0.5 text-muted-foreground">
@@ -221,13 +235,11 @@ function OrderCard({ order }) {
           {order.invoice && (
             <div className="mt-4 text-sm">
               <p className="text-xs font-medium text-muted-foreground mb-1">
-                Invoice
+                {t("account.orders.invoice")}
               </p>
               <p>
                 #{order.invoice.invoiceNumber} &middot;{" "}
-                {new Date(order.invoice.invoiceDate).toLocaleDateString(
-                  "de-DE",
-                )}{" "}
+                {new Date(order.invoice.invoiceDate).toLocaleDateString(locale)}{" "}
                 &middot; €{pricing.grandTotal.toFixed(2)}{" "}
                 {order.invoice.currency}
               </p>
@@ -241,6 +253,7 @@ function OrderCard({ order }) {
 
 export default function MyOrdersPage() {
   const router = useRouter();
+  const { locale, t } = useLocale();
   const { data: session, isPending } = authClient.useSession();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -265,9 +278,9 @@ export default function MyOrdersPage() {
   if (isPending || loading) {
     return (
       <div className="flex flex-col gap-6 w-full">
-        <PageHeader title="My Orders" />
+        <PageHeader title={t("account.orders.pageTitle")} />
         <div className="flex items-center justify-center py-20 text-muted-foreground">
-          Loading...
+          {t("account.orders.loading")}
         </div>
       </div>
     );
@@ -276,14 +289,14 @@ export default function MyOrdersPage() {
   if (orders.length === 0) {
     return (
       <div className="flex flex-col gap-6 w-full">
-        <PageHeader title="My Orders" />
+        <PageHeader title={t("account.orders.pageTitle")} />
         <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
           <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
-          <p className="text-muted-foreground">You have no orders yet.</p>
+          <p className="text-muted-foreground">{t("account.orders.empty")}</p>
           <Button asChild variant="outline">
             <Link href="/shop">
               <ArrowLeft className="h-4 w-4" />
-              Go to Shop
+              {t("account.orders.goToShop")}
             </Link>
           </Button>
         </div>
@@ -293,10 +306,10 @@ export default function MyOrdersPage() {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      <PageHeader title="My Orders" />
+      <PageHeader title={t("account.orders.pageTitle")} />
       <div className="flex flex-col gap-4">
         {orders.map((order) => (
-          <OrderCard key={order.id} order={order} />
+          <OrderCard key={order.id} order={order} locale={locale} t={t} />
         ))}
       </div>
     </div>

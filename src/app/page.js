@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Ticket } from "lucide-react";
 import Link from "next/link";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { useLocale } from "@/lib/locale-context";
 
 export default function Home() {
+  const { t } = useLocale();
   const { data: session, isPending } = authClient.useSession();
 
   if (isPending) {
@@ -27,7 +29,7 @@ export default function Home() {
         <section className="relative w-full md:w-[70vw] h-[50vh] overflow-hidden self-center my-10 rounded">
           <Image
             src="/hero.jpg"
-            alt="Hero"
+            alt={t("home.heroAlt")}
             fill
             priority
             className="object-cover"
@@ -35,13 +37,13 @@ export default function Home() {
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4">
             <h1 className="text-4xl sm:text-5xl font-bold tracking-tight drop-shadow-lg">
-              Welcome back, {session.user.name}
+              {t("home.welcomeBack", { name: session.user.name })}
             </h1>
             <p className="mt-4 text-lg sm:text-xl text-white/80 max-w-xl drop-shadow">
-              Ticket Order Extranet &mdash; France Billet
+              {t("home.tagline")}
             </p>
             <Button asChild size="lg" className="mt-8">
-              <Link href="/shop">Browse Shop</Link>
+              <Link href="/shop">{t("home.browseShop")}</Link>
             </Button>
           </div>
         </section>
@@ -55,11 +57,11 @@ export default function Home() {
             <Image
               aria-hidden
               src="/globe.svg"
-              alt="Globe icon"
+              alt={t("home.globeAlt")}
               width={16}
               height={16}
             />
-            France Billet ©2026
+            {t("home.franceBilletCopyright")}
           </a>
         </footer>
       </div>
@@ -73,13 +75,13 @@ export default function Home() {
         <div className="flex items-center justify-center">
           <Ticket className="h-16 w-16 text-primary" />
         </div>
-        Ticket Order Extranet | France Billet ©2026
+        {t("home.guestHeadline")}
         <div className="flex gap-4 mt-4">
           <Button asChild size="lg">
-            <Link href="/signin">Login</Link>
+            <Link href="/signin">{t("home.login")}</Link>
           </Button>
           <Button asChild variant="outline" size="lg">
-            <Link href="/signup">Sign Up</Link>
+            <Link href="/signup">{t("home.signUp")}</Link>
           </Button>
         </div>
       </main>
@@ -93,11 +95,11 @@ export default function Home() {
           <Image
             aria-hidden
             src="/globe.svg"
-            alt="Globe icon"
+            alt={t("home.globeAlt")}
             width={16}
             height={16}
           />
-          France Billet
+          {t("home.franceBillet")}
         </a>
       </footer>
     </div>

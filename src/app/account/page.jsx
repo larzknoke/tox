@@ -10,9 +10,11 @@ import { PageHeader } from "@/components/page-header";
 import { AccountInfo } from "./components/account-info";
 import { AddressCard } from "./components/address-card";
 import { ChangePasswordDialog } from "./components/change-password-dialog";
+import { useLocale } from "@/lib/locale-context";
 
 export default function AccountPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const { data: session, isPending } = authClient.useSession();
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [billingAddress, setBillingAddress] = useState(null);
@@ -57,11 +59,11 @@ export default function AccountPage() {
 
   return (
     <div className="container mx-auto">
-      <PageHeader title="Account Settings" />
+      <PageHeader title={t("account.pageTitle")} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-5">
         <Card>
           <CardHeader>
-            <CardTitle>Account Info</CardTitle>
+            <CardTitle>{t("account.info.title")}</CardTitle>
           </CardHeader>
           <CardContent>
             <AccountInfo
@@ -73,7 +75,7 @@ export default function AccountPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Billing Address</CardTitle>
+            <CardTitle>{t("account.address.billingTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <AddressCard
@@ -85,7 +87,7 @@ export default function AccountPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Delivery Address</CardTitle>
+            <CardTitle>{t("account.address.deliveryTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <AddressCard

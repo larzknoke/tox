@@ -9,10 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { Trash2 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { EmptyCart } from "@/components/empty-cart";
+import { useLocale } from "@/lib/locale-context";
 
 export default function CartPage() {
-  const { cartItems, cartCount, updateQuantity, removeFromCart, clearCart } =
-    useCart();
+  const { locale, t } = useLocale();
+  const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart();
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + item.pricePerPack * item.quantity,
@@ -26,7 +27,7 @@ export default function CartPage() {
   if (cartItems.length === 0) {
     return (
       <div className="flex flex-col gap-6 w-full">
-        <PageHeader title="Shopping Cart" />
+        <PageHeader title={t("cart.pageTitle")} />
         <EmptyCart />
       </div>
     );
@@ -34,10 +35,9 @@ export default function CartPage() {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      <PageHeader title="Shopping Cart" />
+      <PageHeader title={t("cart.pageTitle")} />
 
       <div className="flex flex-col lg:flex-row gap-8 w-full">
-        {/* Items */}
         <div className="flex-1 flex flex-col gap-0 rounded-md border divide-y">
           {cartItems.map((item) => (
             <div key={item.id} className="flex items-center gap-4 px-4 py-4">
@@ -45,11 +45,20 @@ export default function CartPage() {
                 <p className="font-medium text-sm truncate">{item.name}</p>
                 <p className="text-xs font-mono text-muted-foreground mt-0.5">
                   {item.reference} &middot;{" "}
-                  {item.quantityPerPack.toLocaleString()} tickets/pack &middot;{" "}
-                  {(item.quantityPerPack * item.quantity).toLocaleString()}{" "}
-                  tickets total
+                  {t("cart.ticketsPerPack", {
+                    count: item.quantityPerPack.toLocaleString(locale),
+                  })}{" "}
+                  &middot;{" "}
+                  {item.quantityPerPack * item.quantity
+                    ? t("cart.ticketsTotalCount", {
+                        count: (
+                          item.quantityPerPack * item.quantity
+                        ).toLocaleString(locale),
+                      })
+                    : t("cart.ticketsTotal")}
                 </p>
               </div>
+
               <div className="flex items-center gap-3 shrink-0">
                 <ButtonGroup>
                   <Input
@@ -66,7 +75,7 @@ export default function CartPage() {
                     size="icon"
                     className="text-destructive hover:text-destructive"
                     onClick={() => removeFromCart(item.id)}
-                    aria-label="Remove item"
+                    aria-label={t("cart.removeItem")}
                   >
                     <Trash2 />
                   </Button>
@@ -79,10 +88,11 @@ export default function CartPage() {
           ))}
         </div>
 
-        {/* Summary */}
         <div className="lg:w-72 shrink-0">
           <div className="rounded-md border p-5 flex flex-col gap-4 sticky top-6">
-            <h2 className="font-semibold text-base">Order Summary</h2>
+            <h2 className="font-semibold text-base">
+              {t("cart.orderSummary")}
+            </h2>
             <div className="flex flex-col gap-2 text-sm">
               {cartItems.map((item) => (
                 <div key={item.id} className="flex justify-between gap-2">
@@ -97,15 +107,15 @@ export default function CartPage() {
             </div>
             <Separator />
             <div className="flex justify-between font-semibold">
-              <span>Subtotal (excl. VAT)</span>
+              <span>{t("cart.subtotal")}</span>
               <span>€{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
-              <span>Total tickets</span>
-              <span>{totalTickets.toLocaleString()}</span>
+              <span>{t("cart.totalTickets")}</span>
+              <span>{totalTickets.toLocaleString(locale)}</span>
             </div>
             <Button className="w-full" asChild>
-              <Link href="/checkout">Proceed to Checkout</Link>
+              <Link href="/checkout">{t("cart.proceedToCheckout")}</Link>
             </Button>
             <Button
               variant="ghost"
@@ -113,7 +123,7 @@ export default function CartPage() {
               className="text-muted-foreground w-full"
               onClick={clearCart}
             >
-              Clear Cart
+              {t("cart.clearCart")}
             </Button>
           </div>
         </div>

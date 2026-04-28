@@ -129,5 +129,175 @@
       "statusUpdated": "Statut du ticket mis à jour",
       "statusUpdateFailed": "Échec de la mise à jour du statut"
     }
+  },
+  "shop": {
+    "pageTitle": "Boutique",
+    "badges": {
+      "inStock": "En stock",
+      "unavailable": "Indisponible"
+    },
+    "card": {
+      "view": "Voir",
+      "perPack": "/ pack ({count} billets)"
+    },
+    "detail": {
+      "pageTitle": "Détails du produit",
+      "backToShop": "Retour à la boutique",
+      "reference": "Référence",
+      "quantityPerPack": "Quantité par pack",
+      "pricePerPack": "Prix par pack (HT)",
+      "ticketsCount": "{count} billets",
+      "perPackInfo": "par pack de {count} billets, HT",
+      "addToCart": "Ajouter au panier",
+      "packOne": "pack",
+      "packOther": "packs",
+      "addedToCart": "{quantity} {packsLabel} de {reference} ajouté(s) au panier."
+    }
+  },
+  "cart": {
+    "pageTitle": "Panier",
+    "emptyMessage": "Votre panier est vide.",
+    "backToShop": "Retour à la boutique",
+    "ticketsPerPack": "{count} billets/pack",
+    "ticketsTotal": "billets au total",
+    "ticketsTotalCount": "{count} billets au total",
+    "removeItem": "Supprimer l'article",
+    "orderSummary": "Récapitulatif",
+    "subtotal": "Sous-total (HT)",
+    "totalTickets": "Total billets",
+    "proceedToCheckout": "Passer au paiement",
+    "clearCart": "Vider le panier"
+  },
+  "checkout": {
+    "pageTitle": "Paiement",
+    "loading": "Chargement...",
+    "noAddressProvided": "Aucune adresse fournie.",
+    "taxId": "Numéro d'identification fiscale",
+    "fields": {
+      "firstName": "Prénom *",
+      "lastName": "Nom *",
+      "company": "Société *",
+      "vat": "Numéro d'identification fiscale",
+      "address1": "Adresse ligne 1 *",
+      "address2": "Adresse ligne 2",
+      "postalCode": "Code postal *",
+      "city": "Ville *",
+      "country": "Pays *",
+      "phone": "Téléphone *"
+    },
+    "orderNameTitle": "Nom de commande",
+    "orderNameLabel": "Nom *",
+    "orderNamePlaceholder": "ex. Réassort mars 2026",
+    "billingAddressTitle": "Adresse de facturation",
+    "deliveryAddressTitle": "Adresse de livraison",
+    "edit": "Modifier",
+    "save": "Enregistrer",
+    "orderSummary": "Récapitulatif",
+    "packOne": "pack",
+    "packOther": "packs",
+    "parcelOne": "colis",
+    "parcelOther": "colis",
+    "shipping": "Livraison",
+    "shippingWithParcels": "Livraison ({count} {parcelLabel})",
+    "uponRequest": "Sur devis",
+    "totalExclVat": "Total (HT)",
+    "totalInclShipping": "Total livraison incluse (HT)",
+    "quoteRequiredInfo": "Pour les quantités supérieures à 50 000 billets, la livraison est calculée sur devis.",
+    "quoteRequiredError": "La livraison pour cette quantité est sur devis. Veuillez contacter le support.",
+    "backToCart": "Retour au panier",
+    "placeOrder": "Passer la commande",
+    "placingOrder": "Commande en cours...",
+    "orderPlaced": "Commande passée avec succès !",
+    "orderFailed": "Échec de la commande"
+  },
+  "account": {
+    "pageTitle": "Paramètres du compte",
+    "info": {
+      "title": "Informations du compte",
+      "userFallback": "Utilisateur",
+      "emailVerified": "E-mail vérifié",
+      "session": "Session",
+      "userId": "ID utilisateur :",
+      "sessionId": "ID session :",
+      "role": "Rôle :",
+      "noRole": "Aucun rôle",
+      "created": "Créé le :",
+      "signOut": "Se déconnecter"
+    },
+    "address": {
+      "billingTitle": "Adresse de facturation",
+      "deliveryTitle": "Adresse de livraison",
+      "noBilling": "Aucune adresse de facturation enregistrée.",
+      "noDelivery": "Aucune adresse de livraison enregistrée.",
+      "edit": "Modifier",
+      "add": "Ajouter",
+      "saved": "{label} enregistrée",
+      "editBillingDescription": "Modifiez votre adresse de facturation",
+      "editDeliveryDescription": "Modifiez votre adresse de livraison",
+      "cancel": "Annuler",
+      "saving": "Enregistrement...",
+      "saveAddress": "Enregistrer l'adresse",
+      "errors": {
+        "requiredFields": "Veuillez remplir tous les champs obligatoires",
+        "saveFailed": "Échec de l'enregistrement de l'adresse"
+      },
+      "fields": {
+        "firstName": "Prénom *",
+        "lastName": "Nom *",
+        "company": "Société *",
+        "vat": "Numéro d'identification fiscale *",
+        "address1": "Adresse ligne 1 *",
+        "address2": "Adresse ligne 2",
+        "postalCode": "Code postal *",
+        "city": "Ville *",
+        "country": "Pays *",
+        "phone": "Téléphone *"
+      }
+    },
+    "password": {
+      "change": "Changer le mot de passe",
+      "description": "Saisissez votre mot de passe actuel et le nouveau",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le mot de passe",
+      "minimum": "8 caractères minimum requis",
+      "cancel": "Annuler",
+      "saving": "Enregistrement...",
+      "success": "Mot de passe modifié avec succès",
+      "errors": {
+        "currentRequired": "Le mot de passe actuel est requis",
+        "newRequired": "Le nouveau mot de passe est requis",
+        "minLength": "Le nouveau mot de passe doit contenir au moins 8 caractères",
+        "noMatch": "Les mots de passe ne correspondent pas",
+        "generic": "Une erreur est survenue"
+      }
+    },
+    "orders": {
+      "pageTitle": "Mes commandes",
+      "loading": "Chargement...",
+      "empty": "Vous n'avez pas encore de commandes.",
+      "goToShop": "Aller à la boutique",
+      "packOne": "pack",
+      "packOther": "packs",
+      "invoice": "Facture",
+      "status": {
+        "pending": "En attente",
+        "validated": "Validée",
+        "processing": "En traitement",
+        "shipped": "Expédiée"
+      }
+    }
+  },
+  "home": {
+    "heroAlt": "Bannière",
+    "welcomeBack": "Bon retour, {name}",
+    "tagline": "Extranet de commande de billets - France Billet",
+    "browseShop": "Voir la boutique",
+    "globeAlt": "Icône globe",
+    "franceBillet": "France Billet",
+    "franceBilletCopyright": "France Billet ©2026",
+    "guestHeadline": "Extranet de commande de billets | France Billet ©2026",
+    "login": "Connexion",
+    "signUp": "S'inscrire"
   }
 }

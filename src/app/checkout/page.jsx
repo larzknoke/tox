@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Pencil } from "lucide-react";
 import { EmptyCart } from "@/components/empty-cart";
 import { getShippingByTicketCount } from "@/lib/shipping";
+import { useLocale } from "@/lib/locale-context";
 
 const emptyAddress = {
   firstName: "",
@@ -31,12 +32,15 @@ const emptyAddress = {
   phone: "",
 };
 
-function AddressDisplay({ address, type }) {
+function AddressDisplay({ address, type, t }) {
   if (!address || !address.firstName) {
     return (
-      <p className="text-sm text-muted-foreground">No address provided.</p>
+      <p className="text-sm text-muted-foreground">
+        {t("checkout.noAddressProvided")}
+      </p>
     );
   }
+
   return (
     <div className="text-sm space-y-0.5 text-muted-foreground">
       <p className="text-foreground font-medium">
@@ -44,7 +48,9 @@ function AddressDisplay({ address, type }) {
       </p>
       {address.company && <p>{address.company}</p>}
       {type === "billing" && address.vat && (
-        <p>Tax identification number: {address.vat}</p>
+        <p>
+          {t("checkout.taxId")}: {address.vat}
+        </p>
       )}
       <p>{address.address1}</p>
       {address.address2 && <p>{address.address2}</p>}
@@ -57,7 +63,7 @@ function AddressDisplay({ address, type }) {
   );
 }
 
-function AddressForm({ address, onChange, disabled, type }) {
+function AddressForm({ address, onChange, disabled, type, t }) {
   const update = (field, value) => {
     onChange({ ...address, [field]: value });
   };
@@ -66,7 +72,7 @@ function AddressForm({ address, onChange, disabled, type }) {
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>First Name *</Label>
+          <Label>{t("checkout.fields.firstName")}</Label>
           <Input
             value={address.firstName}
             onChange={(e) => update("firstName", e.target.value)}
@@ -75,7 +81,7 @@ function AddressForm({ address, onChange, disabled, type }) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Last Name *</Label>
+          <Label>{t("checkout.fields.lastName")}</Label>
           <Input
             value={address.lastName}
             onChange={(e) => update("lastName", e.target.value)}
@@ -85,7 +91,7 @@ function AddressForm({ address, onChange, disabled, type }) {
         </div>
       </div>
       <div className="space-y-2">
-        <Label>Company *</Label>
+        <Label>{t("checkout.fields.company")}</Label>
         <Input
           value={address.company}
           onChange={(e) => update("company", e.target.value)}
@@ -95,7 +101,7 @@ function AddressForm({ address, onChange, disabled, type }) {
       </div>
       {type === "billing" && (
         <div className="space-y-2">
-          <Label>Tax identification number</Label>
+          <Label>{t("checkout.fields.vat")}</Label>
           <Input
             value={address.vat}
             onChange={(e) => update("vat", e.target.value)}
@@ -104,7 +110,7 @@ function AddressForm({ address, onChange, disabled, type }) {
         </div>
       )}
       <div className="space-y-2">
-        <Label>Address Line 1 *</Label>
+        <Label>{t("checkout.fields.address1")}</Label>
         <Input
           value={address.address1}
           onChange={(e) => update("address1", e.target.value)}
@@ -113,7 +119,7 @@ function AddressForm({ address, onChange, disabled, type }) {
         />
       </div>
       <div className="space-y-2">
-        <Label>Address Line 2</Label>
+        <Label>{t("checkout.fields.address2")}</Label>
         <Input
           value={address.address2}
           onChange={(e) => update("address2", e.target.value)}
@@ -122,7 +128,7 @@ function AddressForm({ address, onChange, disabled, type }) {
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label>Postal Code *</Label>
+          <Label>{t("checkout.fields.postalCode")}</Label>
           <Input
             value={address.postalCode}
             onChange={(e) => update("postalCode", e.target.value)}
@@ -131,7 +137,7 @@ function AddressForm({ address, onChange, disabled, type }) {
           />
         </div>
         <div className="space-y-2">
-          <Label>City *</Label>
+          <Label>{t("checkout.fields.city")}</Label>
           <Input
             value={address.city}
             onChange={(e) => update("city", e.target.value)}
@@ -141,7 +147,7 @@ function AddressForm({ address, onChange, disabled, type }) {
         </div>
       </div>
       <div className="space-y-2">
-        <Label>Country *</Label>
+        <Label>{t("checkout.fields.country")}</Label>
         <Input
           value={address.country}
           onChange={(e) => update("country", e.target.value)}
@@ -150,7 +156,7 @@ function AddressForm({ address, onChange, disabled, type }) {
         />
       </div>
       <div className="space-y-2">
-        <Label>Phone *</Label>
+        <Label>{t("checkout.fields.phone")}</Label>
         <Input
           type="tel"
           value={address.phone}
@@ -164,6 +170,7 @@ function AddressForm({ address, onChange, disabled, type }) {
 }
 
 export default function CheckoutPage() {
+  const { locale, t } = useLocale();
   const router = useRouter();
   const { data: session, isPending: sessionPending } = authClient.useSession();
   const { cartItems, clearCart } = useCart();
@@ -176,7 +183,6 @@ export default function CheckoutPage() {
   const [editingDelivery, setEditingDelivery] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
-  // Load saved addresses
   useEffect(() => {
     if (session?.user) {
       getAddressesAction().then((result) => {
@@ -219,7 +225,6 @@ export default function CheckoutPage() {
     }
   }, [session]);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!sessionPending && !session) {
       router.push("/signin");
@@ -229,9 +234,9 @@ export default function CheckoutPage() {
   if (sessionPending || !loaded) {
     return (
       <div className="flex flex-col gap-6 w-full">
-        <PageHeader title="Checkout" />
+        <PageHeader title={t("checkout.pageTitle")} />
         <div className="flex items-center justify-center py-20 text-muted-foreground">
-          Loading...
+          {t("checkout.loading")}
         </div>
       </div>
     );
@@ -240,7 +245,7 @@ export default function CheckoutPage() {
   if (cartItems.length === 0) {
     return (
       <div className="flex flex-col gap-6 w-full">
-        <PageHeader title="Checkout" />
+        <PageHeader title={t("checkout.pageTitle")} />
         <EmptyCart />
       </div>
     );
@@ -260,9 +265,7 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = () => {
     if (shipping.isQuoteRequired) {
-      toast.error(
-        "Shipping for this quantity is upon request. Please contact support.",
-      );
+      toast.error(t("checkout.quoteRequiredError"));
       return;
     }
 
@@ -279,10 +282,10 @@ export default function CheckoutPage() {
 
       if (result.success) {
         clearCart();
-        toast.success("Order placed successfully!");
+        toast.success(t("checkout.orderPlaced"));
         router.push("/");
       } else {
-        toast.error(result.error || "Failed to place order");
+        toast.error(t("checkout.orderFailed"));
       }
     });
   };
@@ -309,22 +312,22 @@ export default function CheckoutPage() {
 
   return (
     <div className="flex flex-col gap-6 w-full">
-      <PageHeader title="Checkout" />
+      <PageHeader title={t("checkout.pageTitle")} />
 
       <div className="flex flex-col gap-8 w-full">
-        {/* 3-column layout: Order Name, Billing, Delivery */}
         <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Order Name */}
           <Card>
             <CardHeader>
-              <CardTitle>Order Name</CardTitle>
+              <CardTitle>{t("checkout.orderNameTitle")}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <Label htmlFor="order-name">Name *</Label>
+                <Label htmlFor="order-name">
+                  {t("checkout.orderNameLabel")}
+                </Label>
                 <Input
                   id="order-name"
-                  placeholder="e.g. March 2026 Restock"
+                  placeholder={t("checkout.orderNamePlaceholder")}
                   value={orderName}
                   onChange={(e) => setOrderName(e.target.value)}
                   disabled={isOrdering}
@@ -333,10 +336,9 @@ export default function CheckoutPage() {
             </CardContent>
           </Card>
 
-          {/* Billing Address */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle>Billing Address</CardTitle>
+              <CardTitle>{t("checkout.billingAddressTitle")}</CardTitle>
               {!editingBilling && (
                 <Button
                   variant="outline"
@@ -345,7 +347,7 @@ export default function CheckoutPage() {
                   disabled={isOrdering}
                 >
                   <Pencil className="h-3.5 w-3.5 mr-1" />
-                  Edit
+                  {t("checkout.edit")}
                 </Button>
               )}
             </CardHeader>
@@ -357,35 +359,35 @@ export default function CheckoutPage() {
                     onChange={setBillingAddress}
                     disabled={isOrdering}
                     type="billing"
+                    t={t}
                   />
                   {isAddressComplete(billingAddress) && (
                     <Button
                       onClick={() => setEditingBilling(false)}
                       disabled={isOrdering}
                     >
-                      Save
+                      {t("checkout.save")}
                     </Button>
                   )}
                 </div>
               ) : (
-                <AddressDisplay address={billingAddress} type="billing" />
+                <AddressDisplay address={billingAddress} type="billing" t={t} />
               )}
             </CardContent>
           </Card>
 
-          {/* Delivery Address */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0">
-              <CardTitle>Delivery Address</CardTitle>
+              <CardTitle>{t("checkout.deliveryAddressTitle")}</CardTitle>
               {!editingDelivery && (
                 <Button
                   variant="outline"
-                  size={"sm"}
+                  size="sm"
                   onClick={() => setEditingDelivery(true)}
                   disabled={isOrdering}
                 >
                   <Pencil className="h-3.5 w-3.5 mr-1" />
-                  Edit
+                  {t("checkout.edit")}
                 </Button>
               )}
             </CardHeader>
@@ -397,27 +399,33 @@ export default function CheckoutPage() {
                     onChange={setDeliveryAddress}
                     disabled={isOrdering}
                     type="delivery"
+                    t={t}
                   />
                   {isAddressComplete(deliveryAddress) && (
                     <Button
                       onClick={() => setEditingDelivery(false)}
                       disabled={isOrdering}
                     >
-                      Save
+                      {t("checkout.save")}
                     </Button>
                   )}
                 </div>
               ) : (
-                <AddressDisplay address={deliveryAddress} type="delivery" />
+                <AddressDisplay
+                  address={deliveryAddress}
+                  type="delivery"
+                  t={t}
+                />
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Order summary */}
         <div className="w-full">
           <div className="rounded-md border p-5 flex flex-col gap-4">
-            <h2 className="font-semibold text-base">Order Summary</h2>
+            <h2 className="font-semibold text-base">
+              {t("checkout.orderSummary")}
+            </h2>
 
             <div className="flex flex-col gap-3">
               {cartItems.map((item) => (
@@ -430,8 +438,10 @@ export default function CheckoutPage() {
                   </div>
                   <p className="text-xs text-muted-foreground">
                     {item.reference} &middot; {item.quantity}{" "}
-                    {item.quantity === 1 ? "pack" : "packs"} × €
-                    {item.pricePerPack.toFixed(2)}
+                    {item.quantity === 1
+                      ? t("checkout.packOne")
+                      : t("checkout.packOther")}{" "}
+                    × €{item.pricePerPack.toFixed(2)}
                   </p>
                 </div>
               ))}
@@ -440,41 +450,45 @@ export default function CheckoutPage() {
             <Separator />
 
             <div className="flex justify-between font-medium">
-              <span>Total (excl. VAT)</span>
+              <span>{t("checkout.totalExclVat")}</span>
               <span>€{subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>
-                Shipping{" "}
                 {shipping.parcels > 0
-                  ? `(${shipping.parcels} parcel${shipping.parcels > 1 ? "s" : ""})`
-                  : ""}
+                  ? t("checkout.shippingWithParcels", {
+                      count: shipping.parcels,
+                      parcelLabel:
+                        shipping.parcels === 1
+                          ? t("checkout.parcelOne")
+                          : t("checkout.parcelOther"),
+                    })
+                  : t("checkout.shipping")}
               </span>
               <span>
                 {shipping.isQuoteRequired
-                  ? "Upon request"
+                  ? t("checkout.uponRequest")
                   : `€${shippingCost.toFixed(2)}`}
               </span>
             </div>
             <div className="flex justify-between font-semibold">
-              <span>Total incl. shipping (excl. VAT)</span>
+              <span>{t("checkout.totalInclShipping")}</span>
               <span>
                 {shipping.isQuoteRequired
-                  ? "Upon request"
+                  ? t("checkout.uponRequest")
                   : `€${grandTotal.toFixed(2)}`}
               </span>
             </div>
             {shipping.isQuoteRequired && (
               <p className="text-xs text-muted-foreground">
-                For quantities above 50,000 tickets, shipping is calculated upon
-                request.
+                {t("checkout.quoteRequiredInfo")}
               </p>
             )}
-            <div className="flex space-bewtween w-full items-center justify-between">
+            <div className="flex w-full items-center justify-between">
               <Button asChild variant="ghost" size="sm" className="w-40">
                 <Link href="/cart">
                   <ArrowLeft className="h-4 w-4" />
-                  Back to Cart
+                  {t("checkout.backToCart")}
                 </Link>
               </Button>
               <Button
@@ -482,7 +496,9 @@ export default function CheckoutPage() {
                 onClick={handlePlaceOrder}
                 disabled={!canOrder || isOrdering}
               >
-                {isOrdering ? "Placing Order..." : "Place Order"}
+                {isOrdering
+                  ? t("checkout.placingOrder")
+                  : t("checkout.placeOrder")}
               </Button>
             </div>
           </div>

@@ -14,8 +14,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { changePasswordAction } from "../actions/change-password";
+import { useLocale } from "@/lib/locale-context";
 
 export function ChangePasswordDialog({ open, onOpenChange }) {
+  const { t } = useLocale();
   const [form, setForm] = useState({
     currentPassword: "",
     newPassword: "",
@@ -29,19 +31,19 @@ export function ChangePasswordDialog({ open, onOpenChange }) {
     setError("");
 
     if (!form.currentPassword) {
-      setError("Current password is required");
+      setError(t("account.password.errors.currentRequired"));
       return;
     }
     if (!form.newPassword) {
-      setError("New password is required");
+      setError(t("account.password.errors.newRequired"));
       return;
     }
     if (form.newPassword.length < 8) {
-      setError("New password must be at least 8 characters");
+      setError(t("account.password.errors.minLength"));
       return;
     }
     if (form.newPassword !== form.confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("account.password.errors.noMatch"));
       return;
     }
 
@@ -51,12 +53,12 @@ export function ChangePasswordDialog({ open, onOpenChange }) {
         form.newPassword,
       );
       if (result.success) {
-        toast.success(result.message || "Password changed successfully");
+        toast.success(t("account.password.success"));
         onOpenChange(false);
         setForm({ currentPassword: "", newPassword: "", confirmPassword: "" });
       } else {
-        setError(result.error || "An error occurred");
-        toast.error(result.error || "An error occurred");
+        setError(t("account.password.errors.generic"));
+        toast.error(t("account.password.errors.generic"));
       }
     });
   };
@@ -65,9 +67,9 @@ export function ChangePasswordDialog({ open, onOpenChange }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-106.25">
         <DialogHeader>
-          <DialogTitle>Change Password</DialogTitle>
+          <DialogTitle>{t("account.password.change")}</DialogTitle>
           <DialogDescription>
-            Enter your current and new password
+            {t("account.password.description")}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -78,7 +80,9 @@ export function ChangePasswordDialog({ open, onOpenChange }) {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="currentPassword">Current Password</Label>
+              <Label htmlFor="currentPassword">
+                {t("account.password.current")}
+              </Label>
               <Input
                 id="currentPassword"
                 type="password"
@@ -91,7 +95,7 @@ export function ChangePasswordDialog({ open, onOpenChange }) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">{t("account.password.new")}</Label>
               <Input
                 id="newPassword"
                 type="password"
@@ -104,11 +108,13 @@ export function ChangePasswordDialog({ open, onOpenChange }) {
                 minLength={8}
               />
               <p className="text-xs text-muted-foreground">
-                Minimum 8 characters required
+                {t("account.password.minimum")}
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">
+                {t("account.password.confirm")}
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -128,10 +134,12 @@ export function ChangePasswordDialog({ open, onOpenChange }) {
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Cancel
+              {t("account.password.cancel")}
             </Button>
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Saving..." : "Change Password"}
+              {isPending
+                ? t("account.password.saving")
+                : t("account.password.change")}
             </Button>
           </DialogFooter>
         </form>

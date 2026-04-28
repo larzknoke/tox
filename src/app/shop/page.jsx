@@ -11,8 +11,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import prisma from "@/lib/prisma";
+import { getLocale } from "@/lib/i18n-server";
+import { getMessages, t as interpolate } from "@/lib/i18n";
 
 export default async function ShopPage() {
+  const locale = await getLocale();
+  const messages = getMessages(locale);
+  const t = (key, params = {}) => {
+    const parts = key.split(".");
+    let value = messages;
+    for (const part of parts) {
+      if (value == null || typeof value !== "object") return key;
+      value = value[part];
+    }
+    if (typeof value !== "string") return key;
+    return interpolate(value, params);
+  };
+
   const raw = await prisma.product.findMany({
     where: { isActive: true },
     orderBy: { reference: "asc" },
@@ -25,7 +40,7 @@ export default async function ShopPage() {
   }));
   return (
     <div className="flex flex-col gap-6 w-full">
-      <PageHeader title="Shop" />
+      <PageHeader title={t("shop.pageTitle")} />
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((product) => (
@@ -41,7 +56,9 @@ export default async function ShopPage() {
                     <Package className="h-6 w-6" />
                   </div>
                   <Badge variant={product.isActive ? "default" : "secondary"}>
-                    {product.isActive ? "In Stock" : "Unavailable"}
+                    {product.isActive
+                      ? t("shop.badges.inStock")
+                      : t("shop.badges.unavailable")}
                   </Badge>
                 </div>
                 <CardTitle className="mt-3 text-base leading-snug">
@@ -60,11 +77,13 @@ export default async function ShopPage() {
                     €{product.pricePerPack.toFixed(2)}
                   </span>
                   <span className="text-xs text-muted-foreground ml-1">
-                    / pack ({product.quantityPerPack} tickets)
+                    {t("shop.card.perPack", {
+                      count: product.quantityPerPack,
+                    })}
                   </span>
                 </div>
                 <Button size="sm" variant="outline" tabIndex={-1}>
-                  View
+                  {t("shop.card.view")}
                 </Button>
               </CardFooter>
             </Card>

@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Pencil, Plus } from "lucide-react";
 import { saveAddressAction } from "../actions/save-address";
+import { useLocale } from "@/lib/locale-context";
 
 const emptyAddress = {
   firstName: "",
@@ -30,12 +31,16 @@ const emptyAddress = {
 };
 
 export function AddressCard({ type, address, onSave }) {
+  const { t } = useLocale();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [form, setForm] = useState(emptyAddress);
   const [error, setError] = useState("");
   const [isSaving, startTransition] = useTransition();
 
-  const label = type === "billing" ? "Billing Address" : "Delivery Address";
+  const isBilling = type === "billing";
+  const label = isBilling
+    ? t("account.address.billingTitle")
+    : t("account.address.deliveryTitle");
 
   const handleOpen = () => {
     setForm(
@@ -74,7 +79,7 @@ export function AddressCard({ type, address, onSave }) {
     ];
     for (const field of required) {
       if (!form[field]?.trim()) {
-        setError("Please fill in all required fields");
+        setError(t("account.address.errors.requiredFields"));
         return;
       }
     }
@@ -82,12 +87,12 @@ export function AddressCard({ type, address, onSave }) {
     startTransition(async () => {
       const result = await saveAddressAction(type, form);
       if (result.success) {
-        toast.success(`${label} saved`);
+        toast.success(t("account.address.saved", { label }));
         onSave(result.address);
         setIsDialogOpen(false);
       } else {
-        setError(result.error || "An error occurred");
-        toast.error(result.error || "An error occurred");
+        setError(t("account.address.errors.saveFailed"));
+        toast.error(t("account.address.errors.saveFailed"));
       }
     });
   };
@@ -114,7 +119,9 @@ export function AddressCard({ type, address, onSave }) {
           </div>
         ) : (
           <p className="text-sm text-muted-foreground">
-            No {type} address saved.
+            {isBilling
+              ? t("account.address.noBilling")
+              : t("account.address.noDelivery")}
           </p>
         )}
         <div className="flex items-center justify-between mt-4">
@@ -122,11 +129,12 @@ export function AddressCard({ type, address, onSave }) {
           <Button variant="outline" size="sm" onClick={handleOpen}>
             {address ? (
               <>
-                <Pencil className="h-3.5 w-3.5 mr-1" /> Edit
+                <Pencil className="h-3.5 w-3.5 mr-1" />{" "}
+                {t("account.address.edit")}
               </>
             ) : (
               <>
-                <Plus className="h-3.5 w-3.5 mr-1" /> Add
+                <Plus className="h-3.5 w-3.5 mr-1" /> {t("account.address.add")}
               </>
             )}
           </Button>
@@ -138,9 +146,9 @@ export function AddressCard({ type, address, onSave }) {
           <DialogHeader>
             <DialogTitle>{label}</DialogTitle>
             <DialogDescription>
-              {type === "billing"
-                ? "Edit your billing address"
-                : "Edit your delivery address"}
+              {isBilling
+                ? t("account.address.editBillingDescription")
+                : t("account.address.editDeliveryDescription")}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit}>
@@ -152,7 +160,9 @@ export function AddressCard({ type, address, onSave }) {
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="addr-firstName">First Name *</Label>
+                  <Label htmlFor="addr-firstName">
+                    {t("account.address.fields.firstName")}
+                  </Label>
                   <Input
                     id="addr-firstName"
                     value={form.firstName}
@@ -164,7 +174,9 @@ export function AddressCard({ type, address, onSave }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="addr-lastName">Last Name *</Label>
+                  <Label htmlFor="addr-lastName">
+                    {t("account.address.fields.lastName")}
+                  </Label>
                   <Input
                     id="addr-lastName"
                     value={form.lastName}
@@ -177,7 +189,9 @@ export function AddressCard({ type, address, onSave }) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="addr-company">Company *</Label>
+                <Label htmlFor="addr-company">
+                  {t("account.address.fields.company")}
+                </Label>
                 <Input
                   id="addr-company"
                   value={form.company}
@@ -188,9 +202,11 @@ export function AddressCard({ type, address, onSave }) {
                   required
                 />
               </div>
-              {type === "billing" && (
+              {isBilling && (
                 <div className="space-y-2">
-                  <Label htmlFor="addr-vat">Tax identification number *</Label>
+                  <Label htmlFor="addr-vat">
+                    {t("account.address.fields.vat")}
+                  </Label>
                   <Input
                     id="addr-vat"
                     value={form.vat}
@@ -201,7 +217,9 @@ export function AddressCard({ type, address, onSave }) {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="addr-address1">Address Line 1 *</Label>
+                <Label htmlFor="addr-address1">
+                  {t("account.address.fields.address1")}
+                </Label>
                 <Input
                   id="addr-address1"
                   value={form.address1}
@@ -213,7 +231,9 @@ export function AddressCard({ type, address, onSave }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="addr-address2">Address Line 2</Label>
+                <Label htmlFor="addr-address2">
+                  {t("account.address.fields.address2")}
+                </Label>
                 <Input
                   id="addr-address2"
                   value={form.address2}
@@ -225,7 +245,9 @@ export function AddressCard({ type, address, onSave }) {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="addr-postalCode">Postal Code *</Label>
+                  <Label htmlFor="addr-postalCode">
+                    {t("account.address.fields.postalCode")}
+                  </Label>
                   <Input
                     id="addr-postalCode"
                     value={form.postalCode}
@@ -237,7 +259,9 @@ export function AddressCard({ type, address, onSave }) {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="addr-city">City *</Label>
+                  <Label htmlFor="addr-city">
+                    {t("account.address.fields.city")}
+                  </Label>
                   <Input
                     id="addr-city"
                     value={form.city}
@@ -248,7 +272,9 @@ export function AddressCard({ type, address, onSave }) {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="addr-country">Country *</Label>
+                <Label htmlFor="addr-country">
+                  {t("account.address.fields.country")}
+                </Label>
                 <Input
                   id="addr-country"
                   value={form.country}
@@ -260,7 +286,9 @@ export function AddressCard({ type, address, onSave }) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="addr-phone">Phone *</Label>
+                <Label htmlFor="addr-phone">
+                  {t("account.address.fields.phone")}
+                </Label>
                 <Input
                   id="addr-phone"
                   type="tel"
@@ -278,10 +306,12 @@ export function AddressCard({ type, address, onSave }) {
                 onClick={() => setIsDialogOpen(false)}
                 disabled={isSaving}
               >
-                Cancel
+                {t("account.address.cancel")}
               </Button>
               <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save Address"}
+                {isSaving
+                  ? t("account.address.saving")
+                  : t("account.address.saveAddress")}
               </Button>
             </DialogFooter>
           </form>

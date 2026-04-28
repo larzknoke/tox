@@ -4,6 +4,7 @@ import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useLocale } from "@/lib/locale-context";
 
 function getUserInitials(name) {
   if (!name) return "U";
@@ -17,6 +18,7 @@ function getUserInitials(name) {
 
 export function AccountInfo({ user, session, onChangePassword }) {
   const router = useRouter();
+  const { locale, t } = useLocale();
 
   const handleLogout = async () => {
     await authClient.signOut({
@@ -32,7 +34,10 @@ export function AccountInfo({ user, session, onChangePassword }) {
     <div className="space-y-6">
       <div className="flex items-center space-x-4">
         <Avatar className="h-20 w-20">
-          <AvatarImage src={user.image || ""} alt={user.name || "User"} />
+          <AvatarImage
+            src={user.image || ""}
+            alt={user.name || t("account.info.userFallback")}
+          />
           <AvatarFallback className="text-2xl">
             {getUserInitials(user.name)}
           </AvatarFallback>
@@ -41,39 +46,53 @@ export function AccountInfo({ user, session, onChangePassword }) {
           <h3 className="text-2xl font-semibold">{user.name}</h3>
           <p className="text-sm text-muted-foreground">{user.email}</p>
           {user.emailVerified && (
-            <p className="text-xs text-green-600">✓ Email verified</p>
+            <p className="text-xs text-green-600">
+              {t("account.info.emailVerified")}
+            </p>
           )}
         </div>
       </div>
 
       <div className="border-t pt-6">
-        <h4 className="text-sm font-medium mb-4">Session</h4>
+        <h4 className="text-sm font-medium mb-4">
+          {t("account.info.session")}
+        </h4>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-muted-foreground">User ID:</span>
+            <span className="text-muted-foreground">
+              {t("account.info.userId")}
+            </span>
             <span className="font-mono">...{user.id.slice(-10)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Session ID:</span>
+            <span className="text-muted-foreground">
+              {t("account.info.sessionId")}
+            </span>
             <span className="font-mono">...{session.id.slice(-10)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Role:</span>
-            <span>{user.role.toLocaleUpperCase() || "No role"}</span>
+            <span className="text-muted-foreground">
+              {t("account.info.role")}
+            </span>
+            <span>
+              {user.role?.toLocaleUpperCase() || t("account.info.noRole")}
+            </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-muted-foreground">Created:</span>
-            <span>{new Date(user.createdAt).toLocaleDateString("en-GB")}</span>
+            <span className="text-muted-foreground">
+              {t("account.info.created")}
+            </span>
+            <span>{new Date(user.createdAt).toLocaleDateString(locale)}</span>
           </div>
         </div>
       </div>
 
       <div className="border-t pt-6 flex justify-between">
         <Button variant="outline" onClick={onChangePassword}>
-          Change Password
+          {t("account.password.change")}
         </Button>
         <Button variant="destructive" onClick={handleLogout}>
-          Sign Out
+          {t("account.info.signOut")}
         </Button>
       </div>
     </div>
