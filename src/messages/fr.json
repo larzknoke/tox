@@ -299,5 +299,60 @@
     "guestHeadline": "Extranet de commande de billets | France Billet ©2026",
     "login": "Connexion",
     "signUp": "S'inscrire"
+  },
+  "adminProducts": {
+    "pageTitle": "Produits",
+    "searchPlaceholder": "Rechercher par reference ou nom...",
+    "newProduct": "Nouveau produit",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
+    "delete": "Supprimer",
+    "deleting": "Suppression...",
+    "deleteTitle": "Supprimer le produit",
+    "deleteDescription": "Voulez-vous vraiment supprimer {reference} ? Cette action est irreversible.",
+    "status": {
+      "active": "Actif",
+      "inactive": "Inactif",
+      "inStock": "En stock",
+      "unavailable": "Indisponible"
+    },
+    "toast": {
+      "created": "Produit cree avec succes.",
+      "createFailed": "Echec de la creation du produit.",
+      "updated": "Produit mis a jour avec succes.",
+      "updateFailed": "Echec de la mise a jour du produit.",
+      "deleted": "Produit supprime.",
+      "deleteFailed": "Echec de la suppression du produit."
+    },
+    "table": {
+      "reference": "Reference",
+      "name": "Nom",
+      "description": "Description",
+      "pricePerPack": "Prix / Pack",
+      "qtyPerPack": "Qt / Pack",
+      "status": "Statut",
+      "noProducts": "Aucun produit trouve.",
+      "noDescription": "-",
+      "editAria": "Modifier le produit",
+      "deleteAria": "Supprimer le produit"
+    },
+    "form": {
+      "newTitle": "Nouveau produit",
+      "editTitle": "Modifier le produit",
+      "reference": "Reference *",
+      "referencePlaceholder": "BOFBSM",
+      "qtyPerPack": "Qt par pack *",
+      "qtyPerPackPlaceholder": "1000",
+      "name": "Nom *",
+      "namePlaceholder": "BOCA SANS COUPE PERFORE",
+      "description": "Description",
+      "descriptionPlaceholder": "Description courte du produit",
+      "pricePerPack": "Prix par pack (EUR, HT) *",
+      "pricePerPackPlaceholder": "42.50",
+      "active": "Actif",
+      "saveChanges": "Enregistrer les modifications",
+      "createProduct": "Creer le produit"
+    }
   }
 }

@@ -299,5 +299,60 @@
     "guestHeadline": "Ticket Order Extranet | France Billet ©2026",
     "login": "Login",
     "signUp": "Sign Up"
+  },
+  "adminProducts": {
+    "pageTitle": "Products",
+    "searchPlaceholder": "Search by reference or name...",
+    "newProduct": "New Product",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving...",
+    "delete": "Delete",
+    "deleting": "Deleting...",
+    "deleteTitle": "Delete Product",
+    "deleteDescription": "Are you sure you want to delete {reference}? This action cannot be undone.",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "inStock": "In Stock",
+      "unavailable": "Unavailable"
+    },
+    "toast": {
+      "created": "Product created successfully.",
+      "createFailed": "Failed to create product.",
+      "updated": "Product updated successfully.",
+      "updateFailed": "Failed to update product.",
+      "deleted": "Product deleted.",
+      "deleteFailed": "Failed to delete product."
+    },
+    "table": {
+      "reference": "Reference",
+      "name": "Name",
+      "description": "Description",
+      "pricePerPack": "Price / Pack",
+      "qtyPerPack": "Qty / Pack",
+      "status": "Status",
+      "noProducts": "No products found.",
+      "noDescription": "-",
+      "editAria": "Edit product",
+      "deleteAria": "Delete product"
+    },
+    "form": {
+      "newTitle": "New Product",
+      "editTitle": "Edit Product",
+      "reference": "Reference *",
+      "referencePlaceholder": "BOFBSM",
+      "qtyPerPack": "Qty per Pack *",
+      "qtyPerPackPlaceholder": "1000",
+      "name": "Name *",
+      "namePlaceholder": "BOCA WITHOUT CUTTER PRE-PERFORATED",
+      "description": "Description",
+      "descriptionPlaceholder": "Short product description",
+      "pricePerPack": "Price per Pack (EUR, excl. VAT) *",
+      "pricePerPackPlaceholder": "42.50",
+      "active": "Active",
+      "saveChanges": "Save Changes",
+      "createProduct": "Create Product"
+    }
   }
 }

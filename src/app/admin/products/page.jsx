@@ -5,6 +5,8 @@ import { hasRole } from "@/lib/roles";
 import prisma from "@/lib/prisma";
 import { PageHeader } from "@/components/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getLocale } from "@/lib/i18n-server";
+import { getMessages } from "@/lib/i18n";
 import ProductTable from "./components/ProductTable";
 
 async function getProducts() {
@@ -14,6 +16,8 @@ async function getProducts() {
 async function ProductsContent() {
   const session = await requireSession();
   if (!hasRole(session, "ADMIN")) redirect("/");
+  const locale = await getLocale();
+  const messages = getMessages(locale);
 
   const raw = await getProducts();
   const products = raw.map((p) => ({
@@ -25,7 +29,7 @@ async function ProductsContent() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Products" />
+      <PageHeader title={messages.adminProducts?.pageTitle ?? "Products"} />
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>
         <ProductTable products={products} />
       </Suspense>
