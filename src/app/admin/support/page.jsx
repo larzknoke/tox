@@ -39,7 +39,9 @@ async function SupportContent() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={messages.support?.admin?.pageTitle ?? "Support Tickets"} />
+      <PageHeader
+        title={messages.support?.admin?.pageTitle ?? "Support Tickets"}
+      />
       <Suspense fallback={<Skeleton className="h-64 w-full" />}>
         <SupportTable tickets={tickets} />
       </Suspense>

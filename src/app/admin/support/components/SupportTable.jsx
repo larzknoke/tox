@@ -92,7 +92,9 @@ export default function SupportTable({ tickets: initialTickets }) {
             <SelectValue placeholder={t("support.admin.filterByStatus")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">{t("support.admin.allStatuses")}</SelectItem>
+            <SelectItem value="all">
+              {t("support.admin.allStatuses")}
+            </SelectItem>
             {SUPPORT_TICKET_STATUSES.map((status) => (
               <SelectItem key={status} value={status}>
                 {t(`support.statuses.${status}`)}
@@ -121,17 +123,24 @@ export default function SupportTable({ tickets: initialTickets }) {
               filteredTickets.map((ticket) => (
                 <TableRow key={ticket.id}>
                   <TableCell>#{ticket.id}</TableCell>
-                  <TableCell className="font-medium">{ticket.subject}</TableCell>
+                  <TableCell className="font-medium">
+                    {ticket.subject}
+                  </TableCell>
                   <TableCell>{t(`support.types.${ticket.type}`)}</TableCell>
                   <TableCell>{ticket.name}</TableCell>
                   <TableCell>{ticket.email}</TableCell>
                   <TableCell>
-                    <Badge variant={statusVariant[ticket.status] ?? "secondary"}>
+                    <Badge
+                      variant={statusVariant[ticket.status] ?? "secondary"}
+                    >
                       {t(`support.statuses.${ticket.status}`)}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {format(new Date(ticket.createdAt), locale === "fr" ? "dd/MM/yyyy HH:mm" : "yyyy-MM-dd HH:mm")}
+                    {format(
+                      new Date(ticket.createdAt),
+                      locale === "fr" ? "dd/MM/yyyy HH:mm" : "yyyy-MM-dd HH:mm",
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
@@ -167,7 +176,10 @@ export default function SupportTable({ tickets: initialTickets }) {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={8}
+                  className="text-center text-muted-foreground"
+                >
                   {t("support.admin.noTickets")}
                 </TableCell>
               </TableRow>
@@ -176,7 +188,10 @@ export default function SupportTable({ tickets: initialTickets }) {
         </Table>
       </div>
 
-      <Dialog open={Boolean(detailTicket)} onOpenChange={() => setDetailTicket(null)}>
+      <Dialog
+        open={Boolean(detailTicket)}
+        onOpenChange={() => setDetailTicket(null)}
+      >
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle>
@@ -187,29 +202,38 @@ export default function SupportTable({ tickets: initialTickets }) {
           {detailTicket ? (
             <div className="space-y-3 text-sm">
               <div>
-                <strong>{t("support.fields.subject")}:</strong> {detailTicket.subject}
+                <strong>{t("support.fields.subject")}:</strong>{" "}
+                {detailTicket.subject}
               </div>
               <div>
-                <strong>{t("support.fields.type")}:</strong> {t(`support.types.${detailTicket.type}`)}
+                <strong>{t("support.fields.type")}:</strong>{" "}
+                {t(`support.types.${detailTicket.type}`)}
               </div>
               <div>
-                <strong>{t("support.fields.status")}:</strong> {t(`support.statuses.${detailTicket.status}`)}
+                <strong>{t("support.fields.status")}:</strong>{" "}
+                {t(`support.statuses.${detailTicket.status}`)}
               </div>
               <div>
                 <strong>{t("support.fields.name")}:</strong> {detailTicket.name}
               </div>
               <div>
-                <strong>{t("support.fields.email")}:</strong> {detailTicket.email}
+                <strong>{t("support.fields.email")}:</strong>{" "}
+                {detailTicket.email}
               </div>
               <div>
-                <strong>{t("support.fields.phone")}:</strong> {detailTicket.phone}
+                <strong>{t("support.fields.phone")}:</strong>{" "}
+                {detailTicket.phone}
               </div>
               <div>
-                <strong>{t("support.admin.userId")}:</strong> {detailTicket.userId || "-"}
+                <strong>{t("support.admin.userId")}:</strong>{" "}
+                {detailTicket.userId || "-"}
               </div>
               <div>
                 <strong>{t("support.admin.createdAt")}:</strong>{" "}
-                {format(new Date(detailTicket.createdAt), locale === "fr" ? "dd/MM/yyyy HH:mm" : "yyyy-MM-dd HH:mm")}
+                {format(
+                  new Date(detailTicket.createdAt),
+                  locale === "fr" ? "dd/MM/yyyy HH:mm" : "yyyy-MM-dd HH:mm",
+                )}
               </div>
               <div>
                 <strong>{t("support.fields.description")}:</strong>

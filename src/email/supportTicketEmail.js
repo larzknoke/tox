@@ -1,7 +1,9 @@
 import { SUPPORT_TICKET_TYPES } from "@/lib/support-ticket";
 
 function safe(value) {
-  return String(value ?? "").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+  return String(value ?? "")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
 }
 
 function formatDate(date, locale = "en") {

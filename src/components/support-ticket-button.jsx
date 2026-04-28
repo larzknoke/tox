@@ -37,7 +37,8 @@ const EMPTY_FORM = {
 };
 
 export function SupportTicketButton() {
-  const { data: session, isPending: isSessionPending } = authClient.useSession();
+  const { data: session, isPending: isSessionPending } =
+    authClient.useSession();
   const { locale, t } = useLocale();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -121,7 +122,9 @@ export function SupportTicketButton() {
         <DialogContent className="sm:max-w-xl">
           <DialogHeader>
             <DialogTitle>{t("support.dialogTitle")}</DialogTitle>
-            <DialogDescription>{t("support.dialogDescription")}</DialogDescription>
+            <DialogDescription>
+              {t("support.dialogDescription")}
+            </DialogDescription>
           </DialogHeader>
 
           <form onSubmit={onSubmit} className="space-y-4">
@@ -144,7 +147,9 @@ export function SupportTicketButton() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="support-email">{t("support.fields.email")}</Label>
+                <Label htmlFor="support-email">
+                  {t("support.fields.email")}
+                </Label>
                 <Input
                   id="support-email"
                   type="email"
@@ -159,7 +164,9 @@ export function SupportTicketButton() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="support-phone">{t("support.fields.phone")}</Label>
+                <Label htmlFor="support-phone">
+                  {t("support.fields.phone")}
+                </Label>
                 <Input
                   id="support-phone"
                   value={form.phone}
@@ -193,7 +200,9 @@ export function SupportTicketButton() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="support-subject">{t("support.fields.subject")}</Label>
+              <Label htmlFor="support-subject">
+                {t("support.fields.subject")}
+              </Label>
               <Input
                 id="support-subject"
                 value={form.subject}
@@ -205,12 +214,17 @@ export function SupportTicketButton() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="support-description">{t("support.fields.description")}</Label>
+              <Label htmlFor="support-description">
+                {t("support.fields.description")}
+              </Label>
               <Textarea
                 id="support-description"
                 value={form.description}
                 onChange={(event) =>
-                  setForm((prev) => ({ ...prev, description: event.target.value }))
+                  setForm((prev) => ({
+                    ...prev,
+                    description: event.target.value,
+                  }))
                 }
                 rows={6}
                 disabled={isPending}
