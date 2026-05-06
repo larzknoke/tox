@@ -59,10 +59,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getOrderPricingSummary } from "@/lib/shipping";
-import { Trash2, FileText, Euro, CalendarIcon, ListFilter } from "lucide-react";
+import {
+  Trash2,
+  FileText,
+  Euro,
+  CalendarIcon,
+  ListFilter,
+  Package,
+  Loader2,
+} from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
 import { generateInvoicePDFAction } from "../actions/generate-invoice-pdf";
+import { generateLabelPDFAction } from "../actions/generate-label-pdf";
 
 const statuses = ["PENDING", "VALIDATED", "PROCESSING", "SHIPPED"];
 
@@ -158,6 +167,7 @@ export default function OrderTable({ orders: initialOrders }) {
   }
 
   const [generatingPDFId, setGeneratingPDFId] = useState(null);
+  const [generatingLabelId, setGeneratingLabelId] = useState(null);
 
   const getPricing = (order) => getOrderPricingSummary(order.items);
 
@@ -184,6 +194,33 @@ export default function OrderTable({ orders: initialOrders }) {
       toast.error(t("orders.pdfFailed") + ": " + error.message);
     } finally {
       setGeneratingPDFId(null);
+    }
+  }
+
+  async function handleDownloadLabelPDF(order) {
+    setGeneratingLabelId(order.id);
+    try {
+      const result = await generateLabelPDFAction(order.id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      const blob = new Blob([new Uint8Array(result.pdfBuffer)], {
+        type: "application/pdf",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(t("orders.labelDownloaded"));
+    } catch (error) {
+      toast.error(t("orders.labelFailed") + ": " + error.message);
+    } finally {
+      setGeneratingLabelId(null);
     }
   }
 
@@ -418,6 +455,25 @@ export default function OrderTable({ orders: initialOrders }) {
                               </TooltipTrigger>
                               <TooltipContent>
                                 {t("orders.downloadInvoice")}
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => handleDownloadLabelPDF(order)}
+                                  disabled={generatingLabelId !== null}
+                                >
+                                  {generatingLabelId === order.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <Package className="h-4 w-4" />
+                                  )}
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("orders.downloadLabel")}
                               </TooltipContent>
                             </Tooltip>
                             <Tooltip>
