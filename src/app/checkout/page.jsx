@@ -13,23 +13,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Pencil } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { EmptyCart } from "@/components/empty-cart";
 import { getShippingByTicketCount } from "@/lib/shipping";
 import { useLocale } from "@/lib/locale-context";
 
-const emptyAddress = {
-  firstName: "",
-  lastName: "",
-  company: "",
-  vat: "",
-  address1: "",
-  address2: "",
-  postalCode: "",
-  city: "",
-  country: "",
-  phone: "",
+const emptyAddressBook = {
+  billingAddresses: [],
+  deliveryAddresses: [],
+  defaultBillingAddressId: null,
+  defaultDeliveryAddressId: null,
 };
 
 function AddressDisplay({ address, type, t }) {
@@ -63,112 +64,6 @@ function AddressDisplay({ address, type, t }) {
   );
 }
 
-function AddressForm({ address, onChange, disabled, type, t }) {
-  const update = (field, value) => {
-    onChange({ ...address, [field]: value });
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>{t("checkout.fields.firstName")}</Label>
-          <Input
-            value={address.firstName}
-            onChange={(e) => update("firstName", e.target.value)}
-            disabled={disabled}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>{t("checkout.fields.lastName")}</Label>
-          <Input
-            value={address.lastName}
-            onChange={(e) => update("lastName", e.target.value)}
-            disabled={disabled}
-            required
-          />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label>{t("checkout.fields.company")}</Label>
-        <Input
-          value={address.company}
-          onChange={(e) => update("company", e.target.value)}
-          disabled={disabled}
-          required
-        />
-      </div>
-      {type === "billing" && (
-        <div className="space-y-2">
-          <Label>{t("checkout.fields.vat")}</Label>
-          <Input
-            value={address.vat}
-            onChange={(e) => update("vat", e.target.value)}
-            disabled={disabled}
-          />
-        </div>
-      )}
-      <div className="space-y-2">
-        <Label>{t("checkout.fields.address1")}</Label>
-        <Input
-          value={address.address1}
-          onChange={(e) => update("address1", e.target.value)}
-          disabled={disabled}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>{t("checkout.fields.address2")}</Label>
-        <Input
-          value={address.address2}
-          onChange={(e) => update("address2", e.target.value)}
-          disabled={disabled}
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>{t("checkout.fields.postalCode")}</Label>
-          <Input
-            value={address.postalCode}
-            onChange={(e) => update("postalCode", e.target.value)}
-            disabled={disabled}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label>{t("checkout.fields.city")}</Label>
-          <Input
-            value={address.city}
-            onChange={(e) => update("city", e.target.value)}
-            disabled={disabled}
-            required
-          />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <Label>{t("checkout.fields.country")}</Label>
-        <Input
-          value={address.country}
-          onChange={(e) => update("country", e.target.value)}
-          disabled={disabled}
-          required
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>{t("checkout.fields.phone")}</Label>
-        <Input
-          type="tel"
-          value={address.phone}
-          onChange={(e) => update("phone", e.target.value)}
-          disabled={disabled}
-          required
-        />
-      </div>
-    </div>
-  );
-}
-
 export default function CheckoutPage() {
   const { locale, t } = useLocale();
   const router = useRouter();
@@ -177,48 +72,36 @@ export default function CheckoutPage() {
   const [isOrdering, startTransition] = useTransition();
 
   const [orderName, setOrderName] = useState("");
-  const [billingAddress, setBillingAddress] = useState(emptyAddress);
-  const [deliveryAddress, setDeliveryAddress] = useState(emptyAddress);
-  const [editingBilling, setEditingBilling] = useState(false);
-  const [editingDelivery, setEditingDelivery] = useState(false);
+  const [addressBook, setAddressBook] = useState(emptyAddressBook);
+  const [selectedBillingAddressId, setSelectedBillingAddressId] = useState("");
+  const [selectedDeliveryAddressId, setSelectedDeliveryAddressId] =
+    useState("");
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (session?.user) {
       getAddressesAction().then((result) => {
         if (result.success) {
-          if (result.billingAddress) {
-            setBillingAddress({
-              firstName: result.billingAddress.firstName || "",
-              lastName: result.billingAddress.lastName || "",
-              company: result.billingAddress.company || "",
-              vat: result.billingAddress.vat || "",
-              address1: result.billingAddress.address1 || "",
-              address2: result.billingAddress.address2 || "",
-              postalCode: result.billingAddress.postalCode || "",
-              city: result.billingAddress.city || "",
-              country: result.billingAddress.country || "",
-              phone: result.billingAddress.phone || "",
-            });
-          } else {
-            setEditingBilling(true);
-          }
-          if (result.deliveryAddress) {
-            setDeliveryAddress({
-              firstName: result.deliveryAddress.firstName || "",
-              lastName: result.deliveryAddress.lastName || "",
-              company: result.deliveryAddress.company || "",
-              vat: result.deliveryAddress.vat || "",
-              address1: result.deliveryAddress.address1 || "",
-              address2: result.deliveryAddress.address2 || "",
-              postalCode: result.deliveryAddress.postalCode || "",
-              city: result.deliveryAddress.city || "",
-              country: result.deliveryAddress.country || "",
-              phone: result.deliveryAddress.phone || "",
-            });
-          } else {
-            setEditingDelivery(true);
-          }
+          setAddressBook({
+            billingAddresses: result.billingAddresses,
+            deliveryAddresses: result.deliveryAddresses,
+            defaultBillingAddressId: result.defaultBillingAddressId,
+            defaultDeliveryAddressId: result.defaultDeliveryAddressId,
+          });
+          setSelectedBillingAddressId(
+            String(
+              result.defaultBillingAddressId ??
+                result.billingAddresses[0]?.id ??
+                "",
+            ),
+          );
+          setSelectedDeliveryAddressId(
+            String(
+              result.defaultDeliveryAddressId ??
+                result.deliveryAddresses[0]?.id ??
+                "",
+            ),
+          );
         }
         setLoaded(true);
       });
@@ -272,8 +155,8 @@ export default function CheckoutPage() {
     startTransition(async () => {
       const result = await placeOrderAction({
         name: orderName,
-        billingAddress,
-        deliveryAddress,
+        billingAddressId: Number(selectedBillingAddressId),
+        deliveryAddressId: Number(selectedDeliveryAddressId),
         items: cartItems.map((item) => ({
           id: item.id,
           quantity: item.quantity,
@@ -290,24 +173,19 @@ export default function CheckoutPage() {
     });
   };
 
-  const isAddressComplete = (addr) => {
-    const required = [
-      "firstName",
-      "lastName",
-      "company",
-      "address1",
-      "postalCode",
-      "city",
-      "country",
-      "phone",
-    ];
-    return required.every((f) => addr[f]?.trim());
-  };
+  const selectedBillingAddress =
+    addressBook.billingAddresses.find(
+      (address) => String(address.id) === selectedBillingAddressId,
+    ) ?? null;
+  const selectedDeliveryAddress =
+    addressBook.deliveryAddresses.find(
+      (address) => String(address.id) === selectedDeliveryAddressId,
+    ) ?? null;
 
   const canOrder =
     orderName.trim() &&
-    isAddressComplete(billingAddress) &&
-    isAddressComplete(deliveryAddress) &&
+    selectedBillingAddress &&
+    selectedDeliveryAddress &&
     !shipping.isQuoteRequired;
 
   return (
@@ -337,85 +215,101 @@ export default function CheckoutPage() {
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardHeader>
               <CardTitle>{t("checkout.billingAddressTitle")}</CardTitle>
-              {!editingBilling && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditingBilling(true)}
-                  disabled={isOrdering}
-                >
-                  <Pencil className="h-3.5 w-3.5 mr-1" />
-                  {t("checkout.edit")}
-                </Button>
-              )}
             </CardHeader>
-            <CardContent>
-              {editingBilling ? (
-                <div className="space-y-4">
-                  <AddressForm
-                    address={billingAddress}
-                    onChange={setBillingAddress}
-                    disabled={isOrdering}
+            <CardContent className="space-y-4">
+              {addressBook.billingAddresses.length ? (
+                <>
+                  <div className="space-y-2">
+                    <Label>{t("checkout.selectBillingAddress")}</Label>
+                    <Select
+                      value={selectedBillingAddressId}
+                      onValueChange={setSelectedBillingAddressId}
+                      disabled={isOrdering}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={t("checkout.selectAddressPlaceholder")}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {addressBook.billingAddresses.map((address) => (
+                          <SelectItem
+                            key={address.id}
+                            value={String(address.id)}
+                          >
+                            {address.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <AddressDisplay
+                    address={selectedBillingAddress}
                     type="billing"
                     t={t}
                   />
-                  {isAddressComplete(billingAddress) && (
-                    <Button
-                      onClick={() => setEditingBilling(false)}
-                      disabled={isOrdering}
-                    >
-                      {t("checkout.save")}
-                    </Button>
-                  )}
-                </div>
+                </>
               ) : (
-                <AddressDisplay address={billingAddress} type="billing" t={t} />
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    {t("checkout.noBillingAddressSaved")}
+                  </p>
+                  <Button asChild variant="outline">
+                    <Link href="/account">{t("checkout.manageAddresses")}</Link>
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
 
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0">
+            <CardHeader>
               <CardTitle>{t("checkout.deliveryAddressTitle")}</CardTitle>
-              {!editingDelivery && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditingDelivery(true)}
-                  disabled={isOrdering}
-                >
-                  <Pencil className="h-3.5 w-3.5 mr-1" />
-                  {t("checkout.edit")}
-                </Button>
-              )}
             </CardHeader>
-            <CardContent>
-              {editingDelivery ? (
-                <div className="space-y-4">
-                  <AddressForm
-                    address={deliveryAddress}
-                    onChange={setDeliveryAddress}
-                    disabled={isOrdering}
+            <CardContent className="space-y-4">
+              {addressBook.deliveryAddresses.length ? (
+                <>
+                  <div className="space-y-2">
+                    <Label>{t("checkout.selectDeliveryAddress")}</Label>
+                    <Select
+                      value={selectedDeliveryAddressId}
+                      onValueChange={setSelectedDeliveryAddressId}
+                      disabled={isOrdering}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={t("checkout.selectAddressPlaceholder")}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {addressBook.deliveryAddresses.map((address) => (
+                          <SelectItem
+                            key={address.id}
+                            value={String(address.id)}
+                          >
+                            {address.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <AddressDisplay
+                    address={selectedDeliveryAddress}
                     type="delivery"
                     t={t}
                   />
-                  {isAddressComplete(deliveryAddress) && (
-                    <Button
-                      onClick={() => setEditingDelivery(false)}
-                      disabled={isOrdering}
-                    >
-                      {t("checkout.save")}
-                    </Button>
-                  )}
-                </div>
+                </>
               ) : (
-                <AddressDisplay
-                  address={deliveryAddress}
-                  type="delivery"
-                  t={t}
-                />
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    {t("checkout.noDeliveryAddressSaved")}
+                  </p>
+                  <Button asChild variant="outline">
+                    <Link href="/account">{t("checkout.manageAddresses")}</Link>
+                  </Button>
+                </div>
               )}
             </CardContent>
           </Card>
