@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { LayoutWrapper } from "@/components/layout-wrapper";
+import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { LocaleProvider } from "@/lib/locale-context";
 import { getLocale } from "@/lib/i18n-server";
 import { getMessages } from "@/lib/i18n";
@@ -54,6 +55,7 @@ export default async function RootLayout({ children }) {
         <Toaster position="top-center" />
         <LocaleProvider locale={locale} messages={messages}>
           <LayoutWrapper>{children}</LayoutWrapper>
+          <CookieConsentBanner />
         </LocaleProvider>
       </body>
     </html>

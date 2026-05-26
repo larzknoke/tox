@@ -18,6 +18,7 @@ export function LayoutWrapper({ children }) {
     "/reset-password",
     "/auth/verify-email",
     "/auth/verify-email-pending",
+    "/privacy",
   ].includes(pathname);
 
   if (isAuthPage) {

@@ -578,5 +578,12 @@
       "saveChanges": "Enregistrer les modifications",
       "createProduct": "Creer le produit"
     }
+  },
+  "cookieBanner": {
+    "title": "Cookies & Confidentialite",
+    "description": "Nous utilisons des cookies essentiels pour fournir et securiser ce service. L'acces a la connexion, l'inscription, la boutique et le paiement est possible uniquement apres acceptation de notre politique de confidentialite.",
+    "privacyLink": "Lire la politique de confidentialite",
+    "accept": "Accepter la politique de confidentialite",
+    "accepting": "Enregistrement..."
   }
 }

@@ -578,5 +578,12 @@
       "saveChanges": "Save Changes",
       "createProduct": "Create Product"
     }
+  },
+  "cookieBanner": {
+    "title": "Cookies & Privacy",
+    "description": "We use essential cookies to provide and secure this service. You can access login, registration, shop and checkout only after accepting our privacy policy.",
+    "privacyLink": "Read privacy policy",
+    "accept": "Accept privacy policy",
+    "accepting": "Saving..."
   }
 }
