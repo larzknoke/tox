@@ -57,7 +57,7 @@ export const newUserSignupEmail = (user) => {
 
             <div style="background-color: #f3f4f6; padding: 16px; border-radius: 4px; margin-bottom: 24px;">
               <p style="margin: 0; color: #6b7280; font-size: 14px;">
-                This user was automatically assigned the role "<strong>CUSTOMER</strong>". You can change this in User Management.
+                This user is pending approval and cannot sign in yet. Please review and approve the account in User Management.
               </p>
             </div>
 

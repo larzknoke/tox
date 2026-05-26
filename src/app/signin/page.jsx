@@ -17,9 +17,11 @@ import {
 } from "@/components/ui/card";
 import { Ticket } from "lucide-react";
 import Link from "next/link";
+import { useLocale } from "@/lib/locale-context";
 
 export default function SignInPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -57,13 +59,20 @@ export default function SignInPage() {
               return;
             }
             if (code === "INVALID_EMAIL_OR_PASSWORD") {
-              const message = "Invalid email or password";
+              const message = t("signin.errors.invalidCredentials");
               setError(message);
               toast.error(message);
               setLoading(false);
               return;
             }
-            const message = ctx?.error?.message || "An error occurred";
+            if (code === "BANNED_USER") {
+              const message = t("signin.errors.blocked");
+              setError(message);
+              toast.error(message);
+              setLoading(false);
+              return;
+            }
+            const message = ctx?.error?.message || t("signin.errors.generic");
             setError(message);
             toast.error(message);
             setLoading(false);
@@ -71,7 +80,7 @@ export default function SignInPage() {
         },
       );
     } catch (err) {
-      const message = err?.message || "An unexpected error occurred";
+      const message = err?.message || t("signin.errors.unexpected");
       setError(message);
       toast.error(message);
       setLoading(false);
@@ -85,9 +94,11 @@ export default function SignInPage() {
           <div className="flex items-center justify-center">
             <Ticket className="h-12 w-12 text-primary" />
           </div>
-          <CardTitle className="text-2xl text-center">Welcome back</CardTitle>
+          <CardTitle className="text-2xl text-center">
+            {t("signin.title")}
+          </CardTitle>
           <CardDescription className="text-center">
-            Sign in to your tox account
+            {t("signin.subtitle")}
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -98,11 +109,11 @@ export default function SignInPage() {
               </div>
             )} */}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t("signin.fields.email")}</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
+                placeholder={t("signin.placeholders.email")}
                 value={formData.email}
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
@@ -113,12 +124,12 @@ export default function SignInPage() {
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("signin.fields.password")}</Label>
                 <Link
                   href="/forgot-password"
                   className="text-xs text-primary hover:underline"
                 >
-                  Forgot password?
+                  {t("signin.forgotPassword")}
                 </Link>
               </div>
               <Input
@@ -144,18 +155,20 @@ export default function SignInPage() {
                 className="h-4 w-4 rounded border-gray-300"
               />
               <Label htmlFor="remember" className="text-sm cursor-pointer">
-                Remember me
+                {t("signin.rememberMe")}
               </Label>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Login..." : "Login"}
+              {loading
+                ? t("signin.buttons.loggingIn")
+                : t("signin.buttons.login")}
             </Button>
             <p className="text-sm text-center text-muted-foreground">
-              Don&apos;t have an account?{" "}
+              {t("signin.noAccount")}{" "}
               <Link href="/signup" className="text-primary hover:underline">
-                Sign up
+                {t("signin.buttons.signUp")}
               </Link>
             </p>
           </CardFooter>

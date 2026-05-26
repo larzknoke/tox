@@ -36,7 +36,7 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    autoSignInAfterVerification: true,
+    autoSignInAfterVerification: false,
     sendVerificationEmail: async ({ user, url }, request) => {
       const promise = sendEmail({
         to: user.email,
@@ -69,6 +69,22 @@ export const auth = betterAuth({
     user: {
       create: {
         after: async (user) => {
+          // Every new signup must be approved by an admin before login is allowed.
+          try {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: {
+                approved: false,
+                approvedAt: null,
+                approvedBy: null,
+                banned: true,
+                banReason: "PENDING_APPROVAL",
+              },
+            });
+          } catch (error) {
+            console.error("Error marking new user as pending approval:", error);
+          }
+
           // Send notification email to admin when a new user signs up
           try {
             const { sendAdminNewUserNotification } =

@@ -14,10 +14,12 @@ import {
 } from "@/components/ui/card";
 import { Ticket, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useLocale } from "@/lib/locale-context";
 
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLocale();
   const [status, setStatus] = useState("verifying"); // verifying, success, error
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -27,7 +29,7 @@ function VerifyEmailContent() {
 
       if (!token) {
         setStatus("error");
-        setErrorMessage("No verification token found.");
+        setErrorMessage(t("verifyEmail.errors.noToken"));
         return;
       }
 
@@ -40,7 +42,9 @@ function VerifyEmailContent() {
 
         if (response.error) {
           setStatus("error");
-          setErrorMessage(response.error.message || "Verification failed.");
+          setErrorMessage(
+            response.error.message || t("verifyEmail.errors.failed"),
+          );
         } else {
           setStatus("success");
           // Redirect to sign in after 3 seconds
@@ -50,7 +54,7 @@ function VerifyEmailContent() {
         }
       } catch (error) {
         setStatus("error");
-        setErrorMessage(error.message || "An unexpected error occurred.");
+        setErrorMessage(error.message || t("verifyEmail.errors.unexpected"));
       }
     };
 
@@ -73,22 +77,21 @@ function VerifyEmailContent() {
             )}
           </div>
           <CardTitle className="text-2xl text-center">
-            {status === "verifying" && "Verifying email..."}
-            {status === "success" && "Email verified!"}
-            {status === "error" && "Verification failed"}
+            {status === "verifying" && t("verifyEmail.titleVerifying")}
+            {status === "success" && t("verifyEmail.titleSuccess")}
+            {status === "error" && t("verifyEmail.titleError")}
           </CardTitle>
           <CardDescription className="text-center">
-            {status === "verifying" && "Please wait a moment."}
-            {status === "success" && "Your account has been activated."}
-            {status === "error" && "Email verification failed."}
+            {status === "verifying" && t("verifyEmail.subtitleVerifying")}
+            {status === "success" && t("verifyEmail.subtitleSuccess")}
+            {status === "error" && t("verifyEmail.subtitleError")}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {status === "success" && (
             <div className="p-4 bg-green-50 border border-green-200 rounded-md">
               <p className="text-sm text-green-900 text-center">
-                Your email address has been verified successfully. You will be
-                redirected to the sign in page shortly.
+                {t("verifyEmail.successMessage")}
               </p>
             </div>
           )}
@@ -96,7 +99,7 @@ function VerifyEmailContent() {
             <div className="p-4 bg-red-50 border border-red-200 rounded-md">
               <p className="text-sm text-red-900 text-center">{errorMessage}</p>
               <p className="text-sm text-red-900 text-center mt-2">
-                Please try again or contact support.
+                {t("verifyEmail.errorHelp")}
               </p>
             </div>
           )}
@@ -104,7 +107,9 @@ function VerifyEmailContent() {
         {status !== "verifying" && (
           <CardFooter>
             <Link href="/signin" className="w-full">
-              <Button className="w-full">Go to Sign In</Button>
+              <Button className="w-full">
+                {t("verifyEmail.buttons.goToSignIn")}
+              </Button>
             </Link>
           </CardFooter>
         )}

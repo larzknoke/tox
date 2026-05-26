@@ -40,6 +40,7 @@ export default function UserEditDialog({ open, onClose, user }) {
     name: z.string().min(1, { message: "Please enter a name" }),
     email: z.string().email({ message: "Invalid email address" }),
     role: z.string().optional(),
+    approved: z.boolean().default(false),
     banned: z.boolean().default(false),
     banReason: z.string().optional(),
   });
@@ -50,6 +51,7 @@ export default function UserEditDialog({ open, onClose, user }) {
       name: "",
       email: "",
       role: "",
+      approved: false,
       banned: false,
       banReason: "",
     },
@@ -62,6 +64,7 @@ export default function UserEditDialog({ open, onClose, user }) {
         name: user.name || "",
         email: user.email || "",
         role: user.role || "",
+        approved: Boolean(user.approved),
         banned: user.banned || false,
         banReason: user.banReason || "",
       });
@@ -86,6 +89,7 @@ export default function UserEditDialog({ open, onClose, user }) {
         formData.append("id", user.id);
         formData.append("name", data.name);
         formData.append("email", data.email);
+        formData.append("approved", data.approved.toString());
         formData.append("banned", data.banned.toString());
         if (data.banReason) formData.append("banReason", data.banReason);
 
@@ -104,6 +108,7 @@ export default function UserEditDialog({ open, onClose, user }) {
         name: user.name || "",
         email: user.email || "",
         role: user.role || "",
+        approved: Boolean(user.approved),
         banned: user.banned || false,
         banReason: user.banReason || "",
       });
@@ -182,6 +187,26 @@ export default function UserEditDialog({ open, onClose, user }) {
                       </FormControl>
                       <FormMessage />
                     </div>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="approved"
+                render={({ field }) => (
+                  <FormItem className="col-span-12 col-start-auto flex flex-row items-center gap-2 space-y-0">
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                        className="h-4 w-4"
+                      />
+                    </FormControl>
+                    <FormLabel className="flex shrink-0">
+                      Account approved
+                    </FormLabel>
                   </FormItem>
                 )}
               />

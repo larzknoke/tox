@@ -5,18 +5,30 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { CartProvider } from "@/lib/cart-context";
 import { SupportTicketButton } from "@/components/support-ticket-button";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export function LayoutWrapper({ children }) {
   const pathname = usePathname();
 
   // Don't show sidebar on auth pages
-  const isAuthPage =
-    pathname === "/signin" ||
-    pathname === "/signup" ||
-    pathname === "/auth/verify-email-pending";
+  const isAuthPage = [
+    "/signin",
+    "/signup",
+    "/forgot-password",
+    "/reset-password",
+    "/auth/verify-email",
+    "/auth/verify-email-pending",
+  ].includes(pathname);
 
   if (isAuthPage) {
-    return <>{children}</>;
+    return (
+      <>
+        <div className="fixed right-4 top-4 z-50">
+          <LanguageSwitcher compact />
+        </div>
+        {children}
+      </>
+    );
   }
 
   return (

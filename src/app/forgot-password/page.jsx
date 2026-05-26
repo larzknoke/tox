@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/card";
 import { Ticket, ArrowLeft, Mail } from "lucide-react";
 import Link from "next/link";
+import { useLocale } from "@/lib/locale-context";
 
 export default function ForgotPasswordPage() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -33,15 +35,15 @@ export default function ForgotPasswordPage() {
       });
 
       if (error) {
-        toast.error(error.message || "An error occurred");
+        toast.error(error.message || t("forgotPassword.errors.generic"));
         setLoading(false);
         return;
       }
 
       setSuccess(true);
-      toast.success("Email sent! Check your inbox.");
+      toast.success(t("forgotPassword.feedback.emailSent"));
     } catch (err) {
-      toast.error(err?.message || "An unexpected error occurred");
+      toast.error(err?.message || t("forgotPassword.errors.unexpected"));
     } finally {
       setLoading(false);
     }
@@ -55,12 +57,12 @@ export default function ForgotPasswordPage() {
             <Ticket className="h-12 w-12 text-primary" />
           </div>
           <CardTitle className="text-2xl text-center">
-            Forgot password?
+            {t("forgotPassword.title")}
           </CardTitle>
           <CardDescription className="text-center">
             {success
-              ? "We've sent you an email"
-              : "Enter your email address to reset your password"}
+              ? t("forgotPassword.subtitleSuccess")
+              : t("forgotPassword.subtitle")}
           </CardDescription>
         </CardHeader>
 
@@ -72,15 +74,15 @@ export default function ForgotPasswordPage() {
               </div>
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  We've sent a password reset link to
+                  {t("forgotPassword.sent.line1")}
                 </p>
                 <p className="font-medium">{email}</p>
                 <p className="text-sm text-muted-foreground">
-                  Check your inbox and follow the instructions.
+                  {t("forgotPassword.sent.line2")}
                 </p>
               </div>
               <p className="text-xs text-muted-foreground">
-                Didn't receive an email? Check your spam folder or try again.
+                {t("forgotPassword.sent.line3")}
               </p>
             </div>
           </CardContent>
@@ -88,11 +90,13 @@ export default function ForgotPasswordPage() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email address</Label>
+                <Label htmlFor="email">
+                  {t("forgotPassword.fields.email")}
+                </Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="name@example.com"
+                  placeholder={t("forgotPassword.placeholders.email")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -102,7 +106,9 @@ export default function ForgotPasswordPage() {
             </CardContent>
             <CardFooter className="flex flex-col space-y-4 mt-4">
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Sending..." : "Send reset link"}
+                {loading
+                  ? t("forgotPassword.buttons.sending")
+                  : t("forgotPassword.buttons.sendLink")}
               </Button>
             </CardFooter>
           </form>
@@ -114,7 +120,7 @@ export default function ForgotPasswordPage() {
             className="text-sm text-primary hover:underline flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to sign in
+            {t("forgotPassword.buttons.backToSignIn")}
           </Link>
         </CardFooter>
       </Card>

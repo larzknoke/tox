@@ -15,11 +15,15 @@ export async function requireSession() {
   // Check if user's email is verified
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    select: { emailVerified: true },
+    select: { emailVerified: true, approved: true },
   });
 
   if (!user?.emailVerified) {
     redirect("/auth/verify-email-pending");
+  }
+
+  if (!user?.approved) {
+    redirect("/auth/verify-email-pending?approval=pending");
   }
 
   return session;

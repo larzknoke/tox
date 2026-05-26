@@ -34,6 +34,7 @@ function UserTable({ users, session }) {
     user: null,
   });
   const [searchTerm, setSearchTerm] = useState("");
+  const [pendingOnly, setPendingOnly] = useState(false);
 
   const openDeleteDialog = (user) => setDeleteDialogState({ open: true, user });
   const closeDeleteDialog = () =>
@@ -42,11 +43,17 @@ function UserTable({ users, session }) {
   const openEditDialog = (user) => setEditDialogState({ open: true, user });
   const closeEditDialog = () => setEditDialogState({ open: false, user: null });
 
-  const filteredUsers = users.filter(
-    (user) =>
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase()),
-  );
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (!pendingOnly) {
+      return matchesSearch;
+    }
+
+    return matchesSearch && !user.approved;
+  });
 
   const getRoleBadge = (role) => {
     if (!role) return "-";
@@ -58,6 +65,7 @@ function UserTable({ users, session }) {
   };
 
   const getStatusBadge = (user) => {
+    if (!user.approved) return "Pending Approval";
     if (user.banned) return "Banned";
     if (user.emailVerified) return "Active";
     return "Unverified";
@@ -81,6 +89,13 @@ function UserTable({ users, session }) {
             </InputGroupButton>
           </InputGroupAddon>
         </InputGroup>
+        <Button
+          type="button"
+          variant={pendingOnly ? "default" : "outline"}
+          onClick={() => setPendingOnly((value) => !value)}
+        >
+          {pendingOnly ? "Showing Pending Only" : "Pending Only"}
+        </Button>
       </div>
       <Table>
         <TableCaption>All Users</TableCaption>
