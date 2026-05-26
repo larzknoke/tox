@@ -104,10 +104,13 @@ model TrainerTeamRelation {
 }
 
 model User {
-  id    String   @id
-  name  String?
-  email String   @unique
-  role  UserRole @default(CUSTOMER)
+  id         String    @id
+  name       String?
+  email      String    @unique
+  role       UserRole  @default(CUSTOMER)
+  approved   Boolean   @default(false)
+  approvedAt DateTime?
+  approvedBy String?
 
   // Next-Auth compatible core fields
   emailVerified Boolean   @default(false)
@@ -127,11 +130,13 @@ model User {
   resetToken          String?
   resetTokenExpiresAt DateTime?
 
-  billingAddress   Address? @relation("BillingAddress", fields: [billingAddressId], references: [id])
-  billingAddressId Int?     @unique
+  addresses UserAddress[]
 
-  deliveryAddress   Address? @relation("DeliveryAddress", fields: [deliveryAddressId], references: [id])
-  deliveryAddressId Int?     @unique
+  defaultBillingAddressId Int?
+  defaultBillingAddress   UserAddress? @relation("DefaultBillingAddress", fields: [defaultBillingAddressId], references: [id], onDelete: SetNull)
+
+  defaultDeliveryAddressId Int?
+  defaultDeliveryAddress   UserAddress? @relation("DefaultDeliveryAddress", fields: [defaultDeliveryAddressId], references: [id], onDelete: SetNull)
 
   orders         Order[]
   supportTickets SupportTicket[]
@@ -242,9 +247,6 @@ model Address {
   country    String
   phone      String
 
-  userBilling  User? @relation("BillingAddress")
-  userDelivery User? @relation("DeliveryAddress")
-
   orderBilling  Order[] @relation("OrderBillingSnapshot")
   orderDelivery Order[] @relation("OrderDeliverySnapshot")
 
@@ -252,6 +254,41 @@ model Address {
   updatedAt DateTime @updatedAt
 
   @@map("addresses")
+}
+
+model UserAddress {
+  id Int @id @default(autoincrement())
+
+  userId String
+  type   UserAddressType
+  label  String
+
+  firstName  String
+  lastName   String
+  company    String
+  vat        String?
+  address1   String
+  address2   String?
+  postalCode String
+  city       String
+  country    String
+  phone      String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  defaultBillingForUsers  User[] @relation("DefaultBillingAddress")
+  defaultDeliveryForUsers User[] @relation("DefaultDeliveryAddress")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, type])
+  @@map("user_addresses")
+}
+
+enum UserAddressType {
+  BILLING
+  DELIVERY
 }
 
 model Product {
@@ -288,6 +325,14 @@ model Order {
   items   OrderItem[]
   invoice Invoice?
 
+  ticketCount    Int?
+  shippingMode   ShippingMode?
+  parcelCount    Int?
+  parcelWeightKg Float?
+  parcelLengthCm Float?
+  parcelWidthCm  Float?
+  parcelHeightCm Float?
+
   confirmationEmailSentAt DateTime?
   invoiceEmailSentAt      DateTime?
 
@@ -302,6 +347,11 @@ enum OrderStatus {
   VALIDATED
   PROCESSING
   SHIPPED
+}
+
+enum ShippingMode {
+  STANDARD
+  SPECIAL
 }
 
 model OrderItem {
