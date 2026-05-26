@@ -3,8 +3,14 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
+import {
+  getAddressFields,
+  getUserDefaultField,
+  serializeUserAddress,
+  toUserAddressType,
+} from "@/lib/user-addresses";
 
-export async function saveAddressAction(type, addressData) {
+export async function saveAddressAction(addressData) {
   try {
     const session = await auth.api.getSession({
       headers: await headers(),
@@ -15,53 +21,75 @@ export async function saveAddressAction(type, addressData) {
     }
 
     const userId = session.user.id;
+    const type = toUserAddressType(addressData.type);
+    const defaultField = getUserDefaultField(type);
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
-        billingAddressId: true,
-        deliveryAddressId: true,
+        defaultBillingAddressId: true,
+        defaultDeliveryAddressId: true,
       },
     });
 
-    const existingAddressId =
-      type === "billing" ? user?.billingAddressId : user?.deliveryAddressId;
+    const addressFields = getAddressFields(type, addressData);
 
-    const addressFields = {
-      firstName: addressData.firstName,
-      lastName: addressData.lastName,
-      company: addressData.company,
-      vat: type === "billing" ? addressData.vat || null : null,
-      address1: addressData.address1,
-      address2: addressData.address2 || null,
-      postalCode: addressData.postalCode,
-      city: addressData.city,
-      country: addressData.country,
-      phone: addressData.phone,
+    const result = await prisma.$transaction(async (tx) => {
+      let address;
+
+      if (addressData.id) {
+        const existingAddress = await tx.userAddress.findFirst({
+          where: {
+            id: Number(addressData.id),
+            userId,
+            type,
+          },
+        });
+
+        if (!existingAddress) {
+          throw new Error("Address not found");
+        }
+
+        address = await tx.userAddress.update({
+          where: { id: existingAddress.id },
+          data: addressFields,
+        });
+      } else {
+        address = await tx.userAddress.create({
+          data: {
+            userId,
+            type,
+            ...addressFields,
+          },
+        });
+      }
+
+      const currentDefaultAddressId = user?.[defaultField] ?? null;
+      const shouldSetDefault =
+        Boolean(addressData.makeDefault) || currentDefaultAddressId === null;
+
+      if (shouldSetDefault && currentDefaultAddressId !== address.id) {
+        await tx.user.update({
+          where: { id: userId },
+          data: {
+            [defaultField]: address.id,
+          },
+        });
+      }
+
+      return {
+        address,
+        defaultAddressId: shouldSetDefault
+          ? address.id
+          : currentDefaultAddressId,
+      };
+    });
+
+    return {
+      success: true,
+      address: serializeUserAddress(result.address),
+      defaultAddressId: result.defaultAddressId,
     };
-
-    let address;
-
-    if (existingAddressId) {
-      address = await prisma.address.update({
-        where: { id: existingAddressId },
-        data: addressFields,
-      });
-    } else {
-      address = await prisma.address.create({ data: addressFields });
-
-      const linkField =
-        type === "billing"
-          ? { billingAddressId: address.id }
-          : { deliveryAddressId: address.id };
-
-      await prisma.user.update({
-        where: { id: userId },
-        data: linkField,
-      });
-    }
-
-    return { success: true, address };
   } catch (error) {
     console.error("Error saving address:", error);
     return { success: false, error: "Failed to save address" };

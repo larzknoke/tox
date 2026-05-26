@@ -3,6 +3,11 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
+import {
+  getUserAddressCollectionKey,
+  serializeUserAddress,
+  USER_ADDRESS_TYPES,
+} from "@/lib/user-addresses";
 
 export async function getAddressesAction() {
   try {
@@ -16,16 +21,50 @@ export async function getAddressesAction() {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      include: {
-        billingAddress: true,
-        deliveryAddress: true,
+      select: {
+        defaultBillingAddressId: true,
+        defaultDeliveryAddressId: true,
+        addresses: {
+          orderBy: [{ createdAt: "desc" }],
+        },
       },
     });
 
+    const billingAddresses = [];
+    const deliveryAddresses = [];
+
+    for (const address of user?.addresses ?? []) {
+      const collectionKey = getUserAddressCollectionKey(address.type);
+      const serializedAddress = serializeUserAddress(address);
+
+      if (collectionKey === "billingAddresses") {
+        billingAddresses.push(serializedAddress);
+      } else {
+        deliveryAddresses.push(serializedAddress);
+      }
+    }
+
+    const defaultBillingAddress =
+      billingAddresses.find(
+        (address) => address.id === user?.defaultBillingAddressId,
+      ) ??
+      billingAddresses[0] ??
+      null;
+    const defaultDeliveryAddress =
+      deliveryAddresses.find(
+        (address) => address.id === user?.defaultDeliveryAddressId,
+      ) ??
+      deliveryAddresses[0] ??
+      null;
+
     return {
       success: true,
-      billingAddress: user?.billingAddress ?? null,
-      deliveryAddress: user?.deliveryAddress ?? null,
+      billingAddresses,
+      deliveryAddresses,
+      defaultBillingAddressId: defaultBillingAddress?.id ?? null,
+      defaultDeliveryAddressId: defaultDeliveryAddress?.id ?? null,
+      defaultBillingAddress,
+      defaultDeliveryAddress,
     };
   } catch (error) {
     console.error("Error fetching addresses:", error);

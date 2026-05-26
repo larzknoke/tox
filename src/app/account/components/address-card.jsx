@@ -3,6 +3,18 @@
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -13,52 +25,45 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { saveAddressAction } from "../actions/save-address";
+import { deleteAddressAction } from "../actions/delete-address";
+import { setDefaultAddressAction } from "../actions/set-default-address";
 import { useLocale } from "@/lib/locale-context";
+import { EMPTY_ADDRESS_FORM, mapAddressToForm } from "@/lib/user-addresses";
 
-const emptyAddress = {
-  firstName: "",
-  lastName: "",
-  company: "",
-  vat: "",
-  address1: "",
-  address2: "",
-  postalCode: "",
-  city: "",
-  country: "",
-  phone: "",
-};
-
-export function AddressCard({ type, address, onSave }) {
+export function AddressCard({
+  type,
+  addresses,
+  defaultAddressId,
+  onSave,
+  onDelete,
+  onSetDefault,
+}) {
   const { t } = useLocale();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [form, setForm] = useState(emptyAddress);
+  const [addressToDelete, setAddressToDelete] = useState(null);
+  const [editingAddressId, setEditingAddressId] = useState(null);
+  const [form, setForm] = useState({
+    ...EMPTY_ADDRESS_FORM,
+    makeDefault: false,
+  });
   const [error, setError] = useState("");
-  const [isSaving, startTransition] = useTransition();
+  const [isPending, startTransition] = useTransition();
 
   const isBilling = type === "billing";
   const label = isBilling
     ? t("account.address.billingTitle")
     : t("account.address.deliveryTitle");
 
-  const handleOpen = () => {
-    setForm(
-      address
-        ? {
-            firstName: address.firstName || "",
-            lastName: address.lastName || "",
-            company: address.company || "",
-            vat: address.vat || "",
-            address1: address.address1 || "",
-            address2: address.address2 || "",
-            postalCode: address.postalCode || "",
-            city: address.city || "",
-            country: address.country || "",
-            phone: address.phone || "",
-          }
-        : emptyAddress,
-    );
+  const handleOpen = (address = null) => {
+    setEditingAddressId(address?.id ?? null);
+    setForm({
+      ...mapAddressToForm(address),
+      makeDefault: address
+        ? address.id === defaultAddressId
+        : addresses.length === 0,
+    });
     setError("");
     setIsDialogOpen(true);
   };
@@ -68,6 +73,7 @@ export function AddressCard({ type, address, onSave }) {
     setError("");
 
     const required = [
+      "label",
       "firstName",
       "lastName",
       "company",
@@ -85,10 +91,19 @@ export function AddressCard({ type, address, onSave }) {
     }
 
     startTransition(async () => {
-      const result = await saveAddressAction(type, form);
+      const result = await saveAddressAction({
+        id: editingAddressId,
+        type,
+        ...form,
+      });
+
       if (result.success) {
         toast.success(t("account.address.saved", { label }));
-        onSave(result.address);
+        onSave({
+          type,
+          address: result.address,
+          defaultAddressId: result.defaultAddressId,
+        });
         setIsDialogOpen(false);
       } else {
         setError(t("account.address.errors.saveFailed"));
@@ -97,48 +112,141 @@ export function AddressCard({ type, address, onSave }) {
     });
   };
 
+  const handleSetDefault = (addressId) => {
+    startTransition(async () => {
+      const result = await setDefaultAddressAction(addressId);
+
+      if (result.success) {
+        onSetDefault({
+          type: result.type,
+          defaultAddressId: result.defaultAddressId,
+        });
+        toast.success(t("account.address.defaultUpdated", { label }));
+      } else {
+        toast.error(t("account.address.errors.defaultFailed"));
+      }
+    });
+  };
+
+  const handleDelete = () => {
+    if (!addressToDelete) {
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await deleteAddressAction(addressToDelete.id);
+
+      if (result.success) {
+        onDelete({
+          type: result.type,
+          addressId: result.addressId,
+          defaultAddressId: result.defaultAddressId,
+        });
+        setAddressToDelete(null);
+        toast.success(t("account.address.deleted", { label }));
+      } else {
+        toast.error(t("account.address.errors.deleteFailed"));
+      }
+    });
+  };
+
+  const noAddressText = isBilling
+    ? t("account.address.noBilling")
+    : t("account.address.noDelivery");
+
   return (
     <>
-      <div>
-        {address ? (
-          <div className="text-sm space-y-0.5 text-muted-foreground">
-            <p className="text-foreground font-medium">
-              {address.firstName} {address.lastName}
-            </p>
-            {address.company && <p>{address.company}</p>}
-            {type === "billing" && address.vat && (
-              <p>Tax identification number: {address.vat}</p>
-            )}
-            <p>{address.address1}</p>
-            {address.address2 && <p>{address.address2}</p>}
-            <p>
-              {address.postalCode} {address.city}
-            </p>
-            <p>{address.country}</p>
-            <p>{address.phone}</p>
-          </div>
-        ) : (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground">
-            {isBilling
-              ? t("account.address.noBilling")
-              : t("account.address.noDelivery")}
+            {t("account.address.addressBookDescription")}
           </p>
-        )}
-        <div className="flex items-center justify-between mt-4">
-          {/* <h4 className="text-sm font-medium">{label}</h4> */}
-          <Button variant="outline" size="sm" onClick={handleOpen}>
-            {address ? (
-              <>
-                <Pencil className="h-3.5 w-3.5 mr-1" />{" "}
-                {t("account.address.edit")}
-              </>
-            ) : (
-              <>
-                <Plus className="h-3.5 w-3.5 mr-1" /> {t("account.address.add")}
-              </>
-            )}
+          <Button variant="outline" size="sm" onClick={() => handleOpen()}>
+            <Plus className="h-3.5 w-3.5 mr-1" /> {t("account.address.add")}
           </Button>
         </div>
+
+        {addresses.length ? (
+          <div className="space-y-3">
+            {addresses.map((address) => {
+              const isDefault = address.id === defaultAddressId;
+
+              return (
+                <div
+                  key={address.id}
+                  className="rounded-lg border p-4 space-y-3 bg-background"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-medium text-foreground">
+                          {address.label}
+                        </p>
+                        {isDefault && (
+                          <Badge variant="secondary">
+                            {t("account.address.defaultBadge")}
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="text-sm space-y-0.5 text-muted-foreground">
+                        <p className="text-foreground font-medium">
+                          {address.firstName} {address.lastName}
+                        </p>
+                        {address.company && <p>{address.company}</p>}
+                        {type === "billing" && address.vat && (
+                          <p>
+                            {t("checkout.taxId")}: {address.vat}
+                          </p>
+                        )}
+                        <p>{address.address1}</p>
+                        {address.address2 && <p>{address.address2}</p>}
+                        <p>
+                          {address.postalCode} {address.city}
+                        </p>
+                        <p>{address.country}</p>
+                        <p>{address.phone}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2">
+                    {!isDefault && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleSetDefault(address.id)}
+                        disabled={isPending}
+                      >
+                        <Star className="h-3.5 w-3.5 mr-1" />
+                        {t("account.address.setDefault")}
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpen(address)}
+                      disabled={isPending}
+                    >
+                      <Pencil className="h-3.5 w-3.5 mr-1" />
+                      {t("account.address.edit")}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAddressToDelete(address)}
+                      disabled={isPending}
+                    >
+                      <Trash2 className="h-3.5 w-3.5 mr-1" />
+                      {t("account.address.delete")}
+                    </Button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">{noAddressText}</p>
+        )}
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -158,6 +266,18 @@ export function AddressCard({ type, address, onSave }) {
                   {error}
                 </div>
               )}
+              <div className="space-y-2">
+                <Label htmlFor="addr-label">
+                  {t("account.address.fields.label")}
+                </Label>
+                <Input
+                  id="addr-label"
+                  value={form.label}
+                  onChange={(e) => setForm({ ...form, label: e.target.value })}
+                  disabled={isPending}
+                  required
+                />
+              </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="addr-firstName">
@@ -169,7 +289,7 @@ export function AddressCard({ type, address, onSave }) {
                     onChange={(e) =>
                       setForm({ ...form, firstName: e.target.value })
                     }
-                    disabled={isSaving}
+                    disabled={isPending}
                     required
                   />
                 </div>
@@ -183,7 +303,7 @@ export function AddressCard({ type, address, onSave }) {
                     onChange={(e) =>
                       setForm({ ...form, lastName: e.target.value })
                     }
-                    disabled={isSaving}
+                    disabled={isPending}
                     required
                   />
                 </div>
@@ -198,7 +318,7 @@ export function AddressCard({ type, address, onSave }) {
                   onChange={(e) =>
                     setForm({ ...form, company: e.target.value })
                   }
-                  disabled={isSaving}
+                  disabled={isPending}
                   required
                 />
               </div>
@@ -211,8 +331,7 @@ export function AddressCard({ type, address, onSave }) {
                     id="addr-vat"
                     value={form.vat}
                     onChange={(e) => setForm({ ...form, vat: e.target.value })}
-                    disabled={isSaving}
-                    required
+                    disabled={isPending}
                   />
                 </div>
               )}
@@ -226,7 +345,7 @@ export function AddressCard({ type, address, onSave }) {
                   onChange={(e) =>
                     setForm({ ...form, address1: e.target.value })
                   }
-                  disabled={isSaving}
+                  disabled={isPending}
                   required
                 />
               </div>
@@ -240,7 +359,7 @@ export function AddressCard({ type, address, onSave }) {
                   onChange={(e) =>
                     setForm({ ...form, address2: e.target.value })
                   }
-                  disabled={isSaving}
+                  disabled={isPending}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -254,7 +373,7 @@ export function AddressCard({ type, address, onSave }) {
                     onChange={(e) =>
                       setForm({ ...form, postalCode: e.target.value })
                     }
-                    disabled={isSaving}
+                    disabled={isPending}
                     required
                   />
                 </div>
@@ -266,7 +385,7 @@ export function AddressCard({ type, address, onSave }) {
                     id="addr-city"
                     value={form.city}
                     onChange={(e) => setForm({ ...form, city: e.target.value })}
-                    disabled={isSaving}
+                    disabled={isPending}
                     required
                   />
                 </div>
@@ -281,7 +400,7 @@ export function AddressCard({ type, address, onSave }) {
                   onChange={(e) =>
                     setForm({ ...form, country: e.target.value })
                   }
-                  disabled={isSaving}
+                  disabled={isPending}
                   required
                 />
               </div>
@@ -294,9 +413,22 @@ export function AddressCard({ type, address, onSave }) {
                   type="tel"
                   value={form.phone}
                   onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                  disabled={isSaving}
+                  disabled={isPending}
                   required
                 />
+              </div>
+              <div className="flex items-center gap-3 rounded-md border p-3">
+                <Checkbox
+                  id={`addr-default-${type}`}
+                  checked={form.makeDefault}
+                  onCheckedChange={(checked) =>
+                    setForm({ ...form, makeDefault: checked === true })
+                  }
+                  disabled={isPending}
+                />
+                <Label htmlFor={`addr-default-${type}`}>
+                  {t("account.address.fields.makeDefault")}
+                </Label>
               </div>
             </div>
             <DialogFooter className="mt-6">
@@ -304,12 +436,12 @@ export function AddressCard({ type, address, onSave }) {
                 type="button"
                 variant="outline"
                 onClick={() => setIsDialogOpen(false)}
-                disabled={isSaving}
+                disabled={isPending}
               >
                 {t("account.address.cancel")}
               </Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving
+              <Button type="submit" disabled={isPending}>
+                {isPending
                   ? t("account.address.saving")
                   : t("account.address.saveAddress")}
               </Button>
@@ -317,6 +449,36 @@ export function AddressCard({ type, address, onSave }) {
           </form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={Boolean(addressToDelete)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setAddressToDelete(null);
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("account.address.deleteTitle")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("account.address.deleteDescription", {
+                label: addressToDelete?.label ?? "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>
+              {t("account.address.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={isPending}>
+              {t("account.address.delete")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
