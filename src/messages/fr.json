@@ -65,6 +65,11 @@
     "detailGrandTotal": "Total livraison incluse (HT)",
     "detailBillingAddress": "Adresse de facturation",
     "detailShippingAddress": "Adresse de livraison",
+    "specialShipping": "Expédition spéciale",
+    "specialShippingDescription": "Cette commande nécessite un traitement logistique manuel.",
+    "specialShippingLabelUnavailable": "Les commandes en expédition spéciale ne peuvent pas utiliser le flux d'étiquette DPD",
+    "parcelWeight": "Poids : {weight} kg",
+    "parcelDimensions": "Dimensions : {length} x {width} x {height} cm",
     "ticketsPerPack": "billets/pack",
     "ticketsTotal": "billets au total"
   },
@@ -175,6 +180,12 @@
     "pageTitle": "Paiement",
     "loading": "Chargement...",
     "noAddressProvided": "Aucune adresse fournie.",
+    "noBillingAddressSaved": "Aucune adresse de facturation n'est enregistrée dans votre compte.",
+    "noDeliveryAddressSaved": "Aucune adresse de livraison n'est enregistrée dans votre compte.",
+    "manageAddresses": "Gérer les adresses dans le compte",
+    "selectBillingAddress": "Choisir l'adresse de facturation",
+    "selectDeliveryAddress": "Choisir l'adresse de livraison",
+    "selectAddressPlaceholder": "Choisissez une adresse",
     "taxId": "Numéro d'identification fiscale",
     "fields": {
       "firstName": "Prénom *",
@@ -228,33 +239,46 @@
       "signOut": "Se déconnecter"
     },
     "address": {
+      "addressBookTitle": "Carnet d'adresses",
       "billingTitle": "Adresse de facturation",
       "deliveryTitle": "Adresse de livraison",
+      "addressBookDescription": "Gérez plusieurs adresses enregistrées et définissez une adresse par défaut.",
       "noBilling": "Aucune adresse de facturation enregistrée.",
       "noDelivery": "Aucune adresse de livraison enregistrée.",
       "edit": "Modifier",
       "add": "Ajouter",
+      "delete": "Supprimer",
+      "setDefault": "Définir par défaut",
+      "defaultBadge": "Par défaut",
       "saved": "{label} enregistrée",
+      "deleted": "{label} supprimée",
+      "defaultUpdated": "Adresse {label} par défaut mise à jour",
       "editBillingDescription": "Modifiez votre adresse de facturation",
       "editDeliveryDescription": "Modifiez votre adresse de livraison",
+      "deleteTitle": "Supprimer l'adresse",
+      "deleteDescription": "Voulez-vous vraiment supprimer \"{label}\" ?",
       "cancel": "Annuler",
       "saving": "Enregistrement...",
       "saveAddress": "Enregistrer l'adresse",
       "errors": {
         "requiredFields": "Veuillez remplir tous les champs obligatoires",
-        "saveFailed": "Échec de l'enregistrement de l'adresse"
+        "saveFailed": "Échec de l'enregistrement de l'adresse",
+        "deleteFailed": "Échec de la suppression de l'adresse",
+        "defaultFailed": "Échec de la mise à jour de l'adresse par défaut"
       },
       "fields": {
+        "label": "Libellé *",
         "firstName": "Prénom *",
         "lastName": "Nom *",
         "company": "Société *",
-        "vat": "Numéro d'identification fiscale *",
+        "vat": "Numéro d'identification fiscale",
         "address1": "Adresse ligne 1 *",
         "address2": "Adresse ligne 2",
         "postalCode": "Code postal *",
         "city": "Ville *",
         "country": "Pays *",
-        "phone": "Téléphone *"
+        "phone": "Téléphone *",
+        "makeDefault": "Définir comme adresse par défaut"
       }
     },
     "password": {
@@ -302,6 +326,203 @@
     "guestHeadline": "Extranet de commande de billets | France Billet ©2026",
     "login": "Connexion",
     "signUp": "S'inscrire"
+  },
+  "signup": {
+    "title": "Creer un compte",
+    "subtitle": "Completez les trois etapes pour enregistrer votre compte tox",
+    "steps": {
+      "1": "Utilisateur",
+      "2": "Adresse de livraison",
+      "3": "Adresse de facturation"
+    },
+    "fields": {
+      "name": "Nom",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "label": "Libelle",
+      "firstName": "Prenom",
+      "lastName": "Nom",
+      "company": "Societe",
+      "vatOptional": "TVA (optionnel)",
+      "address1": "Adresse ligne 1",
+      "address2Optional": "Adresse ligne 2 (optionnel)",
+      "postalCode": "Code postal",
+      "city": "Ville",
+      "country": "Pays",
+      "phone": "Telephone"
+    },
+    "placeholders": {
+      "name": "Jean Dupont",
+      "email": "jean@example.com",
+      "addressLabel": "Domicile"
+    },
+    "deliveryTitle": "Adresse de livraison",
+    "billingTitle": "Adresse de facturation",
+    "sameAsDelivery": "L'adresse de facturation est identique a l'adresse de livraison",
+    "alreadyHaveAccount": "Vous avez deja un compte ?",
+    "buttons": {
+      "back": "Retour",
+      "next": "Suivant",
+      "complete": "Finaliser l'inscription",
+      "creating": "Creation du compte...",
+      "signIn": "Connexion",
+      "backToSignIn": "Retour a la connexion"
+    },
+    "validation": {
+      "nameEmailRequired": "Veuillez renseigner le nom et l'e-mail",
+      "passwordsRequired": "Veuillez renseigner le mot de passe et sa confirmation",
+      "passwordMinLength": "Le mot de passe doit contenir au moins 8 caracteres",
+      "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+      "addressRequiredFields": "Veuillez remplir tous les champs obligatoires : {fields}"
+    },
+    "feedback": {
+      "registrationSuccess": "Inscription reussie. Verifiez votre e-mail puis attendez la validation admin.",
+      "genericError": "Une erreur inattendue est survenue",
+      "signupError": "Une erreur est survenue",
+      "addressSaveError": "Compte cree, mais les adresses n'ont pas pu etre enregistrees. Veuillez contacter le support."
+    },
+    "completed": {
+      "title": "Inscription terminee",
+      "subtitle": "Verifiez votre e-mail puis attendez la validation admin",
+      "verificationSent": "Nous avons envoye un lien de confirmation a {email}.",
+      "waitForApproval": "Apres verification de l'e-mail, votre compte restera en attente jusqu'a la validation d'un administrateur.",
+      "spamHint": "Vous n'avez pas recu l'e-mail ? Verifiez aussi votre dossier spam."
+    }
+  },
+  "signin": {
+    "title": "Bon retour",
+    "subtitle": "Connectez-vous a votre compte tox",
+    "fields": {
+      "email": "E-mail",
+      "password": "Mot de passe"
+    },
+    "placeholders": {
+      "email": "nom@example.com"
+    },
+    "forgotPassword": "Mot de passe oublie ?",
+    "rememberMe": "Se souvenir de moi",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "buttons": {
+      "login": "Connexion",
+      "loggingIn": "Connexion...",
+      "signUp": "S'inscrire"
+    },
+    "errors": {
+      "invalidCredentials": "E-mail ou mot de passe invalide",
+      "blocked": "Votre compte est actuellement bloque. Si vous venez de vous inscrire, veuillez verifier votre e-mail puis attendre la validation admin.",
+      "generic": "Une erreur est survenue",
+      "unexpected": "Une erreur inattendue est survenue"
+    }
+  },
+  "forgotPassword": {
+    "title": "Mot de passe oublie ?",
+    "subtitle": "Saisissez votre e-mail pour reinitialiser votre mot de passe",
+    "subtitleSuccess": "Nous vous avons envoye un e-mail",
+    "fields": {
+      "email": "Adresse e-mail"
+    },
+    "placeholders": {
+      "email": "nom@example.com"
+    },
+    "sent": {
+      "line1": "Nous avons envoye un lien de reinitialisation a",
+      "line2": "Consultez votre boite mail et suivez les instructions.",
+      "line3": "Vous n'avez pas recu d'e-mail ? Verifiez vos spams ou reessayez."
+    },
+    "buttons": {
+      "sendLink": "Envoyer le lien",
+      "sending": "Envoi...",
+      "backToSignIn": "Retour a la connexion"
+    },
+    "feedback": {
+      "emailSent": "E-mail envoye. Verifiez votre boite de reception."
+    },
+    "errors": {
+      "generic": "Une erreur est survenue",
+      "unexpected": "Une erreur inattendue est survenue"
+    }
+  },
+  "resetPassword": {
+    "title": "Definir un nouveau mot de passe",
+    "titleSuccess": "Mot de passe reinitialise",
+    "subtitle": "Saisissez votre nouveau mot de passe",
+    "subtitleSuccess": "Votre mot de passe a ete reinitialise avec succes",
+    "loading": "Chargement...",
+    "fields": {
+      "newPassword": "Nouveau mot de passe",
+      "confirmPassword": "Confirmer le mot de passe"
+    },
+    "placeholders": {
+      "newPassword": "Au moins 8 caracteres",
+      "confirmPassword": "Repetez le mot de passe"
+    },
+    "success": {
+      "line1": "Votre mot de passe a ete reinitialise avec succes.",
+      "line2": "Vous allez etre redirige vers la page de connexion sous peu..."
+    },
+    "buttons": {
+      "resetPassword": "Reinitialiser le mot de passe",
+      "saving": "Enregistrement...",
+      "backToSignIn": "Retour a la connexion",
+      "requestNewLink": "Demander un nouveau lien"
+    },
+    "feedback": {
+      "success": "Mot de passe reinitialise avec succes !"
+    },
+    "errors": {
+      "invalidOrExpired": "Le lien de reinitialisation est invalide ou expire. Veuillez en demander un nouveau.",
+      "invalidOrExpiredShort": "Lien invalide ou expire",
+      "noToken": "Aucun jeton trouve. Veuillez demander un nouveau lien.",
+      "passwordsMismatch": "Les mots de passe ne correspondent pas",
+      "passwordTooShort": "Le mot de passe doit contenir au moins 8 caracteres",
+      "generic": "Une erreur est survenue",
+      "unexpected": "Une erreur inattendue est survenue"
+    }
+  },
+  "verifyEmail": {
+    "titleVerifying": "Verification de l'e-mail...",
+    "titleSuccess": "E-mail verifie !",
+    "titleError": "Echec de verification",
+    "subtitleVerifying": "Veuillez patienter un instant.",
+    "subtitleSuccess": "Votre compte a ete active.",
+    "subtitleError": "La verification de l'e-mail a echoue.",
+    "successMessage": "Votre adresse e-mail a ete verifiee avec succes. Vous serez redirige vers la page de connexion sous peu.",
+    "errorHelp": "Veuillez reessayer ou contacter le support.",
+    "buttons": {
+      "goToSignIn": "Aller a la connexion"
+    },
+    "errors": {
+      "noToken": "Aucun jeton de verification trouve.",
+      "failed": "La verification a echoue.",
+      "unexpected": "Une erreur inattendue est survenue."
+    }
+  },
+  "verifyEmailPending": {
+    "titleApprovalPending": "Compte en attente de validation",
+    "titleVerificationRequired": "Verification de l'e-mail requise",
+    "subtitleApprovalPending": "Votre compte necessite une validation admin",
+    "subtitleVerificationRequired": "Veuillez verifier votre adresse e-mail",
+    "infoApprovalPending": "La verification de votre e-mail est terminee. Un administrateur doit approuver votre compte avant que vous puissiez vous connecter.",
+    "infoVerificationRequired": "Votre compte a ete cree, mais votre adresse e-mail n'a pas encore ete verifiee.",
+    "sentPrefix": "Nous avons envoye un lien de verification a",
+    "nextStepsTitle": "Prochaine etape :",
+    "activationStepsTitle": "Pour activer completement votre compte :",
+    "approvalSteps": {
+      "step1": "Attendez qu'un administrateur examine votre inscription",
+      "step2": "Vous recevrez un e-mail une fois votre compte approuve",
+      "step3": "Connectez-vous ensuite"
+    },
+    "verificationSteps": {
+      "step1": "Verifiez votre boite e-mail",
+      "step2": "Cliquez sur le lien de verification",
+      "step3": "Revenez ici ou reconnectez-vous"
+    },
+    "spamHint": "Vous n'avez pas recu l'e-mail ? Verifiez aussi votre dossier spam.",
+    "buttons": {
+      "login": "Connexion",
+      "backToHome": "Retour a l'accueil"
+    }
   },
   "adminProducts": {
     "pageTitle": "Produits",

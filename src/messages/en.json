@@ -65,6 +65,11 @@
     "detailGrandTotal": "Total incl. shipping (excl. VAT)",
     "detailBillingAddress": "Billing Address",
     "detailShippingAddress": "Shipping Address",
+    "specialShipping": "Special shipping",
+    "specialShippingDescription": "This order requires manual shipping handling.",
+    "specialShippingLabelUnavailable": "Special shipping orders cannot use the DPD label flow",
+    "parcelWeight": "Weight: {weight} kg",
+    "parcelDimensions": "Dimensions: {length} x {width} x {height} cm",
     "ticketsPerPack": "tickets/pack",
     "ticketsTotal": "tickets total"
   },
@@ -175,6 +180,12 @@
     "pageTitle": "Checkout",
     "loading": "Loading...",
     "noAddressProvided": "No address provided.",
+    "noBillingAddressSaved": "No billing address saved in your account.",
+    "noDeliveryAddressSaved": "No delivery address saved in your account.",
+    "manageAddresses": "Manage addresses in account",
+    "selectBillingAddress": "Select billing address",
+    "selectDeliveryAddress": "Select delivery address",
+    "selectAddressPlaceholder": "Choose an address",
     "taxId": "Tax identification number",
     "fields": {
       "firstName": "First Name *",
@@ -228,33 +239,46 @@
       "signOut": "Sign Out"
     },
     "address": {
+      "addressBookTitle": "Address Book",
       "billingTitle": "Billing Address",
       "deliveryTitle": "Delivery Address",
+      "addressBookDescription": "Manage multiple saved addresses and choose one as default.",
       "noBilling": "No billing address saved.",
       "noDelivery": "No delivery address saved.",
       "edit": "Edit",
       "add": "Add",
+      "delete": "Delete",
+      "setDefault": "Set as default",
+      "defaultBadge": "Default",
       "saved": "{label} saved",
+      "deleted": "{label} deleted",
+      "defaultUpdated": "Default {label} updated",
       "editBillingDescription": "Edit your billing address",
       "editDeliveryDescription": "Edit your delivery address",
+      "deleteTitle": "Delete address",
+      "deleteDescription": "Are you sure you want to delete \"{label}\"?",
       "cancel": "Cancel",
       "saving": "Saving...",
       "saveAddress": "Save Address",
       "errors": {
         "requiredFields": "Please fill in all required fields",
-        "saveFailed": "Failed to save address"
+        "saveFailed": "Failed to save address",
+        "deleteFailed": "Failed to delete address",
+        "defaultFailed": "Failed to update default address"
       },
       "fields": {
+        "label": "Label *",
         "firstName": "First Name *",
         "lastName": "Last Name *",
         "company": "Company *",
-        "vat": "Tax identification number *",
+        "vat": "Tax identification number",
         "address1": "Address Line 1 *",
         "address2": "Address Line 2",
         "postalCode": "Postal Code *",
         "city": "City *",
         "country": "Country *",
-        "phone": "Phone *"
+        "phone": "Phone *",
+        "makeDefault": "Set as default address"
       }
     },
     "password": {
@@ -302,6 +326,203 @@
     "guestHeadline": "Ticket Order Extranet | France Billet ©2026",
     "login": "Login",
     "signUp": "Sign Up"
+  },
+  "signup": {
+    "title": "Create Account",
+    "subtitle": "Complete all three steps to register your tox account",
+    "steps": {
+      "1": "User",
+      "2": "Shipping Address",
+      "3": "Billing Address"
+    },
+    "fields": {
+      "name": "Name",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "label": "Label",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "company": "Company",
+      "vatOptional": "VAT (optional)",
+      "address1": "Address Line 1",
+      "address2Optional": "Address Line 2 (optional)",
+      "postalCode": "Postal Code",
+      "city": "City",
+      "country": "Country",
+      "phone": "Phone"
+    },
+    "placeholders": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "addressLabel": "Home"
+    },
+    "deliveryTitle": "Shipping Address",
+    "billingTitle": "Billing Address",
+    "sameAsDelivery": "Billing address is the same as shipping address",
+    "alreadyHaveAccount": "Already have an account?",
+    "buttons": {
+      "back": "Back",
+      "next": "Next",
+      "complete": "Complete Registration",
+      "creating": "Creating account...",
+      "signIn": "Sign In",
+      "backToSignIn": "Back to Sign In"
+    },
+    "validation": {
+      "nameEmailRequired": "Please provide name and email",
+      "passwordsRequired": "Please provide password and password confirmation",
+      "passwordMinLength": "Password must be at least 8 characters long",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "addressRequiredFields": "Please fill all required fields: {fields}"
+    },
+    "feedback": {
+      "registrationSuccess": "Registration successful. Please verify your email and wait for admin approval.",
+      "genericError": "An unexpected error occurred",
+      "signupError": "An error occurred",
+      "addressSaveError": "Account created, but addresses could not be saved. Please contact support."
+    },
+    "completed": {
+      "title": "Registration Completed",
+      "subtitle": "Verify your email and wait for admin approval",
+      "verificationSent": "We sent a confirmation link to {email}.",
+      "waitForApproval": "After email verification, your account will remain pending until an admin approves it.",
+      "spamHint": "Didn't receive the email? Please also check your spam folder."
+    }
+  },
+  "signin": {
+    "title": "Welcome back",
+    "subtitle": "Sign in to your tox account",
+    "fields": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "placeholders": {
+      "email": "name@example.com"
+    },
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "noAccount": "Don't have an account?",
+    "buttons": {
+      "login": "Login",
+      "loggingIn": "Login...",
+      "signUp": "Sign up"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "blocked": "Your account is currently blocked. If you just registered, please verify your email and wait for admin approval.",
+      "generic": "An error occurred",
+      "unexpected": "An unexpected error occurred"
+    }
+  },
+  "forgotPassword": {
+    "title": "Forgot password?",
+    "subtitle": "Enter your email address to reset your password",
+    "subtitleSuccess": "We've sent you an email",
+    "fields": {
+      "email": "Email address"
+    },
+    "placeholders": {
+      "email": "name@example.com"
+    },
+    "sent": {
+      "line1": "We've sent a password reset link to",
+      "line2": "Check your inbox and follow the instructions.",
+      "line3": "Didn't receive an email? Check your spam folder or try again."
+    },
+    "buttons": {
+      "sendLink": "Send reset link",
+      "sending": "Sending...",
+      "backToSignIn": "Back to sign in"
+    },
+    "feedback": {
+      "emailSent": "Email sent! Check your inbox."
+    },
+    "errors": {
+      "generic": "An error occurred",
+      "unexpected": "An unexpected error occurred"
+    }
+  },
+  "resetPassword": {
+    "title": "Set New Password",
+    "titleSuccess": "Password Reset",
+    "subtitle": "Enter your new password",
+    "subtitleSuccess": "Your password has been reset successfully",
+    "loading": "Loading...",
+    "fields": {
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password"
+    },
+    "placeholders": {
+      "newPassword": "At least 8 characters",
+      "confirmPassword": "Repeat password"
+    },
+    "success": {
+      "line1": "Your password has been reset successfully.",
+      "line2": "You will be redirected to the sign in page shortly..."
+    },
+    "buttons": {
+      "resetPassword": "Reset Password",
+      "saving": "Saving...",
+      "backToSignIn": "Back to sign in",
+      "requestNewLink": "Request new link"
+    },
+    "feedback": {
+      "success": "Password reset successfully!"
+    },
+    "errors": {
+      "invalidOrExpired": "The reset link is invalid or expired. Please request a new one.",
+      "invalidOrExpiredShort": "Invalid or expired link",
+      "noToken": "No token found. Please request a new link.",
+      "passwordsMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 8 characters",
+      "generic": "An error occurred",
+      "unexpected": "An unexpected error occurred"
+    }
+  },
+  "verifyEmail": {
+    "titleVerifying": "Verifying email...",
+    "titleSuccess": "Email verified!",
+    "titleError": "Verification failed",
+    "subtitleVerifying": "Please wait a moment.",
+    "subtitleSuccess": "Your account has been activated.",
+    "subtitleError": "Email verification failed.",
+    "successMessage": "Your email address has been verified successfully. You will be redirected to the sign in page shortly.",
+    "errorHelp": "Please try again or contact support.",
+    "buttons": {
+      "goToSignIn": "Go to Sign In"
+    },
+    "errors": {
+      "noToken": "No verification token found.",
+      "failed": "Verification failed.",
+      "unexpected": "An unexpected error occurred."
+    }
+  },
+  "verifyEmailPending": {
+    "titleApprovalPending": "Account Pending Approval",
+    "titleVerificationRequired": "Email Verification Required",
+    "subtitleApprovalPending": "Your account needs admin approval",
+    "subtitleVerificationRequired": "Please verify your email address",
+    "infoApprovalPending": "Your email verification is complete. An administrator must approve your account before you can sign in.",
+    "infoVerificationRequired": "Your account has been created, but your email address has not been verified yet.",
+    "sentPrefix": "We've sent a verification link to",
+    "nextStepsTitle": "Next step:",
+    "activationStepsTitle": "To fully activate your account:",
+    "approvalSteps": {
+      "step1": "Wait for an admin to review your registration",
+      "step2": "You will receive an email once your account is approved",
+      "step3": "Sign in afterwards"
+    },
+    "verificationSteps": {
+      "step1": "Check your email inbox",
+      "step2": "Click the verification link",
+      "step3": "Return here or sign in again"
+    },
+    "spamHint": "Didn't receive the email? Please also check your spam folder.",
+    "buttons": {
+      "login": "Login",
+      "backToHome": "Back to home"
+    }
   },
   "adminProducts": {
     "pageTitle": "Products",
