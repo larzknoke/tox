@@ -5,12 +5,16 @@ import { headers } from "next/headers";
 import prisma from "@/lib/prisma";
 import { sendEmail } from "@/lib/email";
 import { orderCreatedEmail } from "@/email/orderCreatedEmail";
-import { getShippingByTicketCount } from "@/lib/shipping";
+import {
+  getShippingByTicketCount,
+  getShipmentSnapshotByTicketCount,
+} from "@/lib/shipping";
+import { USER_ADDRESS_TYPES } from "@/lib/user-addresses";
 
 export async function placeOrderAction({
   name,
-  billingAddress,
-  deliveryAddress,
+  billingAddressId,
+  deliveryAddressId,
   items,
 }) {
   const session = await auth.api.getSession({
@@ -29,30 +33,64 @@ export async function placeOrderAction({
     return { success: false, error: "Cart is empty" };
   }
 
-  const requiredFields = [
-    "firstName",
-    "lastName",
-    "company",
-    "address1",
-    "postalCode",
-    "city",
-    "country",
-    "phone",
-  ];
-
-  for (const field of requiredFields) {
-    if (!billingAddress?.[field]?.trim()) {
-      return { success: false, error: `Billing address: ${field} is required` };
-    }
-    if (!deliveryAddress?.[field]?.trim()) {
-      return {
-        success: false,
-        error: `Delivery address: ${field} is required`,
-      };
-    }
+  if (
+    !Number.isInteger(billingAddressId) ||
+    !Number.isInteger(deliveryAddressId)
+  ) {
+    return { success: false, error: "Addresses are required" };
   }
 
   try {
+    const selectedAddresses = await prisma.userAddress.findMany({
+      where: {
+        userId: session.user.id,
+        id: {
+          in: [billingAddressId, deliveryAddressId],
+        },
+      },
+    });
+
+    const billingAddress = selectedAddresses.find(
+      (address) =>
+        address.id === billingAddressId &&
+        address.type === USER_ADDRESS_TYPES.billing,
+    );
+    const deliveryAddress = selectedAddresses.find(
+      (address) =>
+        address.id === deliveryAddressId &&
+        address.type === USER_ADDRESS_TYPES.delivery,
+    );
+
+    if (!billingAddress || !deliveryAddress) {
+      return { success: false, error: "Selected addresses were not found" };
+    }
+
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "company",
+      "address1",
+      "postalCode",
+      "city",
+      "country",
+      "phone",
+    ];
+
+    for (const field of requiredFields) {
+      if (!billingAddress[field]?.trim()) {
+        return {
+          success: false,
+          error: `Billing address: ${field} is required`,
+        };
+      }
+      if (!deliveryAddress[field]?.trim()) {
+        return {
+          success: false,
+          error: `Delivery address: ${field} is required`,
+        };
+      }
+    }
+
     // Verify all products exist and are active
     const productIds = items.map((i) => i.id);
     const products = await prisma.product.findMany({
@@ -74,6 +112,8 @@ export async function placeOrderAction({
     }, 0);
 
     const shipping = getShippingByTicketCount(totalTickets);
+    const shipmentSnapshot = getShipmentSnapshotByTicketCount(totalTickets);
+
     if (shipping.isQuoteRequired) {
       return {
         success: false,
@@ -137,6 +177,13 @@ export async function placeOrderAction({
           userId: session.user.id,
           billingAddressId: billingSnap.id,
           deliveryAddressId: deliverySnap.id,
+          ticketCount: shipmentSnapshot.ticketCount,
+          shippingMode: shipmentSnapshot.shippingMode,
+          parcelCount: shipmentSnapshot.parcelCount,
+          parcelWeightKg: shipmentSnapshot.parcelWeightKg,
+          parcelLengthCm: shipmentSnapshot.parcelLengthCm,
+          parcelWidthCm: shipmentSnapshot.parcelWidthCm,
+          parcelHeightCm: shipmentSnapshot.parcelHeightCm,
           items: {
             create: orderItems,
           },

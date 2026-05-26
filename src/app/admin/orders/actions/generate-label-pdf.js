@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/auth-helper";
 import { hasRole } from "@/lib/roles";
 import { buildOrderShipmentPayload, createDpdLabel } from "@/lib/dpd";
+import { getOrderShipmentSnapshot } from "@/lib/shipping";
 
 function getFaultMessage(faults = []) {
   if (!faults.length) {
@@ -24,12 +25,22 @@ export async function generateLabelPDFAction(orderId) {
       where: { id: orderId },
       include: {
         user: true,
+        items: true,
         deliveryAddress: true,
       },
     });
 
     if (!order) {
       return { success: false, error: "Order not found" };
+    }
+
+    const shipmentSnapshot = getOrderShipmentSnapshot(order);
+    if (shipmentSnapshot.shippingMode === "SPECIAL") {
+      return {
+        success: false,
+        error:
+          "Special shipping orders require manual handling and cannot use the DPD label flow",
+      };
     }
 
     const shipment = buildOrderShipmentPayload(order);

@@ -11,7 +11,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
-import { getOrderPricingSummary } from "@/lib/shipping";
+import {
+  getOrderPricingSummary,
+  getOrderShipmentSnapshot,
+} from "@/lib/shipping";
 import { useLocale } from "@/lib/locale-context";
 
 const statusVariant = {
@@ -45,6 +48,7 @@ function OrderCard({ order, locale, t }) {
   const [expanded, setExpanded] = useState(false);
 
   const pricing = getOrderPricingSummary(order.items);
+  const shipment = getOrderShipmentSnapshot(order);
 
   return (
     <Card>
@@ -59,6 +63,9 @@ function OrderCard({ order, locale, t }) {
               <Badge variant={statusVariant[order.status] ?? "secondary"}>
                 {getStatusLabel(order.status, t)}
               </Badge>
+              {shipment.isSpecialShipping && (
+                <Badge variant="outline">{t("orders.specialShipping")}</Badge>
+              )}
             </div>
             <p className="text-xs text-muted-foreground font-mono">
               #{order.id}
@@ -142,13 +149,15 @@ function OrderCard({ order, locale, t }) {
           <div className="rounded-md border p-3 text-sm space-y-1">
             <div className="flex items-center justify-between text-muted-foreground">
               <span>
-                {pricing.shipping.parcels === 1
-                  ? t("orders.detailShipping", {
-                      parcels: pricing.shipping.parcels,
-                    })
-                  : t("orders.detailShippingPlural", {
-                      parcels: pricing.shipping.parcels,
-                    })}
+                {shipment.isSpecialShipping
+                  ? t("orders.specialShipping")
+                  : pricing.shipping.parcels === 1
+                    ? t("orders.detailShipping", {
+                        parcels: pricing.shipping.parcels,
+                      })
+                    : t("orders.detailShippingPlural", {
+                        parcels: pricing.shipping.parcels,
+                      })}
               </span>
               <span>
                 {pricing.shipping.isQuoteRequired
@@ -156,6 +165,23 @@ function OrderCard({ order, locale, t }) {
                   : `€${pricing.shippingCost.toFixed(2)}`}
               </span>
             </div>
+            {shipment.isSpecialShipping ? (
+              <p className="text-xs text-muted-foreground">
+                {t("orders.specialShippingDescription")}
+              </p>
+            ) : shipment.parcelWeightKg ? (
+              <p className="text-xs text-muted-foreground">
+                {t("orders.parcelWeight", {
+                  weight: shipment.parcelWeightKg.toFixed(1),
+                })}
+                {" · "}
+                {t("orders.parcelDimensions", {
+                  length: shipment.parcelLengthCm,
+                  width: shipment.parcelWidthCm,
+                  height: shipment.parcelHeightCm,
+                })}
+              </p>
+            ) : null}
             <div className="flex items-center justify-between font-semibold">
               <span>{t("orders.detailGrandTotal")}</span>
               <span>

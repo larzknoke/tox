@@ -58,7 +58,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getOrderPricingSummary } from "@/lib/shipping";
+import {
+  getOrderPricingSummary,
+  getOrderShipmentSnapshot,
+} from "@/lib/shipping";
 import {
   Trash2,
   FileText,
@@ -170,6 +173,7 @@ export default function OrderTable({ orders: initialOrders }) {
   const [generatingLabelId, setGeneratingLabelId] = useState(null);
 
   const getPricing = (order) => getOrderPricingSummary(order.items);
+  const getShipment = (order) => getOrderShipmentSnapshot(order);
 
   async function handleDownloadInvoicePDF(order) {
     setGeneratingPDFId(order.id);
@@ -370,11 +374,19 @@ export default function OrderTable({ orders: initialOrders }) {
                 <TableRow key={order.id}>
                   {(() => {
                     const pricing = getPricing(order);
+                    const shipment = getShipment(order);
                     return (
                       <>
                         <TableCell>
                           <div>
-                            <p className="font-medium">{order.name}</p>
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium">{order.name}</p>
+                              {shipment.isSpecialShipping && (
+                                <Badge variant="outline">
+                                  {t("orders.specialShipping")}
+                                </Badge>
+                              )}
+                            </div>
                             <p className="text-xs text-muted-foreground font-mono">
                               #{order.id}
                             </p>
@@ -463,7 +475,10 @@ export default function OrderTable({ orders: initialOrders }) {
                                   variant="ghost"
                                   size="icon"
                                   onClick={() => handleDownloadLabelPDF(order)}
-                                  disabled={generatingLabelId !== null}
+                                  disabled={
+                                    generatingLabelId !== null ||
+                                    shipment.isSpecialShipping
+                                  }
                                 >
                                   {generatingLabelId === order.id ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -473,7 +488,9 @@ export default function OrderTable({ orders: initialOrders }) {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {t("orders.downloadLabel")}
+                                {shipment.isSpecialShipping
+                                  ? t("orders.specialShippingLabelUnavailable")
+                                  : t("orders.downloadLabel")}
                               </TooltipContent>
                             </Tooltip>
                             <Tooltip>
@@ -560,6 +577,7 @@ export default function OrderTable({ orders: initialOrders }) {
             <div className="flex flex-col gap-4">
               {(() => {
                 const pricing = getPricing(detailOrder);
+                const shipment = getShipment(detailOrder);
                 return (
                   <>
                     {/* Customer */}
@@ -631,13 +649,15 @@ export default function OrderTable({ orders: initialOrders }) {
                     <div className="rounded-md border p-3 text-sm space-y-1">
                       <div className="flex items-center justify-between text-muted-foreground">
                         <span>
-                          {pricing.shipping.parcels === 1
-                            ? t("orders.detailShipping", {
-                                parcels: pricing.shipping.parcels,
-                              })
-                            : t("orders.detailShippingPlural", {
-                                parcels: pricing.shipping.parcels,
-                              })}
+                          {shipment.isSpecialShipping
+                            ? t("orders.specialShipping")
+                            : pricing.shipping.parcels === 1
+                              ? t("orders.detailShipping", {
+                                  parcels: pricing.shipping.parcels,
+                                })
+                              : t("orders.detailShippingPlural", {
+                                  parcels: pricing.shipping.parcels,
+                                })}
                         </span>
                         <span>
                           {pricing.shipping.isQuoteRequired
@@ -645,6 +665,23 @@ export default function OrderTable({ orders: initialOrders }) {
                             : `€${pricing.shippingCost.toFixed(2)}`}
                         </span>
                       </div>
+                      {shipment.isSpecialShipping ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("orders.specialShippingDescription")}
+                        </p>
+                      ) : shipment.parcelWeightKg ? (
+                        <p className="text-xs text-muted-foreground">
+                          {t("orders.parcelWeight", {
+                            weight: shipment.parcelWeightKg.toFixed(1),
+                          })}
+                          {" · "}
+                          {t("orders.parcelDimensions", {
+                            length: shipment.parcelLengthCm,
+                            width: shipment.parcelWidthCm,
+                            height: shipment.parcelHeightCm,
+                          })}
+                        </p>
+                      ) : null}
                       <div className="flex items-center justify-between font-semibold">
                         <span>{t("orders.detailGrandTotal")}</span>
                         <span>

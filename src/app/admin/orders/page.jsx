@@ -29,6 +29,13 @@ async function OrdersContent() {
     ...order,
     createdAt: order.createdAt.toISOString(),
     updatedAt: order.updatedAt.toISOString(),
+    ticketCount: order.ticketCount,
+    shippingMode: order.shippingMode,
+    parcelCount: order.parcelCount,
+    parcelWeightKg: order.parcelWeightKg,
+    parcelLengthCm: order.parcelLengthCm,
+    parcelWidthCm: order.parcelWidthCm,
+    parcelHeightCm: order.parcelHeightCm,
     confirmationEmailSentAt:
       order.confirmationEmailSentAt?.toISOString() ?? null,
     invoiceEmailSentAt: order.invoiceEmailSentAt?.toISOString() ?? null,

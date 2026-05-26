@@ -1,6 +1,7 @@
 import * as soapLib from "soap";
 import { randomUUID } from "crypto";
 import prisma from "@/lib/prisma";
+import { getOrderShipmentSnapshot } from "@/lib/shipping";
 
 const soap = soapLib.default ?? soapLib;
 
@@ -262,6 +263,19 @@ export function buildOrderShipmentPayload(order) {
 
   const senderConfig = getSenderConfig();
   const recipientName = buildRecipientName(order.deliveryAddress);
+  const shipmentSnapshot = getOrderShipmentSnapshot(order);
+
+  if (shipmentSnapshot.shippingMode === "SPECIAL") {
+    throw new Error(
+      "Special shipping orders require manual handling and cannot use the DPD label flow",
+    );
+  }
+
+  if ((shipmentSnapshot.parcelCount ?? 1) !== 1) {
+    throw new Error(
+      "DPD label generation currently supports only single-parcel orders",
+    );
+  }
 
   return {
     printOptions: {
@@ -292,7 +306,8 @@ export function buildOrderShipmentPayload(order) {
         parcels: [
           {
             parcelLabelNumber: buildParcelLabelNumber(order.id),
-            weight: senderConfig.parcelWeight,
+            weight:
+              shipmentSnapshot.parcelWeightKg ?? senderConfig.parcelWeight,
           },
         ],
         productAndServiceData: {

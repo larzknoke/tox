@@ -16,6 +16,118 @@ const SHIPPING_BRACKETS = [
   { maxTickets: 50000, parcels: 7, price: 139.5 },
 ];
 
+const STANDARD_SHIPMENT_SNAPSHOTS = {
+  2000: {
+    shippingMode: "STANDARD",
+    parcelCount: 1,
+    parcelWeightKg: 6.6,
+    parcelLengthCm: 24,
+    parcelWidthCm: 24,
+    parcelHeightCm: 24,
+  },
+  4000: {
+    shippingMode: "STANDARD",
+    parcelCount: 1,
+    parcelWeightKg: 13.1,
+    parcelLengthCm: 40,
+    parcelWidthCm: 26,
+    parcelHeightCm: 25,
+  },
+  6000: {
+    shippingMode: "STANDARD",
+    parcelCount: 1,
+    parcelWeightKg: 19.6,
+    parcelLengthCm: 58,
+    parcelWidthCm: 26,
+    parcelHeightCm: 25,
+  },
+  8000: {
+    shippingMode: "STANDARD",
+    parcelCount: 1,
+    parcelWeightKg: 26.2,
+    parcelLengthCm: 51,
+    parcelWidthCm: 19,
+    parcelHeightCm: 49,
+  },
+};
+
+export function getShipmentSnapshotByTicketCount(totalTickets) {
+  const normalizedTickets = Number(totalTickets || 0);
+
+  if (normalizedTickets <= 0) {
+    return {
+      ticketCount: 0,
+      shippingMode: null,
+      parcelCount: 0,
+      parcelWeightKg: null,
+      parcelLengthCm: null,
+      parcelWidthCm: null,
+      parcelHeightCm: null,
+      isSpecialShipping: false,
+    };
+  }
+
+  if (normalizedTickets > 8000) {
+    return {
+      ticketCount: normalizedTickets,
+      shippingMode: "SPECIAL",
+      parcelCount: null,
+      parcelWeightKg: null,
+      parcelLengthCm: null,
+      parcelWidthCm: null,
+      parcelHeightCm: null,
+      isSpecialShipping: true,
+    };
+  }
+
+  const standardSnapshot = STANDARD_SHIPMENT_SNAPSHOTS[normalizedTickets];
+
+  if (!standardSnapshot) {
+    return {
+      ticketCount: normalizedTickets,
+      shippingMode: "SPECIAL",
+      parcelCount: null,
+      parcelWeightKg: null,
+      parcelLengthCm: null,
+      parcelWidthCm: null,
+      parcelHeightCm: null,
+      isSpecialShipping: true,
+    };
+  }
+
+  return {
+    ticketCount: normalizedTickets,
+    ...standardSnapshot,
+    isSpecialShipping: false,
+  };
+}
+
+export function getOrderShipmentSnapshot(order) {
+  if (order?.shippingMode) {
+    return {
+      ticketCount: Number(order.ticketCount || 0),
+      shippingMode: order.shippingMode,
+      parcelCount: order.parcelCount ?? null,
+      parcelWeightKg: order.parcelWeightKg ?? null,
+      parcelLengthCm: order.parcelLengthCm ?? null,
+      parcelWidthCm: order.parcelWidthCm ?? null,
+      parcelHeightCm: order.parcelHeightCm ?? null,
+      isSpecialShipping: order.shippingMode === "SPECIAL",
+    };
+  }
+
+  const totalTickets = Array.isArray(order?.items)
+    ? order.items.reduce(
+        (sum, item) =>
+          sum +
+          Number(item.quantityPerPack || 0) * Number(item.numberOfPacks || 0),
+        0,
+      )
+    : Number(order?.ticketCount || 0);
+
+  return getShipmentSnapshotByTicketCount(totalTickets);
+}
+
 export function getShippingByTicketCount(totalTickets) {
   const normalizedTickets = Number(totalTickets || 0);
 
@@ -25,6 +137,7 @@ export function getShippingByTicketCount(totalTickets) {
       parcels: 0,
       price: 0,
       isQuoteRequired: false,
+      isSpecialShipping: false,
       label: "No shipping",
     };
   }
@@ -39,16 +152,20 @@ export function getShippingByTicketCount(totalTickets) {
       parcels: 1,
       price: null,
       isQuoteRequired: true,
+      isSpecialShipping: false,
       label: "Upon request",
     };
   }
+
+  const isSpecialShipping = normalizedTickets > 8000;
 
   return {
     totalTickets: normalizedTickets,
     parcels: bracket.parcels,
     price: bracket.price,
     isQuoteRequired: false,
-    label: null,
+    isSpecialShipping,
+    label: isSpecialShipping ? "Special shipping" : null,
   };
 }
 
@@ -75,6 +192,7 @@ export function getOrderPricingSummary(items = []) {
     totalTickets,
     totalPacks,
     shipping,
+    shipmentSnapshot: getShipmentSnapshotByTicketCount(totalTickets),
     shippingCost,
     grandTotal,
   };
