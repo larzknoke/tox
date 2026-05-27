@@ -6,7 +6,10 @@ export async function POST(request) {
   const accepted = Boolean(body?.accepted);
 
   if (!accepted) {
-    return NextResponse.json({ error: "Consent not accepted" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Consent not accepted" },
+      { status: 400 },
+    );
   }
 
   const response = NextResponse.json({ accepted: true });

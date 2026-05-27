@@ -76,12 +76,10 @@ import { deleteOrderAction } from "../actions/delete-order";
 import { generateInvoicePDFAction } from "../actions/generate-invoice-pdf";
 import { generateLabelPDFAction } from "../actions/generate-label-pdf";
 
-const statuses = ["PENDING", "VALIDATED", "PROCESSING", "SHIPPED"];
+const statuses = ["IN_PROGRESS", "SHIPPED"];
 
 const statusVariant = {
-  PENDING: "secondary",
-  VALIDATED: "default",
-  PROCESSING: "default",
+  IN_PROGRESS: "secondary",
   SHIPPED: "outline",
 };
 
@@ -143,9 +141,17 @@ export default function OrderTable({ orders: initialOrders }) {
   function handleStatusChange(orderId, newStatus) {
     startTransition(async () => {
       try {
-        await updateOrderStatusAction(orderId, newStatus);
+        const updated = await updateOrderStatusAction(orderId, newStatus);
         setOrders((prev) =>
-          prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)),
+          prev.map((o) =>
+            o.id === orderId
+              ? {
+                  ...o,
+                  status: updated?.status ?? newStatus,
+                  shippedDate: updated?.shippedDate ?? null,
+                }
+              : o,
+          ),
         );
         toast.success(t("orders.statusUpdated"));
       } catch {
@@ -352,6 +358,9 @@ export default function OrderTable({ orders: initialOrders }) {
               </TableHead>
               <TableHead>{t("orders.tableStatus")}</TableHead>
               <TableHead className="text-right">
+                {t("orders.tableShippedDate")}
+              </TableHead>
+              <TableHead className="text-right">
                 {t("orders.tableDate")}
               </TableHead>
               <TableHead className="text-right">
@@ -363,7 +372,7 @@ export default function OrderTable({ orders: initialOrders }) {
             {filtered.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={7}
+                  colSpan={8}
                   className="text-center text-muted-foreground py-8"
                 >
                   {t("orders.noOrdersFound")}
@@ -427,11 +436,18 @@ export default function OrderTable({ orders: initialOrders }) {
                             <SelectContent>
                               {statuses.map((s) => (
                                 <SelectItem key={s} value={s}>
-                                  {s}
+                                  {t(`orders.statusLabels.${s}`)}
                                 </SelectItem>
                               ))}
                             </SelectContent>
                           </Select>
+                        </TableCell>
+                        <TableCell className="text-right text-sm tabular-nums">
+                          {order.shippedDate
+                            ? new Date(order.shippedDate).toLocaleDateString(
+                                locale,
+                              )
+                            : "-"}
                         </TableCell>
                         <TableCell className="text-right text-sm tabular-nums">
                           {new Date(order.createdAt).toLocaleDateString(locale)}
@@ -565,7 +581,7 @@ export default function OrderTable({ orders: initialOrders }) {
                 variant={statusVariant[detailOrder?.status] ?? "secondary"}
                 className="ml-2"
               >
-                {detailOrder?.status}
+                {t(`orders.statusLabels.${detailOrder?.status}`)}
               </Badge>
             </DialogTitle>
             <p className="text-xs text-muted-foreground font-mono">

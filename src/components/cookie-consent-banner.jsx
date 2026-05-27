@@ -81,7 +81,11 @@ export function CookieConsentBanner() {
         </p>
 
         <DialogFooter>
-          <Button onClick={acceptConsent} disabled={saving} className="w-full sm:w-auto">
+          <Button
+            onClick={acceptConsent}
+            disabled={saving}
+            className="w-full sm:w-auto"
+          >
             {saving ? t("cookieBanner.accepting") : t("cookieBanner.accept")}
           </Button>
         </DialogFooter>

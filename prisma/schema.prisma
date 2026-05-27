@@ -12,7 +12,6 @@ model Bill {
   id         Int         @id @default(autoincrement())
   trainerId  Int
   teamId     Int
-  userId     String
   iban       String?
   quarter    Int
   year       Int
@@ -21,6 +20,7 @@ model Bill {
   status     String      @default("draft")
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  userId     String
   team       Team        @relation(fields: [teamId], references: [id], onDelete: Cascade)
   trainer    Trainer     @relation(fields: [trainerId], references: [id], onDelete: Cascade)
   events     BillEvent[]
@@ -50,9 +50,9 @@ model Player {
   name        String
   birthday    DateTime?
   gender      String?
-  stammverein String?
   createdAt   DateTime             @default(now())
   updatedAt   DateTime             @updatedAt
+  stammverein String?
   playerTeams PlayerTeamRelation[]
 }
 
@@ -69,14 +69,13 @@ model PlayerTeamRelation {
 }
 
 model Team {
-  id           Int                   @id @default(autoincrement())
-  name         String
-  createdAt    DateTime              @default(now())
-  updatedAt    DateTime              @updatedAt
-  bills        Bill[]
-  playerTeams  PlayerTeamRelation[]
-  trainerTeams TrainerTeamRelation[]
-
+  id            Int                   @id @default(autoincrement())
+  name          String
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  bills         Bill[]
+  playerTeams   PlayerTeamRelation[]
+  trainerTeams  TrainerTeamRelation[]
   travelReports TravelReport[]
 }
 
@@ -104,67 +103,49 @@ model TrainerTeamRelation {
 }
 
 model User {
-  id         String    @id
-  name       String?
-  email      String    @unique
-  role       UserRole  @default(CUSTOMER)
-  approved   Boolean   @default(false)
-  approvedAt DateTime?
-  approvedBy String?
-
-  // Next-Auth compatible core fields
-  emailVerified Boolean   @default(false)
-  image         String?
-  sessions      Session[]
-  accounts      Account[]
-
-  banned     Boolean?  @default(false)
-  banReason  String?
-  banExpires DateTime?
-
-  // GDPR consent
-  gdprConsent     Boolean   @default(false)
-  gdprConsentedAt DateTime?
-
-  // Password reset
-  resetToken          String?
-  resetTokenExpiresAt DateTime?
-
-  addresses UserAddress[]
-
-  defaultBillingAddressId Int?
-  defaultBillingAddress   UserAddress? @relation("DefaultBillingAddress", fields: [defaultBillingAddressId], references: [id], onDelete: SetNull)
-
+  name                     String?
+  email                    String          @unique
+  role                     UserRole        @default(CUSTOMER)
+  emailVerified            Boolean         @default(false)
+  image                    String?
+  gdprConsent              Boolean         @default(false)
+  gdprConsentedAt          DateTime?
+  resetToken               String?
+  resetTokenExpiresAt      DateTime?
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
+  banExpires               DateTime?
+  banReason                String?
+  banned                   Boolean?        @default(false)
+  id                       String          @id
+  defaultBillingAddressId  Int?
   defaultDeliveryAddressId Int?
-  defaultDeliveryAddress   UserAddress? @relation("DefaultDeliveryAddress", fields: [defaultDeliveryAddressId], references: [id], onDelete: SetNull)
-
-  orders         Order[]
-  supportTickets SupportTicket[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  approved                 Boolean         @default(false)
+  approvedAt               DateTime?
+  approvedBy               String?
+  accounts                 Account[]
+  orders                   Order[]
+  sessions                 Session[]
+  supportTickets           SupportTicket[]
+  addresses                UserAddress[]
+  defaultBillingAddress    UserAddress?    @relation("DefaultBillingAddress", fields: [defaultBillingAddressId], references: [id])
+  defaultDeliveryAddress   UserAddress?    @relation("DefaultDeliveryAddress", fields: [defaultDeliveryAddressId], references: [id])
 
   @@map("users")
-}
-
-enum UserRole {
-  CUSTOMER
-  ADMIN
 }
 
 model Session {
   id             String   @id
   expiresAt      DateTime
-  token          String
+  token          String   @unique
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   ipAddress      String?
   userAgent      String?
   userId         String
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   impersonatedBy String?
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([token])
   @@index([userId])
   @@map("session")
 }
@@ -174,7 +155,6 @@ model Account {
   accountId             String
   providerId            String
   userId                String
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
   idToken               String?
@@ -184,6 +164,7 @@ model Account {
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@map("account")
@@ -208,11 +189,11 @@ model TravelReport {
   destination String
   distance    Float
   teamId      Int
-  userId      String
   totalCost   Float
-  status      String    @default("unpaid")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  status      String    @default("unpaid")
+  userId      String
   team        Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
   vehicles    Vehicle[]
 
@@ -234,56 +215,145 @@ model Vehicle {
 }
 
 model Address {
-  id Int @id @default(autoincrement())
-
-  firstName  String
-  lastName   String
-  company    String
-  vat        String?
-  address1   String
-  address2   String?
-  postalCode String
-  city       String
-  country    String
-  phone      String
-
-  orderBilling  Order[] @relation("OrderBillingSnapshot")
-  orderDelivery Order[] @relation("OrderDeliverySnapshot")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  firstName     String
+  lastName      String
+  company       String
+  address1      String
+  address2      String?
+  postalCode    String
+  city          String
+  country       String
+  phone         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  vat           String?
+  orderBilling  Order[]  @relation("OrderBillingSnapshot")
+  orderDelivery Order[]  @relation("OrderDeliverySnapshot")
 
   @@map("addresses")
 }
 
 model UserAddress {
-  id Int @id @default(autoincrement())
-
-  userId String
-  type   UserAddressType
-  label  String
-
-  firstName  String
-  lastName   String
-  company    String
-  vat        String?
-  address1   String
-  address2   String?
-  postalCode String
-  city       String
-  country    String
-  phone      String
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  defaultBillingForUsers  User[] @relation("DefaultBillingAddress")
-  defaultDeliveryForUsers User[] @relation("DefaultDeliveryAddress")
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                      Int             @id @default(autoincrement())
+  userId                  String
+  type                    UserAddressType
+  label                   String
+  firstName               String
+  lastName                String
+  company                 String
+  vat                     String?
+  address1                String
+  address2                String?
+  postalCode              String
+  city                    String
+  country                 String
+  phone                   String
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  user                    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  defaultBillingForUsers  User[]          @relation("DefaultBillingAddress")
+  defaultDeliveryForUsers User[]          @relation("DefaultDeliveryAddress")
 
   @@index([userId, type])
   @@map("user_addresses")
+}
+
+model Product {
+  id              Int         @id @default(autoincrement())
+  reference       String      @unique
+  name            String
+  description     String?
+  pricePerPack    Decimal     @db.Decimal(10, 2)
+  quantityPerPack Int
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  orderItems      OrderItem[]
+
+  @@map("products")
+}
+
+model Order {
+  id                      Int           @id @default(autoincrement())
+  name                    String
+  status                  OrderStatus   @default(IN_PROGRESS)
+  billingAddressId        Int
+  deliveryAddressId       Int
+  confirmationEmailSentAt DateTime?
+  invoiceEmailSentAt      DateTime?
+  shippedDate             DateTime?
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime      @updatedAt
+  userId                  String
+  parcelCount             Int?
+  parcelHeightCm          Float?
+  parcelLengthCm          Float?
+  parcelWeightKg          Float?
+  parcelWidthCm           Float?
+  shippingMode            ShippingMode?
+  ticketCount             Int?
+  invoice                 Invoice?
+  items                   OrderItem[]
+  billingAddress          Address       @relation("OrderBillingSnapshot", fields: [billingAddressId], references: [id])
+  deliveryAddress         Address       @relation("OrderDeliverySnapshot", fields: [deliveryAddressId], references: [id])
+  user                    User          @relation(fields: [userId], references: [id])
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id              Int     @id @default(autoincrement())
+  orderId         Int
+  productId       Int
+  reference       String
+  designation     String
+  quantityPerPack Int
+  numberOfPacks   Int
+  pricePerPack    Decimal @db.Decimal(10, 2)
+  totalPrice      Decimal @db.Decimal(10, 2)
+  order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product         Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Invoice {
+  id            Int       @id @default(autoincrement())
+  invoiceNumber String    @unique
+  orderId       Int       @unique
+  totalAmount   Decimal   @db.Decimal(10, 2)
+  currency      String    @default("EUR")
+  invoiceDate   DateTime
+  pdfUrl        String?
+  sentAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  order         Order     @relation(fields: [orderId], references: [id])
+
+  @@map("invoices")
+}
+
+model SupportTicket {
+  id          Int               @id @default(autoincrement())
+  userId      String?
+  name        String
+  email       String
+  phone       String
+  subject     String
+  type        SupportTicketType
+  description String
+  status      String            @default("open")
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  user        User?             @relation(fields: [userId], references: [id])
+
+  @@map("support_tickets")
+}
+
+enum UserRole {
+  CUSTOMER
+  ADMIN
 }
 
 enum UserAddressType {
@@ -291,123 +361,14 @@ enum UserAddressType {
   DELIVERY
 }
 
-model Product {
-  id              Int     @id @default(autoincrement())
-  reference       String  @unique
-  name            String
-  description     String?
-  pricePerPack    Decimal @db.Decimal(10, 2)
-  quantityPerPack Int
-  isActive        Boolean @default(true)
-
-  orderItems OrderItem[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("products")
-}
-
-model Order {
-  id     Int         @id @default(autoincrement())
-  name   String
-  status OrderStatus @default(PENDING)
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
-
-  billingAddressId Int
-  billingAddress   Address @relation("OrderBillingSnapshot", fields: [billingAddressId], references: [id])
-
-  deliveryAddressId Int
-  deliveryAddress   Address @relation("OrderDeliverySnapshot", fields: [deliveryAddressId], references: [id])
-
-  items   OrderItem[]
-  invoice Invoice?
-
-  ticketCount    Int?
-  shippingMode   ShippingMode?
-  parcelCount    Int?
-  parcelWeightKg Float?
-  parcelLengthCm Float?
-  parcelWidthCm  Float?
-  parcelHeightCm Float?
-
-  confirmationEmailSentAt DateTime?
-  invoiceEmailSentAt      DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("orders")
-}
-
 enum OrderStatus {
-  PENDING
-  VALIDATED
-  PROCESSING
+  IN_PROGRESS
   SHIPPED
 }
 
 enum ShippingMode {
   STANDARD
   SPECIAL
-}
-
-model OrderItem {
-  id      Int   @id @default(autoincrement())
-  orderId Int
-  order   Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-
-  productId Int
-  product   Product @relation(fields: [productId], references: [id])
-
-  reference       String
-  designation     String
-  quantityPerPack Int
-  numberOfPacks   Int
-  pricePerPack    Decimal @db.Decimal(10, 2)
-  totalPrice      Decimal @db.Decimal(10, 2)
-
-  @@map("order_items")
-}
-
-model Invoice {
-  id            Int    @id @default(autoincrement())
-  invoiceNumber String @unique
-  orderId       Int    @unique
-  order         Order  @relation(fields: [orderId], references: [id])
-
-  totalAmount Decimal  @db.Decimal(10, 2)
-  currency    String   @default("EUR")
-  invoiceDate DateTime
-  pdfUrl      String?
-
-  sentAt DateTime?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("invoices")
-}
-
-model SupportTicket {
-  id     Int     @id @default(autoincrement())
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id])
-
-  name        String
-  email       String
-  phone       String
-  subject     String
-  type        SupportTicketType
-  description String            @db.Text
-
-  status    String   @default("open")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("support_tickets")
 }
 
 enum SupportTicketType {

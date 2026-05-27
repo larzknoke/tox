@@ -39,6 +39,7 @@ async function OrdersContent() {
     confirmationEmailSentAt:
       order.confirmationEmailSentAt?.toISOString() ?? null,
     invoiceEmailSentAt: order.invoiceEmailSentAt?.toISOString() ?? null,
+    shippedDate: order.shippedDate?.toISOString() ?? null,
     items: order.items.map((item) => ({
       ...item,
       pricePerPack: Number(item.pricePerPack),

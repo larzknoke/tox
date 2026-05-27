@@ -31,6 +31,7 @@
     "tableItems": "Articles",
     "tableTotal": "Total",
     "tableStatus": "Statut",
+    "tableShippedDate": "Date d'expedition",
     "tableDate": "Date",
     "tableActions": "Actions",
     "noOrdersFound": "Aucune commande trouvée.",
@@ -71,7 +72,11 @@
     "parcelWeight": "Poids : {weight} kg",
     "parcelDimensions": "Dimensions : {length} x {width} x {height} cm",
     "ticketsPerPack": "billets/pack",
-    "ticketsTotal": "billets au total"
+    "ticketsTotal": "billets au total",
+    "statusLabels": {
+      "IN_PROGRESS": "En cours",
+      "SHIPPED": "Expediee"
+    }
   },
   "support": {
     "button": "Help",
@@ -308,6 +313,7 @@
       "packOther": "packs",
       "invoice": "Facture",
       "status": {
+        "inProgress": "En cours",
         "pending": "En attente",
         "validated": "Validée",
         "processing": "En traitement",

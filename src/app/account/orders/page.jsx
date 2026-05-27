@@ -18,17 +18,13 @@ import {
 import { useLocale } from "@/lib/locale-context";
 
 const statusVariant = {
-  PENDING: "secondary",
-  VALIDATED: "default",
-  PROCESSING: "default",
+  IN_PROGRESS: "secondary",
   SHIPPED: "outline",
 };
 
 function getStatusLabel(status, t) {
   const map = {
-    PENDING: "account.orders.status.pending",
-    VALIDATED: "account.orders.status.validated",
-    PROCESSING: "account.orders.status.processing",
+    IN_PROGRESS: "account.orders.status.inProgress",
     SHIPPED: "account.orders.status.shipped",
   };
   return t(map[status] ?? "") || status;

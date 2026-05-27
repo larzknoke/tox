@@ -174,6 +174,7 @@ export async function placeOrderAction({
       const created = await tx.order.create({
         data: {
           name: name.trim(),
+          status: "IN_PROGRESS",
           userId: session.user.id,
           billingAddressId: billingSnap.id,
           deliveryAddressId: deliverySnap.id,

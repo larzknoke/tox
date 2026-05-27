@@ -10,6 +10,8 @@ export const orderCreatedEmail = (order) => {
 
   const getStatusLabel = (status) => {
     switch (status) {
+      case "IN_PROGRESS":
+        return "In progress";
       case "PENDING":
         return "Pending";
       case "VALIDATED":
