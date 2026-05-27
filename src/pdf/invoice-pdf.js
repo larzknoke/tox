@@ -3,6 +3,43 @@ import { Page, Text, View, Document, StyleSheet } from "@react-pdf/renderer";
 import { formatCurrency } from "@/lib/utils";
 import { getOrderPricingSummary } from "@/lib/shipping";
 
+function getInvoiceMessages(messages = {}) {
+  return {
+    title: messages.title ?? "Invoice",
+    date: messages.date ?? "Date",
+    orderName: messages.orderName ?? "Order Name",
+    status: messages.status ?? "Status",
+    customer: messages.customer ?? "Customer",
+    name: messages.name ?? "Name",
+    email: messages.email ?? "E-Mail",
+    billingAddress: messages.billingAddress ?? "Billing Address",
+    deliveryAddress: messages.deliveryAddress ?? "Delivery Address",
+    taxId: messages.taxId ?? "Tax identification number",
+    tel: messages.tel ?? "Tel",
+    items: messages.items ?? "Items",
+    product: messages.product ?? "Product",
+    qty: messages.qty ?? "Qty",
+    unitPrice: messages.unitPrice ?? "Unit Price",
+    total: messages.total ?? "Total",
+    ticketsPerPack: messages.ticketsPerPack ?? "tickets/pack",
+    ticketsTotal: messages.ticketsTotal ?? "tickets total",
+    totalPacks: messages.totalPacks ?? "Total Packs",
+    totalTickets: messages.totalTickets ?? "Total Tickets",
+    subtotalExclVat: messages.subtotalExclVat ?? "Subtotal (excl. VAT)",
+    shipping: messages.shipping ?? "Shipping",
+    parcelOne: messages.parcelOne ?? "parcel",
+    parcelOther: messages.parcelOther ?? "parcels",
+    uponRequest: messages.uponRequest ?? "Upon request",
+    totalInclShippingExclVat:
+      messages.totalInclShippingExclVat ?? "Total incl. shipping (excl. VAT)",
+    invoiceDetails: messages.invoiceDetails ?? "Invoice Details",
+    invoiceNo: messages.invoiceNo ?? "Invoice No.",
+    invoiceDate: messages.invoiceDate ?? "Invoice Date",
+    amount: messages.amount ?? "Amount",
+    statusLabels: messages.statusLabels ?? {},
+  };
+}
+
 const styles = StyleSheet.create({
   page: {
     padding: 40,
@@ -93,8 +130,10 @@ const styles = StyleSheet.create({
   },
 });
 
-const InvoicePDF = ({ order }) => {
+const InvoicePDF = ({ order, locale = "en", messages = {} }) => {
   const pricing = getOrderPricingSummary(order.items);
+  const m = getInvoiceMessages(messages);
+  const statusLabel = m.statusLabels?.[order.status] ?? order.status;
 
   const formatAddress = (address) => {
     if (!address) return null;
@@ -105,7 +144,9 @@ const InvoicePDF = ({ order }) => {
         </Text>
         {address.company ? <Text>{address.company}</Text> : null}
         {address.vat ? (
-          <Text>Tax identification number: {address.vat}</Text>
+          <Text>
+            {m.taxId}: {address.vat}
+          </Text>
         ) : null}
         <Text>{address.address1}</Text>
         {address.address2 ? <Text>{address.address2}</Text> : null}
@@ -113,7 +154,11 @@ const InvoicePDF = ({ order }) => {
           {address.postalCode} {address.city}
         </Text>
         <Text>{address.country}</Text>
-        {address.phone ? <Text>Tel: {address.phone}</Text> : null}
+        {address.phone ? (
+          <Text>
+            {m.tel}: {address.phone}
+          </Text>
+        ) : null}
       </View>
     );
   };
@@ -123,25 +168,31 @@ const InvoicePDF = ({ order }) => {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Invoice #{order.id}</Text>
-          <Text>
-            Date: {new Date(order.createdAt).toLocaleDateString("de-DE")}
+          <Text style={styles.title}>
+            {m.title} #{order.id}
           </Text>
-          <Text>Order Name: {order.name}</Text>
-          <Text>Status: {order.status}</Text>
+          <Text>
+            {m.date}: {new Date(order.createdAt).toLocaleDateString(locale)}
+          </Text>
+          <Text>
+            {m.orderName}: {order.name}
+          </Text>
+          <Text>
+            {m.status}: {statusLabel}
+          </Text>
         </View>
 
         <View style={styles.separator} />
 
         {/* Customer */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Customer</Text>
+          <Text style={styles.sectionTitle}>{m.customer}</Text>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Name:</Text>
+            <Text style={styles.label}>{m.name}:</Text>
             <Text style={styles.value}>{order.user?.name ?? "—"}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>E-Mail:</Text>
+            <Text style={styles.label}>{m.email}:</Text>
             <Text style={styles.value}>{order.user?.email ?? "—"}</Text>
           </View>
         </View>
@@ -150,7 +201,7 @@ const InvoicePDF = ({ order }) => {
         <View style={[styles.section, styles.columnsRow]}>
           <View style={styles.column}>
             <View style={styles.addressBlock}>
-              <Text style={styles.addressTitle}>Billing Address</Text>
+              <Text style={styles.addressTitle}>{m.billingAddress}</Text>
               {order.billingAddress ? (
                 formatAddress(order.billingAddress)
               ) : (
@@ -160,7 +211,7 @@ const InvoicePDF = ({ order }) => {
           </View>
           <View style={styles.column}>
             <View style={styles.addressBlock}>
-              <Text style={styles.addressTitle}>Delivery Address</Text>
+              <Text style={styles.addressTitle}>{m.deliveryAddress}</Text>
               {order.deliveryAddress ? (
                 formatAddress(order.deliveryAddress)
               ) : (
@@ -174,24 +225,24 @@ const InvoicePDF = ({ order }) => {
 
         {/* Items */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Items</Text>
+          <Text style={styles.sectionTitle}>{m.items}</Text>
           <View style={styles.table}>
             <View style={styles.tableHeader}>
-              <Text style={styles.tableCellWide}>Product</Text>
-              <Text style={styles.tableCellSmall}>Qty</Text>
-              <Text style={styles.tableCellRight}>Unit Price</Text>
-              <Text style={styles.tableCellRight}>Total</Text>
+              <Text style={styles.tableCellWide}>{m.product}</Text>
+              <Text style={styles.tableCellSmall}>{m.qty}</Text>
+              <Text style={styles.tableCellRight}>{m.unitPrice}</Text>
+              <Text style={styles.tableCellRight}>{m.total}</Text>
             </View>
             {order.items.map((item) => (
               <View key={item.id} style={styles.tableRow}>
                 <View style={styles.tableCellWide}>
                   <Text>{item.designation}</Text>
                   <Text style={{ fontSize: 9, color: "#666" }}>
-                    {item.reference} · {item.quantityPerPack} tickets/pack ·{" "}
+                    {item.reference} · {item.quantityPerPack} {m.ticketsPerPack} ·{" "}
                     {(
                       item.quantityPerPack * item.numberOfPacks
-                    ).toLocaleString()}{" "}
-                    tickets total
+                    ).toLocaleString(locale)}{" "}
+                    {m.ticketsTotal}
                   </Text>
                 </View>
                 <Text style={styles.tableCellSmall}>{item.numberOfPacks}</Text>
@@ -207,31 +258,31 @@ const InvoicePDF = ({ order }) => {
 
           {/* Totals */}
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Total Packs:</Text>
+            <Text style={styles.label}>{m.totalPacks}:</Text>
             <Text style={styles.value}>{pricing.totalPacks}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Total Tickets:</Text>
+            <Text style={styles.label}>{m.totalTickets}:</Text>
             <Text style={styles.value}>
-              {pricing.totalTickets.toLocaleString()}
+              {pricing.totalTickets.toLocaleString(locale)}
             </Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Subtotal (excl. VAT):</Text>
+            <Text style={styles.label}>{m.subtotalExclVat}:</Text>
             <Text style={styles.value}>{formatCurrency(pricing.subtotal)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Shipping:</Text>
+            <Text style={styles.label}>{m.shipping}:</Text>
             <Text style={styles.value}>
               {pricing.shipping.isQuoteRequired
-                ? "Upon request"
-                : `${formatCurrency(pricing.shippingCost)} (${pricing.shipping.parcels} parcel${pricing.shipping.parcels === 1 ? "" : "s"})`}
+                ? m.uponRequest
+                : `${formatCurrency(pricing.shippingCost)} (${pricing.shipping.parcels} ${pricing.shipping.parcels === 1 ? m.parcelOne : m.parcelOther})`}
             </Text>
           </View>
           <Text style={styles.total}>
-            Total incl. shipping (excl. VAT):{" "}
+            {m.totalInclShippingExclVat}:{" "}
             {pricing.shipping.isQuoteRequired
-              ? "Upon request"
+              ? m.uponRequest
               : formatCurrency(pricing.grandTotal)}
           </Text>
         </View>
@@ -241,24 +292,22 @@ const InvoicePDF = ({ order }) => {
           <>
             <View style={styles.separator} />
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Invoice Details</Text>
+              <Text style={styles.sectionTitle}>{m.invoiceDetails}</Text>
               <View style={styles.infoRow}>
-                <Text style={styles.label}>Invoice No.:</Text>
+                <Text style={styles.label}>{m.invoiceNo}:</Text>
                 <Text style={styles.value}>{order.invoice.invoiceNumber}</Text>
               </View>
               <View style={styles.infoRow}>
-                <Text style={styles.label}>Invoice Date:</Text>
+                <Text style={styles.label}>{m.invoiceDate}:</Text>
                 <Text style={styles.value}>
-                  {new Date(order.invoice.invoiceDate).toLocaleDateString(
-                    "de-DE",
-                  )}
+                  {new Date(order.invoice.invoiceDate).toLocaleDateString(locale)}
                 </Text>
               </View>
               <View style={styles.infoRow}>
-                <Text style={styles.label}>Amount:</Text>
+                <Text style={styles.label}>{m.amount}:</Text>
                 <Text style={styles.value}>
                   {pricing.shipping.isQuoteRequired
-                    ? "Upon request"
+                    ? m.uponRequest
                     : formatCurrency(pricing.grandTotal)}{" "}
                   {order.invoice.currency}
                 </Text>

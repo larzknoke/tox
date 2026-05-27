@@ -70,10 +70,12 @@ import {
   ListFilter,
   Package,
   Loader2,
+  Truck,
 } from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
 import { generateInvoicePDFAction } from "../actions/generate-invoice-pdf";
+import { generateDeliveryNotePDFAction } from "../actions/generate-delivery-note-pdf";
 import { generateLabelPDFAction } from "../actions/generate-label-pdf";
 
 const statuses = ["IN_PROGRESS", "SHIPPED"];
@@ -176,6 +178,8 @@ export default function OrderTable({ orders: initialOrders }) {
   }
 
   const [generatingPDFId, setGeneratingPDFId] = useState(null);
+  const [generatingDeliveryNoteId, setGeneratingDeliveryNoteId] =
+    useState(null);
   const [generatingLabelId, setGeneratingLabelId] = useState(null);
 
   const getPricing = (order) => getOrderPricingSummary(order.items);
@@ -184,7 +188,7 @@ export default function OrderTable({ orders: initialOrders }) {
   async function handleDownloadInvoicePDF(order) {
     setGeneratingPDFId(order.id);
     try {
-      const result = await generateInvoicePDFAction(order.id);
+      const result = await generateInvoicePDFAction(order.id, locale);
       if (!result.success) {
         throw new Error(result.error);
       }
@@ -204,6 +208,33 @@ export default function OrderTable({ orders: initialOrders }) {
       toast.error(t("orders.pdfFailed") + ": " + error.message);
     } finally {
       setGeneratingPDFId(null);
+    }
+  }
+
+  async function handleDownloadDeliveryNotePDF(order) {
+    setGeneratingDeliveryNoteId(order.id);
+    try {
+      const result = await generateDeliveryNotePDFAction(order.id, locale);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      const blob = new Blob([new Uint8Array(result.pdfBuffer)], {
+        type: "application/pdf",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = result.filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success(t("orders.deliveryNoteDownloaded"));
+    } catch (error) {
+      toast.error(t("orders.deliveryNoteFailed") + ": " + error.message);
+    } finally {
+      setGeneratingDeliveryNoteId(null);
     }
   }
 
@@ -483,6 +514,25 @@ export default function OrderTable({ orders: initialOrders }) {
                               </TooltipTrigger>
                               <TooltipContent>
                                 {t("orders.downloadInvoice")}
+                              </TooltipContent>
+                            </Tooltip>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() =>
+                                    handleDownloadDeliveryNotePDF(order)
+                                  }
+                                  disabled={
+                                    generatingDeliveryNoteId === order.id
+                                  }
+                                >
+                                  <Truck className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("orders.downloadDeliveryNote")}
                               </TooltipContent>
                             </Tooltip>
                             <Tooltip>

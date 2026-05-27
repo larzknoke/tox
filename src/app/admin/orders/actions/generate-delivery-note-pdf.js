@@ -1,7 +1,7 @@
 "use server";
 
 import { pdf } from "@react-pdf/renderer";
-import InvoicePDF from "@/pdf/invoice-pdf";
+import DeliveryNotePDF from "@/pdf/delivery-note-pdf";
 import prisma from "@/lib/prisma";
 import { requireSession } from "@/lib/auth-helper";
 import { hasRole } from "@/lib/roles";
@@ -15,7 +15,7 @@ function getActiveLocale(locale) {
   return null;
 }
 
-export async function generateInvoicePDFAction(orderId, locale) {
+export async function generateDeliveryNotePDFAction(orderId, locale) {
   const session = await requireSession();
   if (!hasRole(session, "ADMIN")) throw new Error("Unauthorized");
 
@@ -27,7 +27,6 @@ export async function generateInvoicePDFAction(orderId, locale) {
         billingAddress: true,
         deliveryAddress: true,
         items: true,
-        invoice: true,
       },
     });
 
@@ -39,15 +38,15 @@ export async function generateInvoicePDFAction(orderId, locale) {
     const messages = getMessages(resolvedLocale);
 
     const blob = await pdf(
-      InvoicePDF({
+      DeliveryNotePDF({
         order,
         locale: resolvedLocale,
-        messages: messages?.pdf?.invoice,
+        messages: messages?.pdf?.deliveryNote,
       }),
     ).toBlob();
     const buffer = await blob.arrayBuffer();
 
-    const filename = `Invoice_${order.id}_${order.name.replace(/\s+/g, "_")}.pdf`;
+    const filename = `Delivery_Note_${order.id}_${order.name.replace(/\s+/g, "_")}.pdf`;
 
     return {
       success: true,
@@ -55,10 +54,10 @@ export async function generateInvoicePDFAction(orderId, locale) {
       filename,
     };
   } catch (error) {
-    console.error("Error generating invoice PDF:", error);
+    console.error("Error generating delivery note PDF:", error);
     return {
       success: false,
-      error: error.message || "Failed to generate PDF",
+      error: error.message || "Failed to generate delivery note PDF",
     };
   }
 }
