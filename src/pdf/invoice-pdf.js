@@ -238,10 +238,11 @@ const InvoicePDF = ({ order, locale = "en", messages = {} }) => {
                 <View style={styles.tableCellWide}>
                   <Text>{item.designation}</Text>
                   <Text style={{ fontSize: 9, color: "#666" }}>
-                    {item.reference} · {item.quantityPerPack} {m.ticketsPerPack} ·{" "}
-                    {(
-                      item.quantityPerPack * item.numberOfPacks
-                    ).toLocaleString(locale)}{" "}
+                    {item.reference} · {item.quantityPerPack} {m.ticketsPerPack}{" "}
+                    ·{" "}
+                    {(item.quantityPerPack * item.numberOfPacks).toLocaleString(
+                      locale,
+                    )}{" "}
                     {m.ticketsTotal}
                   </Text>
                 </View>
@@ -300,7 +301,9 @@ const InvoicePDF = ({ order, locale = "en", messages = {} }) => {
               <View style={styles.infoRow}>
                 <Text style={styles.label}>{m.invoiceDate}:</Text>
                 <Text style={styles.value}>
-                  {new Date(order.invoice.invoiceDate).toLocaleDateString(locale)}
+                  {new Date(order.invoice.invoiceDate).toLocaleDateString(
+                    locale,
+                  )}
                 </Text>
               </View>
               <View style={styles.infoRow}>

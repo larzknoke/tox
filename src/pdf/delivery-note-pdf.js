@@ -126,7 +126,8 @@ const DeliveryNotePDF = ({ order, locale = "en", messages = {} }) => {
     0,
   );
   const totalTickets = order.items.reduce(
-    (sum, item) => sum + (item.quantityPerPack ?? 0) * (item.numberOfPacks ?? 0),
+    (sum, item) =>
+      sum + (item.quantityPerPack ?? 0) * (item.numberOfPacks ?? 0),
     0,
   );
 
@@ -174,7 +175,8 @@ const DeliveryNotePDF = ({ order, locale = "en", messages = {} }) => {
             {m.orderName}: {order.name}
           </Text>
           <Text>
-            {m.orderDate}: {new Date(order.createdAt).toLocaleDateString(locale)}
+            {m.orderDate}:{" "}
+            {new Date(order.createdAt).toLocaleDateString(locale)}
           </Text>
           <Text>
             {m.shippedDate}:{" "}
@@ -205,7 +207,11 @@ const DeliveryNotePDF = ({ order, locale = "en", messages = {} }) => {
           <View style={styles.column}>
             <View style={styles.addressBlock}>
               <Text style={styles.addressTitle}>{m.billingAddress}</Text>
-              {order.billingAddress ? formatAddress(order.billingAddress) : <Text>{m.na}</Text>}
+              {order.billingAddress ? (
+                formatAddress(order.billingAddress)
+              ) : (
+                <Text>{m.na}</Text>
+              )}
             </View>
           </View>
           <View style={styles.column}>
@@ -254,7 +260,9 @@ const DeliveryNotePDF = ({ order, locale = "en", messages = {} }) => {
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>{m.totalTickets}:</Text>
-            <Text style={styles.value}>{totalTickets.toLocaleString(locale)}</Text>
+            <Text style={styles.value}>
+              {totalTickets.toLocaleString(locale)}
+            </Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.label}>{m.shippingMode}:</Text>

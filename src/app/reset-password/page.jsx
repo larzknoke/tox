@@ -201,6 +201,8 @@ function ResetPasswordForm() {
 }
 
 export default function ResetPasswordPage() {
+  const { t } = useLocale();
+
   return (
     <Suspense
       fallback={
