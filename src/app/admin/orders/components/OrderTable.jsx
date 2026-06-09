@@ -62,6 +62,7 @@ import {
   getOrderPricingSummary,
   getOrderShipmentSnapshot,
 } from "@/lib/shipping";
+import { downloadClientFile } from "@/lib/download-client-file";
 import {
   Trash2,
   FileText,
@@ -74,7 +75,7 @@ import {
 } from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
-import { generateInvoicePDFAction } from "../actions/generate-invoice-pdf";
+import { generateInvoicePDFAction } from "@/app/actions/generate-invoice-pdf";
 import { generateDeliveryNotePDFAction } from "../actions/generate-delivery-note-pdf";
 import { generateLabelPDFAction } from "../actions/generate-label-pdf";
 
@@ -185,6 +186,10 @@ export default function OrderTable({ orders: initialOrders }) {
   const getPricing = (order) => getOrderPricingSummary(order.items);
   const getShipment = (order) => getOrderShipmentSnapshot(order);
 
+  function downloadPdfFromActionResult(result) {
+    downloadClientFile(result.pdfBuffer, result.filename, "application/pdf");
+  }
+
   async function handleDownloadInvoicePDF(order) {
     setGeneratingPDFId(order.id);
     try {
@@ -192,17 +197,7 @@ export default function OrderTable({ orders: initialOrders }) {
       if (!result.success) {
         throw new Error(result.error);
       }
-      const blob = new Blob([new Uint8Array(result.pdfBuffer)], {
-        type: "application/pdf",
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = result.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      downloadPdfFromActionResult(result);
       toast.success(t("orders.pdfDownloaded"));
     } catch (error) {
       toast.error(t("orders.pdfFailed") + ": " + error.message);
@@ -219,17 +214,7 @@ export default function OrderTable({ orders: initialOrders }) {
         throw new Error(result.error);
       }
 
-      const blob = new Blob([new Uint8Array(result.pdfBuffer)], {
-        type: "application/pdf",
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = result.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      downloadPdfFromActionResult(result);
       toast.success(t("orders.deliveryNoteDownloaded"));
     } catch (error) {
       toast.error(t("orders.deliveryNoteFailed") + ": " + error.message);
@@ -246,17 +231,7 @@ export default function OrderTable({ orders: initialOrders }) {
         throw new Error(result.error);
       }
 
-      const blob = new Blob([new Uint8Array(result.pdfBuffer)], {
-        type: "application/pdf",
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = result.filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      downloadPdfFromActionResult(result);
       toast.success(t("orders.labelDownloaded"));
     } catch (error) {
       toast.error(t("orders.labelFailed") + ": " + error.message);

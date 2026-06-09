@@ -39,7 +39,7 @@
     "tickets": "tickets",
     "uponRequest": "Upon request",
     "viewDetails": "View details",
-    "downloadInvoice": "Download Invoice PDF",
+    "downloadInvoice": "Download Invoice",
     "downloadDeliveryNote": "Download Delivery Note PDF",
     "downloadLabel": "Download DPD label",
     "deleteOrder": "Delete order",

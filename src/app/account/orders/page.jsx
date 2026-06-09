@@ -5,16 +5,26 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { getMyOrdersAction } from "../actions/get-my-orders";
+import { generateInvoicePDFAction } from "@/app/actions/generate-invoice-pdf";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
+import { toast } from "sonner";
+import {
+  ShoppingBag,
+  ArrowLeft,
+  ChevronDown,
+  ChevronUp,
+  Euro,
+  Loader2,
+} from "lucide-react";
 import {
   getOrderPricingSummary,
   getOrderShipmentSnapshot,
 } from "@/lib/shipping";
+import { downloadClientFile } from "@/lib/download-client-file";
 import { useLocale } from "@/lib/locale-context";
 
 const statusVariant = {
@@ -40,7 +50,13 @@ function AddressSummary({ address }) {
   );
 }
 
-function OrderCard({ order, locale, t }) {
+function OrderCard({
+  order,
+  locale,
+  t,
+  onDownloadInvoice,
+  isGeneratingInvoice,
+}) {
   const [expanded, setExpanded] = useState(false);
 
   const pricing = getOrderPricingSummary(order.items);
@@ -84,6 +100,24 @@ function OrderCard({ order, locale, t }) {
                 {new Date(order.createdAt).toLocaleDateString(locale)}
               </p>
             </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={(event) => {
+                event.stopPropagation();
+                onDownloadInvoice(order);
+              }}
+              disabled={isGeneratingInvoice}
+              className="shrink-0"
+            >
+              {isGeneratingInvoice ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Euro className="h-4 w-4" />
+              )}
+              {t("orders.downloadInvoice")}
+            </Button>
             {expanded ? (
               <ChevronUp className="h-4 w-4 text-muted-foreground shrink-0" />
             ) : (
@@ -189,7 +223,7 @@ function OrderCard({ order, locale, t }) {
           </div>
 
           {/* Addresses */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 px-2 mt-5">
             <div>
               <p className="text-xs font-medium text-muted-foreground mb-1">
                 {t("orders.detailBillingAddress")}
@@ -279,6 +313,24 @@ export default function MyOrdersPage() {
   const { data: session, isPending } = authClient.useSession();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [generatingInvoiceId, setGeneratingInvoiceId] = useState(null);
+
+  async function handleDownloadInvoicePDF(order) {
+    setGeneratingInvoiceId(order.id);
+    try {
+      const result = await generateInvoicePDFAction(order.id, locale);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+
+      downloadClientFile(result.pdfBuffer, result.filename, "application/pdf");
+      toast.success(t("orders.pdfDownloaded"));
+    } catch (error) {
+      toast.error(t("orders.pdfFailed") + ": " + error.message);
+    } finally {
+      setGeneratingInvoiceId(null);
+    }
+  }
 
   useEffect(() => {
     if (!isPending && !session) {
@@ -331,7 +383,14 @@ export default function MyOrdersPage() {
       <PageHeader title={t("account.orders.pageTitle")} />
       <div className="flex flex-col gap-4">
         {orders.map((order) => (
-          <OrderCard key={order.id} order={order} locale={locale} t={t} />
+          <OrderCard
+            key={order.id}
+            order={order}
+            locale={locale}
+            t={t}
+            onDownloadInvoice={handleDownloadInvoicePDF}
+            isGeneratingInvoice={generatingInvoiceId === order.id}
+          />
         ))}
       </div>
     </div>
