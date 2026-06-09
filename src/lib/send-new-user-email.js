@@ -1,6 +1,27 @@
 import { sendEmail } from "./email.js";
 import { newUserSignupEmail } from "../email/newUserSignupEmail.js";
-import prisma from "./prisma.js";
+
+function parseAdminEmailsFromEnv(rawValue) {
+  if (!rawValue || !rawValue.trim()) {
+    return [];
+  }
+
+  // Preferred: JSON array, e.g. ["a@x.com","b@y.com"]
+  try {
+    const parsed = JSON.parse(rawValue);
+    const list = Array.isArray(parsed) ? parsed : [parsed];
+    return list
+      .filter((value) => typeof value === "string")
+      .map((email) => email.trim())
+      .filter(Boolean);
+  } catch {
+    // Fallback: comma-separated string
+    return rawValue
+      .split(",")
+      .map((email) => email.trim())
+      .filter(Boolean);
+  }
+}
 
 /**
  * Send notification email to admin about a new user signup
@@ -8,63 +29,26 @@ import prisma from "./prisma.js";
  */
 export async function sendAdminNewUserNotification(user) {
   try {
-    if (process.env.NODE_ENV !== "production") {
-      const developmentAdminEmail = process.env.ADMIN_EMAIL;
+    const developmentAdminEmails = parseAdminEmailsFromEnv(
+      process.env.NEW_USER_REGISTRATION_EMAIL,
+    );
 
-      if (!developmentAdminEmail) {
-        console.log(
-          "ADMIN_EMAIL is not set in development. Skipping new user notification.",
-        );
-        return;
-      }
-
-      const emailContent = newUserSignupEmail(user);
-
-      await sendEmail({
-        to: developmentAdminEmail,
-        ...emailContent,
-      });
-
+    if (developmentAdminEmails.length === 0) {
       console.log(
-        `New user signup notification sent to development admin (${developmentAdminEmail})`,
+        "NEW_USER_REGISTRATION_EMAIL is missing/invalid. Skipping new user notification.",
       );
-      return;
-    }
-
-    const adminUsers = await prisma.user.findMany({
-      where: {
-        role: "ADMIN",
-        email: {
-          not: null,
-        },
-      },
-      select: {
-        email: true,
-      },
-    });
-
-    const adminEmails = adminUsers
-      .map((adminUser) => adminUser.email)
-      .filter(Boolean);
-
-    if (adminEmails.length === 0) {
-      console.log("No admin users found for new user notification");
       return;
     }
 
     const emailContent = newUserSignupEmail(user);
 
-    await Promise.all(
-      adminEmails.map((adminEmail) =>
-        sendEmail({
-          to: adminEmail,
-          ...emailContent,
-        }),
-      ),
-    );
+    await sendEmail({
+      to: developmentAdminEmails,
+      ...emailContent,
+    });
 
     console.log(
-      `New user signup notification sent to ${adminEmails.length} admin(s)`,
+      `New user signup notification sent to configured admins (${developmentAdminEmails.join(", ")})`,
     );
   } catch (error) {
     console.error("Error sending admin new user notification:", error);
