@@ -42,6 +42,21 @@
     "downloadInvoice": "Télécharger la facture",
     "downloadDeliveryNote": "Télécharger le bon de livraison PDF",
     "downloadLabel": "Télécharger l'étiquette DPD",
+    "shippingActions": "Actions d'expedition",
+    "shippingDialogTitle": "Documents d'expedition",
+    "shippingDialogDescription": "Choisissez les documents d'expedition et les actions a executer pour cette commande.",
+    "shippingDialogDownloadZip": "Telecharger l'etiquette DPD, la facture et le bon de livraison en ZIP",
+    "shippingDialogDownloadLabelOnly": "Telecharger uniquement l'etiquette DPD",
+    "shippingDialogMarkShipped": "Definir le statut sur expediee avec la date d'aujourd'hui",
+    "shippingDialogNotifyCustomer": "Notifier le client",
+    "shippingDialogDownloadRequired": "Veuillez selectionner une option de telechargement.",
+    "shippingDialogActionRequired": "Veuillez selectionner au moins une action.",
+    "shippingDialogConfirm": "Executer l'action d'expedition",
+    "shippingDialogProcessing": "Traitement...",
+    "shippingZipDownloaded": "ZIP d'expedition telecharge",
+    "shippingActionCompleted": "Action d'expedition terminee",
+    "shippingActionCompletedWithWarning": "Action d'expedition terminee avec avertissement",
+    "shippingCustomerNotificationFailed": "La notification client n'a pas pu etre envoyee",
     "deleteOrder": "Supprimer la commande",
     "statusUpdated": "Statut mis à jour",
     "statusUpdateFailed": "Échec de la mise à jour du statut",
@@ -146,6 +161,25 @@
       "parcelOther": "colis",
       "specialShipping": "Expédition spéciale",
       "na": "—",
+      "statusLabels": {
+        "IN_PROGRESS": "En cours",
+        "SHIPPED": "Expediee"
+      }
+    }
+  },
+  "email": {
+    "orderShipped": {
+      "subject": "Votre commande a ete expediee",
+      "title": "Commande expediee",
+      "greeting": "Bonjour",
+      "intro": "Votre commande a ete expediee. Vous trouverez ci-dessous les informations principales.",
+      "orderName": "Nom de commande",
+      "orderNumber": "Numero de commande",
+      "customer": "Client",
+      "email": "E-Mail",
+      "shippedDate": "Date d'expedition",
+      "status": "Statut",
+      "closing": "Cette notification a ete generee automatiquement par le systeme tox shop.",
       "statusLabels": {
         "IN_PROGRESS": "En cours",
         "SHIPPED": "Expediee"

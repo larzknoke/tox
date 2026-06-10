@@ -35,10 +35,13 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Tooltip,
   TooltipContent,
@@ -80,7 +83,7 @@ import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
 import { generateInvoicePDFAction } from "@/app/actions/generate-invoice-pdf";
 import { generateDeliveryNotePDFAction } from "../actions/generate-delivery-note-pdf";
-import { generateLabelPDFAction } from "../actions/generate-label-pdf";
+import { processShippingDownloadAction } from "../actions/process-shipping-download";
 
 const statuses = ["IN_PROGRESS", "SHIPPED"];
 
@@ -96,6 +99,11 @@ export default function OrderTable({ orders: initialOrders }) {
   const [selectedItemKeys, setSelectedItemKeys] = useState([]);
   const [deleteOrder, setDeleteOrder] = useState(null);
   const [detailOrder, setDetailOrder] = useState(null);
+  const [shippingOrder, setShippingOrder] = useState(null);
+  const [downloadZipSelected, setDownloadZipSelected] = useState(false);
+  const [downloadLabelOnlySelected, setDownloadLabelOnlySelected] = useState(true);
+  const [markAsShippedSelected, setMarkAsShippedSelected] = useState(false);
+  const [notifyCustomerSelected, setNotifyCustomerSelected] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { locale, t } = useLocale();
 
@@ -193,6 +201,22 @@ export default function OrderTable({ orders: initialOrders }) {
     downloadClientFile(result.pdfBuffer, result.filename, "application/pdf");
   }
 
+  function openShippingDialog(order) {
+    setShippingOrder(order);
+    setDownloadZipSelected(false);
+    setDownloadLabelOnlySelected(false);
+    setMarkAsShippedSelected(false);
+    setNotifyCustomerSelected(false);
+  }
+
+  function closeShippingDialog() {
+    setShippingOrder(null);
+    setDownloadZipSelected(false);
+    setDownloadLabelOnlySelected(false);
+    setMarkAsShippedSelected(false);
+    setNotifyCustomerSelected(false);
+  }
+
   async function handleDownloadInvoicePDF(order) {
     setGeneratingPDFId(order.id);
     try {
@@ -226,16 +250,73 @@ export default function OrderTable({ orders: initialOrders }) {
     }
   }
 
-  async function handleDownloadLabelPDF(order) {
-    setGeneratingLabelId(order.id);
+  async function handleProcessShippingDownload() {
+    if (!shippingOrder) return;
+    if (
+      !downloadZipSelected &&
+      !downloadLabelOnlySelected &&
+      !markAsShippedSelected &&
+      !notifyCustomerSelected
+    ) {
+      toast.error(t("orders.shippingDialogActionRequired"));
+      return;
+    }
+
+    setGeneratingLabelId(shippingOrder.id);
     try {
-      const result = await generateLabelPDFAction(order.id);
+      const result = await processShippingDownloadAction({
+        orderId: shippingOrder.id,
+        locale,
+        downloadZip: downloadZipSelected,
+        downloadLabelOnly: downloadLabelOnlySelected,
+        markAsShipped: markAsShippedSelected,
+        notifyCustomer: notifyCustomerSelected,
+      });
+
       if (!result.success) {
         throw new Error(result.error);
       }
 
-      downloadPdfFromActionResult(result);
-      toast.success(t("orders.labelDownloaded"));
+      if (result.fileBuffer && result.filename && result.mimeType) {
+        downloadClientFile(result.fileBuffer, result.filename, result.mimeType);
+      }
+
+      if (result.updatedOrder) {
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.id === result.updatedOrder.id
+              ? {
+                  ...order,
+                  status: result.updatedOrder.status,
+                  shippedDate: result.updatedOrder.shippedDate,
+                }
+              : order,
+          ),
+        );
+        setDetailOrder((prev) =>
+          prev?.id === result.updatedOrder.id
+            ? {
+                ...prev,
+                status: result.updatedOrder.status,
+                shippedDate: result.updatedOrder.shippedDate,
+              }
+            : prev,
+        );
+      }
+
+      if (downloadZipSelected) {
+        toast.success(t("orders.shippingZipDownloaded"));
+      } else if (downloadLabelOnlySelected) {
+        toast.success(t("orders.labelDownloaded"));
+      }
+
+      if (result.warnings?.includes("customerNotificationFailed")) {
+        toast.error(t("orders.shippingCustomerNotificationFailed"));
+      } else if (markAsShippedSelected || notifyCustomerSelected) {
+        toast.success(t("orders.shippingActionCompleted"));
+      }
+
+      closeShippingDialog();
     } catch (error) {
       toast.error(t("orders.labelFailed") + ": " + error.message);
     } finally {
@@ -509,7 +590,7 @@ export default function OrderTable({ orders: initialOrders }) {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => handleDownloadLabelPDF(order)}
+                                  onClick={() => openShippingDialog(order)}
                                   disabled={
                                     generatingLabelId !== null ||
                                     shipment.isSpecialShipping
@@ -523,9 +604,7 @@ export default function OrderTable({ orders: initialOrders }) {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                {shipment.isSpecialShipping
-                                  ? t("orders.specialShippingLabelUnavailable")
-                                  : t("orders.downloadLabel")}
+                                {t("orders.shippingActions")}
                               </TooltipContent>
                             </Tooltip>
                             <Separator
@@ -574,6 +653,88 @@ export default function OrderTable({ orders: initialOrders }) {
       </div>
 
       {/* Delete confirmation */}
+      <Dialog
+        open={!!shippingOrder}
+        onOpenChange={(open) => !open && closeShippingDialog()}
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("orders.shippingDialogTitle")}</DialogTitle>
+            <DialogDescription>
+              {t("orders.shippingDialogDescription")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div className="space-y-3">
+              <label className="flex items-start gap-3 text-sm">
+                <Checkbox
+                  checked={downloadZipSelected}
+                  onCheckedChange={(checked) => {
+                    const isChecked = checked === true;
+                    setDownloadZipSelected(isChecked);
+                    if (isChecked) {
+                      setDownloadLabelOnlySelected(false);
+                    }
+                  }}
+                />
+                <span>{t("orders.shippingDialogDownloadZip")}</span>
+              </label>
+              <label className="flex items-start gap-3 text-sm">
+                <Checkbox
+                  checked={downloadLabelOnlySelected}
+                  onCheckedChange={(checked) => {
+                    const isChecked = checked === true;
+                    setDownloadLabelOnlySelected(isChecked);
+                    if (isChecked) {
+                      setDownloadZipSelected(false);
+                    }
+                  }}
+                />
+                <span>{t("orders.shippingDialogDownloadLabelOnly")}</span>
+              </label>
+            </div>
+
+            <Separator />
+
+            <div className="space-y-3">
+              <label className="flex items-start gap-3 text-sm">
+                <Checkbox
+                  checked={markAsShippedSelected}
+                  onCheckedChange={(checked) =>
+                    setMarkAsShippedSelected(checked === true)
+                  }
+                />
+                <span>{t("orders.shippingDialogMarkShipped")}</span>
+              </label>
+              <label className="flex items-start gap-3 text-sm">
+                <Checkbox
+                  checked={notifyCustomerSelected}
+                  onCheckedChange={(checked) =>
+                    setNotifyCustomerSelected(checked === true)
+                  }
+                />
+                <span>{t("orders.shippingDialogNotifyCustomer")}</span>
+              </label>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={closeShippingDialog}>
+              {t("orders.cancelButton")}
+            </Button>
+            <Button
+              onClick={handleProcessShippingDownload}
+              disabled={generatingLabelId === shippingOrder?.id}
+            >
+              {generatingLabelId === shippingOrder?.id
+                ? t("orders.shippingDialogProcessing")
+                : t("orders.shippingDialogConfirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <AlertDialog
         open={!!deleteOrder}
         onOpenChange={(open) => !open && setDeleteOrder(null)}

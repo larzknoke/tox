@@ -42,6 +42,21 @@
     "downloadInvoice": "Download Invoice",
     "downloadDeliveryNote": "Download Delivery Note",
     "downloadLabel": "Download DPD label",
+    "shippingActions": "Shipping Actions",
+    "shippingDialogTitle": "Shipping documents",
+    "shippingDialogDescription": "Choose which shipping documents and follow-up actions should be executed for this order.",
+    "shippingDialogDownloadZip": "Download DPD label, invoice, and delivery note as ZIP",
+    "shippingDialogDownloadLabelOnly": "Download only the DPD label",
+    "shippingDialogMarkShipped": "Set status to shipped with today's date",
+    "shippingDialogNotifyCustomer": "Notify customer",
+    "shippingDialogDownloadRequired": "Please select one download option.",
+    "shippingDialogActionRequired": "Please select at least one action.",
+    "shippingDialogConfirm": "Run shipping action",
+    "shippingDialogProcessing": "Processing...",
+    "shippingZipDownloaded": "Shipping ZIP downloaded",
+    "shippingActionCompleted": "Shipping action completed",
+    "shippingActionCompletedWithWarning": "Shipping action completed with warning",
+    "shippingCustomerNotificationFailed": "Customer notification could not be sent",
     "deleteOrder": "Delete order",
     "statusUpdated": "Status updated",
     "statusUpdateFailed": "Failed to update status",
@@ -146,6 +161,25 @@
       "parcelOther": "parcels",
       "specialShipping": "Special shipping",
       "na": "—",
+      "statusLabels": {
+        "IN_PROGRESS": "In Progress",
+        "SHIPPED": "Shipped"
+      }
+    }
+  },
+  "email": {
+    "orderShipped": {
+      "subject": "Your order has been shipped",
+      "title": "Order shipped",
+      "greeting": "Hello",
+      "intro": "Your order has been shipped. The key order details are listed below.",
+      "orderName": "Order name",
+      "orderNumber": "Order number",
+      "customer": "Customer",
+      "email": "E-Mail",
+      "shippedDate": "Shipped date",
+      "status": "Status",
+      "closing": "This notification was generated automatically by the tox shop system.",
       "statusLabels": {
         "IN_PROGRESS": "In Progress",
         "SHIPPED": "Shipped"
