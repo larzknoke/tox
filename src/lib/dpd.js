@@ -152,19 +152,19 @@ function normalizeCountryCode(value, fallback = "DE") {
 
 function getSenderConfig() {
   return {
-    sendingDepot: getEnvValue("DPD_SENDING_DEPOT", "0163"),
+    sendingDepot: getEnvValue("DPD_SENDING_DEPOT", "134"),
     product: getEnvValue("DPD_PRODUCT", "CL"),
     parcelWeight: Number(getEnvValue("DPD_DEFAULT_WEIGHT", "100")),
     sender: {
-      name1: getEnvValue("DPD_SENDER_NAME1", "Absender Name"),
+      name1: getEnvValue("DPD_SENDER_NAME1", "Haubold + Sperling GmbH"),
       name2: process.env.DPD_SENDER_NAME2?.trim() || undefined,
-      street: getEnvValue("DPD_SENDER_STREET", "Strasse 1"),
+      street: getEnvValue("DPD_SENDER_STREET", "Leuchtbergstraße 16"),
       country: normalizeCountryCode(process.env.DPD_SENDER_COUNTRY, "DE"),
-      zipCode: getEnvValue("DPD_SENDER_ZIP_CODE", "11111"),
-      city: getEnvValue("DPD_SENDER_CITY", "Ort"),
-      customerNumber: getEnvValue("DPD_SENDER_CUSTOMER_NUMBER", "12345679"),
+      zipCode: getEnvValue("DPD_SENDER_ZIP_CODE", "37269"),
+      city: getEnvValue("DPD_SENDER_CITY", "Eschwege"),
+      customerNumber: getEnvValue("DPD_SENDER_CUSTOMER_NUMBER", "2200055855"),
       phone: process.env.DPD_SENDER_PHONE?.trim() || undefined,
-      email: process.env.DPD_SENDER_EMAIL?.trim() || undefined,
+      email: getEnvValue("DPD_SENDER_EMAIL", "info@haubold.com"),
     },
   };
 }
