@@ -72,6 +72,9 @@ import {
   Package,
   Loader2,
   Truck,
+  FileBox,
+  FileSearch,
+  ReceiptEuro,
 } from "lucide-react";
 import { updateOrderStatusAction } from "../actions/update-order-status";
 import { deleteOrderAction } from "../actions/delete-order";
@@ -370,7 +373,7 @@ export default function OrderTable({ orders: initialOrders }) {
                 {t("orders.tableDate")}
               </TableHead>
               <TableHead className="text-right">
-                {t("orders.tableActions")}
+                {/* {t("orders.tableActions")} */}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -465,32 +468,19 @@ export default function OrderTable({ orders: initialOrders }) {
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  onClick={() => setDetailOrder(order)}
-                                >
-                                  <FileText className="h-4 w-4" />
-                                </Button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                {t("orders.viewDetails")}
-                              </TooltipContent>
-                            </Tooltip>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
                                   onClick={() =>
                                     handleDownloadInvoicePDF(order)
                                   }
                                   disabled={generatingPDFId === order.id}
                                 >
-                                  <Euro className="h-4 w-4" />
+                                  <ReceiptEuro className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
                                 {t("orders.downloadInvoice")}
                               </TooltipContent>
                             </Tooltip>
+
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -503,13 +493,17 @@ export default function OrderTable({ orders: initialOrders }) {
                                     generatingDeliveryNoteId === order.id
                                   }
                                 >
-                                  <Truck className="h-4 w-4" />
+                                  <FileBox className="h-4 w-4" />
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
                                 {t("orders.downloadDeliveryNote")}
                               </TooltipContent>
                             </Tooltip>
+                            <Separator
+                              orientation="vertical"
+                              className="my-1"
+                            />
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <Button
@@ -524,7 +518,7 @@ export default function OrderTable({ orders: initialOrders }) {
                                   {generatingLabelId === order.id ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                   ) : (
-                                    <Package className="h-4 w-4" />
+                                    <Truck className="h-4 w-4" />
                                   )}
                                 </Button>
                               </TooltipTrigger>
@@ -532,6 +526,24 @@ export default function OrderTable({ orders: initialOrders }) {
                                 {shipment.isSpecialShipping
                                   ? t("orders.specialShippingLabelUnavailable")
                                   : t("orders.downloadLabel")}
+                              </TooltipContent>
+                            </Tooltip>
+                            <Separator
+                              orientation="vertical"
+                              className="my-1"
+                            />
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => setDetailOrder(order)}
+                                >
+                                  <FileSearch className="h-4 w-4" />
+                                </Button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                {t("orders.viewDetails")}
                               </TooltipContent>
                             </Tooltip>
                             <Tooltip>
