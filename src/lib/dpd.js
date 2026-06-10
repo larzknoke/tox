@@ -188,15 +188,16 @@ function buildRecipientName(address) {
   };
 }
 
-function buildParcelLabelNumber(orderId) {
+function buildParcelLabelNumber(orderId, parcelIndex = 0) {
   const orderPart = String(orderId)
     .replace(/\D/g, "")
     .slice(-4)
     .padStart(4, "0");
   const timePart = Date.now().toString().slice(-4);
+  const parcelPart = String(parcelIndex + 1).padStart(2, "0");
 
   // DPD requires parcelLabelNumber minLength 11.
-  return `ORD${orderPart}${timePart}`;
+  return `ORD${orderPart}${timePart}${parcelPart}`;
 }
 
 export function buildTestShipmentPayload(overrides = {}) {
@@ -271,11 +272,17 @@ export function buildOrderShipmentPayload(order) {
     );
   }
 
-  if ((shipmentSnapshot.parcelCount ?? 1) !== 1) {
+  const parcelCount = Number(shipmentSnapshot.parcelCount ?? 1);
+  if (!Number.isInteger(parcelCount) || parcelCount < 1 || parcelCount > 100) {
     throw new Error(
-      "DPD label generation currently supports only single-parcel orders",
+      `DPD label generation requires parcelCount between 1 and 100 (received ${shipmentSnapshot.parcelCount})`,
     );
   }
+
+  const parcels = Array.from({ length: parcelCount }, (_, index) => ({
+    parcelLabelNumber: buildParcelLabelNumber(order.id, index),
+    weight: shipmentSnapshot.parcelWeightKg ?? senderConfig.parcelWeight,
+  }));
 
   return {
     printOptions: {
@@ -283,6 +290,7 @@ export function buildOrderShipmentPayload(order) {
         {
           outputFormat: "PDF",
           paperFormat: "A4",
+          // splitByParcel: false,
         },
       ],
     },
@@ -303,13 +311,7 @@ export function buildOrderShipmentPayload(order) {
             phone: order.deliveryAddress.phone || undefined,
           },
         },
-        parcels: [
-          {
-            parcelLabelNumber: buildParcelLabelNumber(order.id),
-            weight:
-              shipmentSnapshot.parcelWeightKg ?? senderConfig.parcelWeight,
-          },
-        ],
+        parcels,
         productAndServiceData: {
           orderType: "consignment",
         },
@@ -320,15 +322,20 @@ export function buildOrderShipmentPayload(order) {
 
 export function extractLabel(orderResult) {
   const shipmentResponse = orderResult?.shipmentResponses?.[0];
-  const parcelInformation = shipmentResponse?.parcelInformation?.[0];
-  const parcelOutput = parcelInformation?.output?.[0];
+  const parcelInformation = shipmentResponse?.parcelInformation ?? [];
+  const firstParcelInformation = parcelInformation[0];
+  const parcelOutput = firstParcelInformation?.output?.[0];
   const orderOutput = orderResult?.output;
+  const parcelLabelNumbers = parcelInformation
+    .map((parcel) => parcel?.parcelLabelNumber)
+    .filter(Boolean);
 
   return {
-    parcelLabelNumber: parcelInformation?.parcelLabelNumber ?? null,
-    dpdReference: parcelInformation?.dpdReference ?? null,
-    format: parcelOutput?.format ?? orderOutput?.format ?? null,
-    content: parcelOutput?.content ?? orderOutput?.content ?? null,
+    parcelLabelNumber: firstParcelInformation?.parcelLabelNumber ?? null,
+    parcelLabelNumbers,
+    dpdReference: firstParcelInformation?.dpdReference ?? null,
+    format: orderOutput?.format ?? parcelOutput?.format ?? null,
+    content: orderOutput?.content ?? parcelOutput?.content ?? null,
     faults: shipmentResponse?.faults ?? [],
   };
 }

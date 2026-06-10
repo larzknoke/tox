@@ -16,6 +16,8 @@ const SHIPPING_BRACKETS = [
   { maxTickets: 50000, parcels: 7, price: 139.5 },
 ];
 
+const MAX_STANDARD_DPD_TICKETS = 50000;
+
 const STANDARD_SHIPMENT_SNAPSHOTS = {
   2000: {
     shippingMode: "STANDARD",
@@ -67,7 +69,7 @@ export function getShipmentSnapshotByTicketCount(totalTickets) {
     };
   }
 
-  if (normalizedTickets > 8000) {
+  if (normalizedTickets > MAX_STANDARD_DPD_TICKETS) {
     return {
       ticketCount: normalizedTickets,
       shippingMode: "SPECIAL",
@@ -81,24 +83,68 @@ export function getShipmentSnapshotByTicketCount(totalTickets) {
   }
 
   const standardSnapshot = STANDARD_SHIPMENT_SNAPSHOTS[normalizedTickets];
-
-  if (!standardSnapshot) {
+  if (standardSnapshot) {
     return {
       ticketCount: normalizedTickets,
-      shippingMode: "SPECIAL",
-      parcelCount: null,
-      parcelWeightKg: null,
-      parcelLengthCm: null,
-      parcelWidthCm: null,
-      parcelHeightCm: null,
-      isSpecialShipping: true,
+      ...standardSnapshot,
+      isSpecialShipping: false,
     };
   }
 
+  const bracket = SHIPPING_BRACKETS.find(
+    (entry) => normalizedTickets <= entry.maxTickets,
+  );
+
   return {
     ticketCount: normalizedTickets,
-    ...standardSnapshot,
+    shippingMode: "STANDARD",
+    parcelCount: bracket?.parcels ?? 1,
+    parcelWeightKg: null,
+    parcelLengthCm: null,
+    parcelWidthCm: null,
+    parcelHeightCm: null,
     isSpecialShipping: false,
+  };
+}
+
+export function getShippingByTicketCount(totalTickets) {
+  const normalizedTickets = Number(totalTickets || 0);
+
+  if (normalizedTickets <= 0) {
+    return {
+      totalTickets: 0,
+      parcels: 0,
+      price: 0,
+      isQuoteRequired: false,
+      isSpecialShipping: false,
+      label: "No shipping",
+    };
+  }
+
+  const bracket = SHIPPING_BRACKETS.find(
+    (entry) => normalizedTickets <= entry.maxTickets,
+  );
+
+  if (!bracket) {
+    return {
+      totalTickets: normalizedTickets,
+      parcels: 1,
+      price: null,
+      isQuoteRequired: true,
+      isSpecialShipping: true,
+      label: "Special shipping",
+    };
+  }
+
+  const isSpecialShipping = normalizedTickets > MAX_STANDARD_DPD_TICKETS;
+
+  return {
+    totalTickets: normalizedTickets,
+    parcels: bracket.parcels,
+    price: bracket.price,
+    isQuoteRequired: false,
+    isSpecialShipping,
+    label: isSpecialShipping ? "Special shipping" : null,
   };
 }
 
@@ -126,47 +172,6 @@ export function getOrderShipmentSnapshot(order) {
     : Number(order?.ticketCount || 0);
 
   return getShipmentSnapshotByTicketCount(totalTickets);
-}
-
-export function getShippingByTicketCount(totalTickets) {
-  const normalizedTickets = Number(totalTickets || 0);
-
-  if (normalizedTickets <= 0) {
-    return {
-      totalTickets: 0,
-      parcels: 0,
-      price: 0,
-      isQuoteRequired: false,
-      isSpecialShipping: false,
-      label: "No shipping",
-    };
-  }
-
-  const bracket = SHIPPING_BRACKETS.find(
-    (entry) => normalizedTickets <= entry.maxTickets,
-  );
-
-  if (!bracket) {
-    return {
-      totalTickets: normalizedTickets,
-      parcels: 1,
-      price: null,
-      isQuoteRequired: true,
-      isSpecialShipping: false,
-      label: "Upon request",
-    };
-  }
-
-  const isSpecialShipping = normalizedTickets > 8000;
-
-  return {
-    totalTickets: normalizedTickets,
-    parcels: bracket.parcels,
-    price: bracket.price,
-    isQuoteRequired: false,
-    isSpecialShipping,
-    label: isSpecialShipping ? "Special shipping" : null,
-  };
 }
 
 export function getOrderPricingSummary(items = []) {
