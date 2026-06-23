@@ -84,6 +84,7 @@ import { deleteOrderAction } from "../actions/delete-order";
 import { generateInvoicePDFAction } from "@/app/actions/generate-invoice-pdf";
 import { generateDeliveryNotePDFAction } from "../actions/generate-delivery-note-pdf";
 import { processShippingDownloadAction } from "../actions/process-shipping-download";
+import { updateOrderSerialNumberAction } from "../actions/update-order-serial-number";
 
 const statuses = ["IN_PROGRESS", "SHIPPED"];
 
@@ -104,6 +105,8 @@ export default function OrderTable({ orders: initialOrders }) {
   const [downloadLabelOnlySelected, setDownloadLabelOnlySelected] = useState(true);
   const [markAsShippedSelected, setMarkAsShippedSelected] = useState(false);
   const [notifyCustomerSelected, setNotifyCustomerSelected] = useState(false);
+  const [serialNumberInput, setSerialNumberInput] = useState("");
+  const [savingSerialNumber, setSavingSerialNumber] = useState(false);
   const [isPending, startTransition] = useTransition();
   const { locale, t } = useLocale();
 
@@ -203,6 +206,7 @@ export default function OrderTable({ orders: initialOrders }) {
 
   function openShippingDialog(order) {
     setShippingOrder(order);
+    setSerialNumberInput(order.serialNumber ?? "");
     setDownloadZipSelected(false);
     setDownloadLabelOnlySelected(false);
     setMarkAsShippedSelected(false);
@@ -211,10 +215,42 @@ export default function OrderTable({ orders: initialOrders }) {
 
   function closeShippingDialog() {
     setShippingOrder(null);
+    setSerialNumberInput("");
     setDownloadZipSelected(false);
     setDownloadLabelOnlySelected(false);
     setMarkAsShippedSelected(false);
     setNotifyCustomerSelected(false);
+  }
+
+  async function handleSaveSerialNumber() {
+    if (!shippingOrder) return;
+    setSavingSerialNumber(true);
+    try {
+      const updated = await updateOrderSerialNumberAction(
+        shippingOrder.id,
+        serialNumberInput,
+      );
+      setOrders((prev) =>
+        prev.map((o) =>
+          o.id === shippingOrder.id
+            ? { ...o, serialNumber: updated.serialNumber }
+            : o,
+        ),
+      );
+      setShippingOrder((prev) =>
+        prev ? { ...prev, serialNumber: updated.serialNumber } : prev,
+      );
+      setDetailOrder((prev) =>
+        prev?.id === shippingOrder.id
+          ? { ...prev, serialNumber: updated.serialNumber }
+          : prev,
+      );
+      toast.success(t("orders.serialNumberSaved"));
+    } catch {
+      toast.error(t("orders.serialNumberSaveFailed"));
+    } finally {
+      setSavingSerialNumber(false);
+    }
   }
 
   async function handleDownloadInvoicePDF(order) {
@@ -666,6 +702,28 @@ export default function OrderTable({ orders: initialOrders }) {
           </DialogHeader>
 
           <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">
+                {t("orders.serialNumber")}
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  value={serialNumberInput}
+                  onChange={(e) => setSerialNumberInput(e.target.value)}
+                  placeholder={t("orders.serialNumberPlaceholder")}
+                />
+                <Button
+                  variant="outline"
+                  onClick={handleSaveSerialNumber}
+                  disabled={savingSerialNumber}
+                >
+                  {t("orders.saveSerialNumber")}
+                </Button>
+              </div>
+            </div>
+
+            <Separator />
+
             <div className="space-y-3">
               <label className="flex items-start gap-3 text-sm">
                 <Checkbox
@@ -804,6 +862,17 @@ export default function OrderTable({ orders: initialOrders }) {
                         {detailOrder.user?.email ?? "—"})
                       </p>
                     </div>
+
+                    {detailOrder.serialNumber && (
+                      <div>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          {t("orders.serialNumber")}
+                        </p>
+                        <p className="text-sm font-mono">
+                          {detailOrder.serialNumber}
+                        </p>
+                      </div>
+                    )}
 
                     <Separator />
 

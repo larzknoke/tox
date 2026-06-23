@@ -43,6 +43,11 @@
     "downloadDeliveryNote": "Télécharger le bon de livraison PDF",
     "downloadLabel": "Télécharger l'étiquette DPD",
     "shippingActions": "Actions d'expedition",
+    "serialNumber": "Numéro de série",
+    "serialNumberPlaceholder": "Entrer le numéro de série...",
+    "saveSerialNumber": "Enregistrer",
+    "serialNumberSaved": "Numéro de série enregistré",
+    "serialNumberSaveFailed": "Échec de l'enregistrement du numéro de série",
     "shippingDialogTitle": "Documents d'expedition",
     "shippingDialogDescription": "Choisissez les documents d'expedition et les actions a executer pour cette commande.",
     "shippingDialogDownloadZip": "Telecharger l'etiquette DPD, la facture et le bon de livraison en ZIP",
@@ -128,6 +133,7 @@
       "invoiceNo": "No de facture",
       "invoiceDate": "Date de facture",
       "amount": "Montant",
+      "serialNumber": "Numéro de série",
       "statusLabels": {
         "IN_PROGRESS": "En cours",
         "SHIPPED": "Expediee"
@@ -160,6 +166,7 @@
       "parcelOne": "colis",
       "parcelOther": "colis",
       "specialShipping": "Expédition spéciale",
+      "serialNumber": "Numéro de série",
       "na": "—",
       "statusLabels": {
         "IN_PROGRESS": "En cours",

@@ -225,9 +225,14 @@ export async function placeOrderAction({
         html: emailContent.html,
         text: emailContent.text,
       });
-      console.log("Order info email sent to francebillet@haubold.com successfully");
+      console.log(
+        "Order info email sent to francebillet@haubold.com successfully",
+      );
     } catch (infoEmailError) {
-      console.error("Error sending order info email to francebillet@haubold.com:", infoEmailError);
+      console.error(
+        "Error sending order info email to francebillet@haubold.com:",
+        infoEmailError,
+      );
       // Don't fail the entire operation if email fails
     }
 

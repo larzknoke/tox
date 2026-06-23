@@ -43,6 +43,11 @@
     "downloadDeliveryNote": "Download Delivery Note",
     "downloadLabel": "Download DPD label",
     "shippingActions": "Shipping Actions",
+    "serialNumber": "Serial Number",
+    "serialNumberPlaceholder": "Enter serial number...",
+    "saveSerialNumber": "Save",
+    "serialNumberSaved": "Serial number saved",
+    "serialNumberSaveFailed": "Failed to save serial number",
     "shippingDialogTitle": "Shipping documents",
     "shippingDialogDescription": "Choose which shipping documents and follow-up actions should be executed for this order.",
     "shippingDialogDownloadZip": "Download DPD label, invoice, and delivery note as ZIP",
@@ -128,6 +133,7 @@
       "invoiceNo": "Invoice No.",
       "invoiceDate": "Invoice Date",
       "amount": "Amount",
+      "serialNumber": "Serial Number",
       "statusLabels": {
         "IN_PROGRESS": "In Progress",
         "SHIPPED": "Shipped"
@@ -160,6 +166,7 @@
       "parcelOne": "parcel",
       "parcelOther": "parcels",
       "specialShipping": "Special shipping",
+      "serialNumber": "Serial Number",
       "na": "—",
       "statusLabels": {
         "IN_PROGRESS": "In Progress",

@@ -111,6 +111,7 @@ function getDeliveryNoteMessages(messages = {}) {
     shippingMode: messages.shippingMode ?? "Shipping Mode",
     parcelCount: messages.parcelCount ?? "Parcels",
     specialShipping: messages.specialShipping ?? "Special shipping",
+    serialNumber: messages.serialNumber ?? "Serial Number",
     parcelOne: messages.parcelOne ?? "parcel",
     parcelOther: messages.parcelOther ?? "parcels",
     na: messages.na ?? "—",
@@ -187,6 +188,11 @@ const DeliveryNotePDF = ({ order, locale = "en", messages = {} }) => {
           <Text>
             {m.status}: {statusLabel}
           </Text>
+          {order.serialNumber ? (
+            <Text>
+              {m.serialNumber}: {order.serialNumber}
+            </Text>
+          ) : null}
         </View>
 
         <View style={styles.separator} />

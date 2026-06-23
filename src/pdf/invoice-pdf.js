@@ -30,6 +30,7 @@ function getInvoiceMessages(messages = {}) {
     parcelOne: messages.parcelOne ?? "parcel",
     parcelOther: messages.parcelOther ?? "parcels",
     uponRequest: messages.uponRequest ?? "Upon request",
+    serialNumber: messages.serialNumber ?? "Serial Number",
     totalInclShippingExclVat:
       messages.totalInclShippingExclVat ?? "Total incl. shipping (excl. VAT)",
     invoiceDetails: messages.invoiceDetails ?? "Invoice Details",
@@ -180,6 +181,11 @@ const InvoicePDF = ({ order, locale = "en", messages = {} }) => {
           <Text>
             {m.status}: {statusLabel}
           </Text>
+          {order.serialNumber ? (
+            <Text>
+              {m.serialNumber}: {order.serialNumber}
+            </Text>
+          ) : null}
         </View>
 
         <View style={styles.separator} />
