@@ -282,8 +282,6 @@ model Order {
   deliveryAddressId       Int
   confirmationEmailSentAt DateTime?
   invoiceEmailSentAt      DateTime?
-  shippedDate             DateTime?
-  serialNumber            String?
   createdAt               DateTime      @default(now())
   updatedAt               DateTime      @updatedAt
   userId                  String
@@ -294,6 +292,8 @@ model Order {
   parcelWidthCm           Float?
   shippingMode            ShippingMode?
   ticketCount             Int?
+  shippedDate             DateTime?
+  serialNumber            String?
   invoice                 Invoice?
   items                   OrderItem[]
   billingAddress          Address       @relation("OrderBillingSnapshot", fields: [billingAddressId], references: [id])
