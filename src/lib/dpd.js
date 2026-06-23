@@ -152,7 +152,7 @@ function normalizeCountryCode(value, fallback = "DE") {
 
 function getSenderConfig() {
   return {
-    sendingDepot: getEnvValue("DPD_SENDING_DEPOT", "134"),
+    sendingDepot: getEnvValue("DPD_SENDING_DEPOT", "0134"),
     product: getEnvValue("DPD_PRODUCT", "CL"),
     parcelWeight: Number(getEnvValue("DPD_DEFAULT_WEIGHT", "100")),
     sender: {
